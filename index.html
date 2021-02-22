@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous"></script>
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+
+<body>
+
+    <div class="main-toolbar">
+        <button id="binaryNode" class="btn active" onclick="setSelectedButton('binaryNode')">
+            <img src="images/branch_act.png" alt="binaryBranch">
+        </button>
+
+        <button id="singleNode" class="btn" onclick="setSelectedButton('singleNode')">
+            <img src="images/node_act.png" alt="singleBranch">
+        </button>
+
+        <button id="ternaryNode" class="btn" onclick="setSelectedButton('ternaryNode')">
+            <img src="images/ternary.png" alt="ternaryBranch">
+        </button>
+    </div>
+
+    <!-- Active color to selected button -->
+    <script>
+        $('button').on('click', function () {
+            $('button').removeClass('active');
+            $(this).addClass('active');
+        });
+    </script>
+
+
+
+    <div class="container">
+        <canvas id="treeCanvas" width="1000" height="5000"></canvas>
+    </div>
+
+    <a download="canvas.svg" id="downloadlink">Download</a>
+
+    <h2 id="coords"></h2>
+
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+
+    <script src="utils/methods.js"></script>
+    <script src="canvas.js"></script>
+
+
+</body>
+
+</html>
