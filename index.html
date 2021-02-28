@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>TreeBuilderJS</title>
 
-    <!-- <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
@@ -17,6 +16,7 @@
 
 <body>
 
+    <!-- Toolbar for different kinds of nodes -->
     <div class="main-toolbar">
         <button id="binaryNode" class="btn active" onclick="setSelectedButton('binaryNode')">
             <img src="images/branch_act.png" alt="binaryBranch">
@@ -31,7 +31,7 @@
         </button>
     </div>
 
-    <!-- Active color to selected button -->
+    <!-- Set 'active' color to selected button -->
     <script>
         $('button').on('click', function () {
             $('button').removeClass('active');
@@ -40,14 +40,13 @@
     </script>
 
 
+    <a download="canvas.svg" id="downloadlink">Download</a>
 
+    <!-- The canvas running the tree-building javascript -->
     <div class="container">
         <canvas id="treeCanvas" width="1000" height="5000"></canvas>
     </div>
-
-    <a download="canvas.svg" id="downloadlink">Download</a>
-
-    <h2 id="coords"></h2>
+    <!-- <h2 id="coords"></h2> -->
 
     <style type="text/css">
         canvas {
@@ -55,7 +54,12 @@
         }
     </style>
 
+
+    <!-- Loading all canvas javascript -->
     <script src="utils/methods.js"></script>
+    <script src="js/nodeText.js"></script>
+    <script src="js/hoverCircle.js"></script>
+    <script src="js/treeNode.js"></script>
     <script src="canvas.js"></script>
 
 

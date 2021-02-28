@@ -162,7 +162,13 @@ function findFirstCommonAncestor(node1, node2, hoverToFind) {
 
 
 
-
+/**
+ * Returns the vertical offset of a TreeNode object.
+ * \n
+ * This offset is needed to correctly position the TreeNode in respect to its boundingRect().
+ * 
+ * @param {Array} array - the arm-coords array of a TreeNode object
+ */
 function getVertOffset(array) {
     let yCoords = [];
     for (point of array) {
@@ -171,6 +177,13 @@ function getVertOffset(array) {
     return (Math.max(...yCoords) / 2);
 }
 
+/**
+ * Returns the horizontal offset of a TreeNode object.
+ * \n
+ * This offset is needed to correctly position the TreeNode in respect to its boundingRect().
+ * 
+ * @param {Array} array - the arm-coords array of a TreeNode object
+ */
 function getHorizOffset(array) {
     let nodeWidth = getNodeWidth(array);
     let xCoords = [];
@@ -178,11 +191,16 @@ function getHorizOffset(array) {
         xCoords.push(point[0]);
     }
     let min = Math.abs(Math.min(...xCoords));
-    let max = Math.max(...xCoords);
+    // let max = Math.max(...xCoords);
 
     return (nodeWidth / 2) - min;
 }
 
+/**
+ * Returns the total width of a TreeNode object.
+ * 
+ * @param {Array} array - the arm-coords array of a TreeNode object
+ */
 function getNodeWidth(array) {
     let xCoords = [];
     for (point of array) {
@@ -196,7 +214,11 @@ function getNodeWidth(array) {
 }
 
 
-
+/**
+ * Sets the global variable 'selectedButton' of canvas.js
+ * 
+ * @param {string} choice - toolbar button to set as selected
+ */
 function setSelectedButton(choice) {
     selectedButton = choice;
 }

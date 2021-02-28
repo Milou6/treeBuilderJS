@@ -75,6 +75,78 @@ var triangle = new fabric.Triangle({
 
 
 
+// first version of TreeNode.changeArms()
+changeArms: function (newArray) {
+    let oldArmsArray = [...this.armsArray];
+    this.points = [];
+    let point = [];
+    let horizOffset = getHorizOffset(newArray);
+    let vertOffset = getVertOffset(newArray);
+    let nodeWidth = getNodeWidth(newArray);
+    console.log(`NEW vertOffset : ${vertOffset}`);
+    this.armsArray = newArray;
+
+    // why don't I have to update top coords too below??
+    // this.set({ width: nodeWidth, left: this.left + horizOffset });
+    this.set({ width: nodeWidth, height: vertOffset * 2 });
+    // this.set({ pathOffset: { x: horizOffset, y: vertOffset } });
+    this.set({ pathOffset: { x: this.pathOffset.x, y: this.pathOffset.y } });
+
+    let minX = 0;
+    let maxX = 0;
+    for (let i = 0; i < newArray.length; i++) {
+        point = newArray[i];
+        // Getting minX and maxX to calculate offestX later
+        minX = Math.min(minX, point[0]);
+        maxX = Math.max(maxX, point[0]);
+    }
+    // Set the X offset of the node
+    let offsetX = Math.abs(Math.abs(minX) - Math.abs(maxX)) / 2;
+    console.log(`offsetX: ${offsetX}`);
+    // this.set({ pathOffset: { x: offsetX, y: this.pathOffset.y } });
+
+    // for (point of newArray) {
+    for (let i = 0; i < newArray.length; i++) {
+        point = newArray[i];
+
+        // adding the arm coords to the polyline points
+        // this.points.push({ x: point[0] - horizOffset, y: point[1] - vertOffset });
+        this.points.push({ x: point[0], y: point[1] });
+        // this.points.push({ x: 0 - horizOffset, y: 0 - vertOffset });
+        this.points.push({ x: 0, y: 0 });
+
+        // console.log(`old X : ${this.hoverCircles[i].X} new X : ${this.X + point[0] - 12}`);
+        // console.log(`old Y : ${this.hoverCircles[i].Y} new Y : ${this.Y + point[1] - 12}`);
+
+        // updating the hoverCircle coords to keep them over node edges
+        // for X : get oldX + difference between new armX and old armX
+        this.hoverCircles[i].set({ X: this.hoverCircles[i].X + (point[0] - oldArmsArray[i][0]) - offsetX, Y: this.hoverCircles[i].Y + (point[1] - oldArmsArray[i][1]), dirty: true });
+
+        // updating the textNode coords too
+        this.textNodes[i].set({ X: this.textNodes[i].X + (point[0] - oldArmsArray[i][0]) - offsetX, Y: this.textNodes[i].Y + (point[1] - oldArmsArray[i][1]) });
+        // this.textNodes[i].set({ X: this.textNodes[i].X + 20, Y: this.textNodes[i].Y + 20 });
+        this.textNodes[i].set({ left: this.textNodes[i].X, top: this.textNodes[i].Y, dirty: true });
+
+        // VERSION BELOW NOT WORKING...
+        // this.hoverCircles[i].set({ X: this.X + point[0] - 12, Y: this.Y + point[1] - 12, dirty: true });
+        console.log(`UPDATED HOVER ${i}`);
+
+    }
+    // don't forget to update the last hoverCircle (i+1)
+    let topCircle = this.hoverCircles[this.hoverCircles.length - 1];
+    topCircle.set({ X: this.X, Y: this.Y });
+    topCircle.set({ left: topCircle.X, top: topCircle.Y, dirty: true });
+    this.set({ dirty: true });
+
+    this.moveNodeBy(offsetX, 0); //TURN ON AGAIN
+    // canvas.renderAll();
+},
+
+
+
+
+
+
 // 3rd version of TreeNode (trying to fix originX and originY problem)
 var TreeNode = fabric.util.createClass(fabric.Polyline, {
     type: 'treeNode',

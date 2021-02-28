@@ -1,0 +1,188 @@
+var TreeNode = fabric.util.createClass(fabric.Polyline, {
+    // Type below must be 'polyline' for SVG export to work properly
+    type: 'polyline',
+
+    /**
+     * Creates a new TreeNode object.
+     * Example: var myNode = new TreeNode(100, 100, [[-80, 70], [80, 70]], null, null, [],);
+     * @constructor
+     * @param {number} X - horizontal coord of the TreeNode top
+     * @param {number} Y - vertical coord of the TreeNode top
+     * @param {Array} armsArray - contains the tip coords of each TreeNode arm
+     * @param {TreeNode} nodeParent - this TreeNode's parent (node just above it)
+     * @param {hoverCircle} hoverParent - the specific hoverCircle that connects this TreeNode to its parent
+     */
+    initialize: function (X, Y, armsArray, nodeParent, hoverParent, options) {
+        options || (options = {});
+        // callSuper() to initialize fabricJS Polyline
+        this.callSuper('initialize', options);
+        this.X = X;
+        this.Y = Y;
+        this.armsArray = armsArray;
+        this.nodeParent = nodeParent;
+        this.hoverParent = hoverParent;
+
+        // Arrays containing this node's hoverCircles & textNodes
+        this.hoverCircles = [];
+        this.textNodes = [];
+        // horizOffset & vertOffset needed for proper alignment of a TreeNode's boundingRect
+        this.horizOffset = getHorizOffset(this.armsArray);
+        this.vertOffset = getVertOffset(this.armsArray);
+        let nodeWidth = getNodeWidth(this.armsArray);
+
+        this.set({ width: nodeWidth, height: this.vertOffset * 2, originX: 'center', originY: 'top' });
+        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: true });
+        this.setCoords();
+
+        // Dymanically setting the offset
+        this.set({ pathOffset: { x: this.horizOffset, y: this.vertOffset } });
+        // Correcting the X-coord of node top
+        this.set({ X: this.X - this.horizOffset });
+
+
+        for (point of this.armsArray) {
+            // adding the arm coords to the polyline points
+            this.points.push({ x: point[0], y: point[1] });
+            this.points.push({ x: 0, y: 0 });
+
+            // creating the bottom hoverCircles for each arm
+            var hoverCircle = new HoverCircle(this.X + point[0] - 12 - this.horizOffset, this.Y + point[1] - 12 + this.vertOffset, 'bottom', this);
+            canvas.add(hoverCircle);
+            this.hoverCircles.push(hoverCircle);
+
+            // creating the bottom textNodes
+            var textNode = new NodeText(this.X + point[0] - 12 /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, 'XP'); // The textNodes don't need coord offset apparently
+            canvas.add(textNode);
+            this.textNodes.push(textNode);
+        }
+        // creating the top hoverCircle
+        var topHoverCircle = new HoverCircle(this.X - 12 - this.horizOffset, this.Y - 12 + this.vertOffset, 'top', this);
+        canvas.add(topHoverCircle);
+        this.hoverCircles.push(topHoverCircle);
+
+        // Correcting the positioning of TreeNode on canvas
+        this.moveNodeBy(this.horizOffset, 0);
+    },
+
+    _render: function (ctx) {
+        this.callSuper('_render', ctx);
+        console.log('rendering');
+    },
+
+    /**
+     * Updates the coords of each arm of the TreeNode.
+     * 
+     * For example, for myTreeNode with arm coords [[-80,70], [80,70]]
+     * myTreeNode.updateArmCoords([[-70, 20], [20, 30]]);
+     * 
+     * myTreeNode now has arm coords [[-150, 90], [100, 100]].
+     * 
+     * @param {Array} coordUpdates - Array containing the changes to make to each arm
+     */
+    updateArmCoords: function (coordUpdates) {
+        if (coordUpdates.length != this.armsArray.length) {
+            console.error("updateArmCoords: new array length different from old array length");
+        }
+
+        for (let i = 0; i < this.armsArray.length; i++) {
+            // setting new X of each arm
+            this.armsArray[i][0] = this.armsArray[i][0] + coordUpdates[i][0];
+            // setting new Y of each arm
+            this.armsArray[i][1] = this.armsArray[i][1] + coordUpdates[i][1];
+        }
+
+        // Difference between the horizOffset of old & new arm coords arrays
+        let horizOffsetDifference = getHorizOffset(this.armsArray) - this.horizOffset; // dont set it just yet
+        console.log(horizOffsetDifference);
+
+        // We need to move the TreeNode before redrawing the arms, 
+        // and also before recalculating new this.horizOffset
+        this.moveNodeBy(horizOffsetDifference, 0);
+        this.horizOffset = getHorizOffset(this.armsArray);
+
+
+        // deleting all old points from polyline
+        this.points = [];
+        // resetting width, height, coords, pathOffset, all according to new arm coords
+        this.nodeWidth = getNodeWidth(this.armsArray);
+        this.vertOffset = getVertOffset(this.armsArray);
+        this.set({ width: this.nodeWidth, height: this.vertOffset * 2 });
+        this.set({ pathOffset: { x: this.horizOffset, y: this.vertOffset } });
+        this.set({ X: this.X - horizOffsetDifference });
+
+        let point = [];
+        for (let i = 0; i < this.armsArray.length; i++) {
+            point = this.armsArray[i];
+            // adding the new arm coords to the polyline points
+            this.points.push({ x: point[0], y: point[1] });
+            this.points.push({ x: 0, y: 0 });
+
+            // resetting correct bottom-hoverCircle coords
+            this.hoverCircles[i].set({ X: this.X + point[0] - 12 - this.horizOffset, Y: this.Y + point[1] - 12 + this.vertOffset });
+            this.hoverCircles[i].set({ left: this.X, top: this.Y });
+
+            // resetting correct bottom-textNode coords
+            this.textNodes[i].set({ X: this.X + point[0] - 12 /*- this.horizOffset*/, Y: this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12 });
+            this.textNodes[i].set({ left: this.textNodes[i].X, top: this.textNodes[i].Y });
+        }
+        // resetting correct top-hoverCircle coords
+        this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12 - this.horizOffset, Y: this.Y - 12 + this.vertOffset });
+    },
+
+    /**
+     * Move the TreeNode in the canvas.
+     * The function recalculates the position of each of the TreeNode's hoverCircles & nodeTexts.
+     * 
+     * @param {number} moveX - how much horizontal movement (negative value moves the TreeNode to the left)
+     * @param {number} moveY - how much vertical movement (negative value moves the TreeNode upwards)
+     */
+    moveNodeBy: function (moveX, moveY) {
+        // move the node itself
+        this.set({ X: this.X + moveX, Y: this.Y + moveY });
+
+        // important to add horizOffset to left: here
+        this.set({ left: this.X + this.horizOffset, top: this.Y });
+        this.set({ dirty: true });
+        this.setCoords();
+
+        // move each of the TreeNode's hoverCircles
+        for (circle of this.hoverCircles) {
+            circle.set({ X: circle.X + moveX, Y: circle.Y + moveY }); // horizOffset also here
+            circle.set({ dirty: true });
+            circle.setCoords();
+        }
+        // move each of of the TreeNode's textNodes
+        for (text of this.textNodes) {
+            text.set({ X: text.X + moveX, Y: text.Y + moveY });
+            text.set({ left: text.X, top: text.Y, dirty: true });
+            text.setCoords();
+        }
+    }
+});
+
+
+
+// TRYING TO FIX SVG EXPORT
+// fabric.Object.prototype.toObject = (function (toObject) {
+//     // TreeNode.toObject = (function (toObject) {
+//     return function () {
+//         return fabric.util.object.extend(toObject.call(this), {
+//             // name: this.name,
+//             // X: this.X,
+//             // Y: this.Y,
+//             // armsArray: this.armsArray,
+//             // nodeParent: this.nodeParent,
+//             // hoverParent: this.hoverParent,
+//             // hoverCircles: this.hoverCircles,
+//             // textNodes: this.textNodes,
+//             // testATTR: 'lalalala'
+//         });
+//     };
+// })(fabric.Object.prototype.toObject);
+// })(TreeNode.toObject);
+
+// fabric.Object.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
+console.log(fabric.Object.prototype.stateProperties);
+
+console.log(fabric.TreeNode);
+
