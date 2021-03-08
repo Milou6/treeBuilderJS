@@ -17,34 +17,54 @@
 <body>
 
     <!-- Toolbar for different kinds of nodes -->
-    <div class="main-toolbar">
-        <button id="binaryNode" class="btn active" onclick="setSelectedButton('binaryNode')">
+    <div id="main-toolbar">
+        <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)">
             <img src="images/branch_act.png" alt="binaryBranch">
         </button>
 
-        <button id="singleNode" class="btn" onclick="setSelectedButton('singleNode')">
+        <button id="singleNode" class="btn" onclick="setSelectedButton(this)">
             <img src="images/node_act.png" alt="singleBranch">
         </button>
 
-        <button id="ternaryNode" class="btn" onclick="setSelectedButton('ternaryNode')">
+        <button id="ternaryNode" class="btn" onclick="setSelectedButton(this)">
             <img src="images/ternary.png" alt="ternaryBranch">
         </button>
     </div>
 
-    <!-- Set 'active' color to selected button -->
     <script>
-        $('button').on('click', function () {
-            $('button').removeClass('active');
-            $(this).addClass('active');
+        $(document).ready(function () {
+            // Set 'active' color to selected button
+            // $('button').on('click', function () {
+            //     $('button').removeClass('active');
+            //     $(this).addClass('active');
+            // });
+
+            // scroll the canvas container to first node
+            // $(".container").scrollTop(2000);
+            // $(".container").scrollLeft(2000);
+            $(".container").scrollTop(1000);
+            $(".container").scrollLeft(1000);
+
+            document.addEventListener('keyup', (event) => {
+                if (['1', '2', '3'].includes(event.key)) {
+                    // console.log(event.key);
+                    $(`.btn`).removeClass('active');
+                    $(`.btn:nth-child(${event.key}`).addClass('active');
+                    // console.log($(`.btn:nth-child(${event.key}`));
+                    setSelectedButton($(`.btn:nth-child(${event.key}`)[0]);
+                }
+            });
+
         });
     </script>
+
 
 
     <a download="canvas.svg" id="downloadlink">Download</a>
 
     <!-- The canvas running the tree-building javascript -->
     <div class="container">
-        <canvas id="treeCanvas" width="1000" height="5000"></canvas>
+        <canvas id="treeCanvas" width="3000" height="3000"></canvas>
     </div>
     <!-- <h2 id="coords"></h2> -->
 
