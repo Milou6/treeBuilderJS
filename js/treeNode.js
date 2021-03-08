@@ -31,7 +31,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         let nodeWidth = getNodeWidth(this.armsArray);
 
         this.set({ width: nodeWidth, height: this.vertOffset * 2, originX: 'center', originY: 'top' });
-        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: true });
+        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false });
         this.setCoords();
 
         // Dymanically setting the offset
@@ -51,7 +51,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.hoverCircles.push(hoverCircle);
 
             // creating the bottom textNodes
-            var textNode = new NodeText(this.X + point[0] - 12 /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, 'XP'); // The textNodes don't need coord offset apparently
+            var textNode = new NodeText(this.X + point[0]  /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, 'XP'); // The textNodes don't need coord offset apparently
             canvas.add(textNode);
             this.textNodes.push(textNode);
         }
@@ -62,6 +62,11 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
 
         // Correcting the positioning of TreeNode on canvas
         this.moveNodeBy(this.horizOffset, 0);
+
+        this.on('drag:enter', function (e) {
+            // console.log(e);
+            console.log("dragenter");
+        });
     },
 
     _render: function (ctx) {
@@ -122,8 +127,9 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.hoverCircles[i].set({ left: this.X, top: this.Y });
 
             // resetting correct bottom-textNode coords
-            this.textNodes[i].set({ X: this.X + point[0] - 12 /*- this.horizOffset*/, Y: this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12 });
+            this.textNodes[i].set({ X: this.X + point[0]  /*- this.horizOffset*/, Y: this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12 });
             this.textNodes[i].set({ left: this.textNodes[i].X, top: this.textNodes[i].Y });
+            this.textNodes[i].setCoords();
         }
         // resetting correct top-hoverCircle coords
         this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12 - this.horizOffset, Y: this.Y - 12 + this.vertOffset });
@@ -157,6 +163,37 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             text.set({ left: text.X, top: text.Y, dirty: true });
             text.setCoords();
         }
+    },
+
+    /**
+     * Move the TreeNode object and all of its subtree (all nodes descended from it)
+     * 
+     * @param {*} moveX - how much horizontal movement (negative value moves the TreeNode to the left)
+     * @param {*} moveY - how much vertical movement (negative value moves the TreeNode upwards)
+     */
+    moveSubtreeBy: function (moveX, moveY) {
+        console.log("Moving subtree");
+        // console.log(this.getChildNodes());
+        this.moveNodeBy(moveX, moveY);
+
+        for (child of this.getChildNodes()) {
+            child.moveSubtreeBy(moveX, moveY);
+        }
+    },
+
+    /**
+     * @returns {Array} - Array of TreeNode objects that are children of this node
+     */
+    getChildNodes: function () {
+        let result = [];
+        for (let i = 0; i < this.hoverCircles.length - 1; i++) {
+            // for (circle of this.hoverCircles) {
+            let child = this.hoverCircles[i].childNode;
+            // let child = circle.childNode;
+            if (child != null) result.push(child);
+        }
+        // if (result.length > 0) result.pop();
+        return result;
     }
 });
 

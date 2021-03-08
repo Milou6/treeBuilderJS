@@ -74,6 +74,71 @@ var triangle = new fabric.Triangle({
 
 
 
+// 1st version of findAncestor
+// should return ancestor + hoverCircle of ancestor that leads to arg2
+function findFirstCommonAncestor(node1, node2, hoverToFind) {
+    let node1Ancestors = [];
+    let node2Ancestors = [];
+    let ancestorFound = false;
+    let filteredArray = [];
+    let hover1 = null;
+    let hover2 = null;
+    let passedHover = null;
+
+    while (ancestorFound == false) {
+        // save hover info to pass on to super-method
+        hover1 = node1.hoverParent;
+        hover2 = node2.hoverParent;
+
+        if (node1.nodeParent != null) {
+            node1 = node1.nodeParent;
+            node1Ancestors.push(node1);
+        }
+
+        if (node2.nodeParent != null) {
+            node2 = node2.nodeParent;
+            node2Ancestors.push(node2);
+        }
+
+        // Alternative method to filter arrays
+        // var arraysIntersection = node1Ancestors.filter(function(n) {
+        //     return node2Ancestors.indexOf(n) !== -1;
+        // });
+        filteredArray = node1Ancestors.filter(value => node2Ancestors.includes(value));
+        if (filteredArray.length > 0) {
+            ancestorFound = true;
+            console.log('ancestor found');
+            // console.log(filteredArray);
+
+            // find out which hover should be passed
+            // if (hover1.parentNode == filteredArray[0]) passedHover = hover1
+            // else passedHover = hover2
+        }
+    }
+
+    // keep going with the hover side, until we hit the ancestor
+    let secondRun = (hoverToFind == 'right' ? node2 : node1);
+    if (secondRun == filteredArray[0] && hoverToFind == 'right') {
+        passedHover = hover2;
+    }
+    else if (secondRun == filteredArray[0] && hoverToFind == 'left') {
+        passedHover = hover1;
+    }
+    else {
+        // keep going up with node until we hit the ancestor, then save the hover that lead to it
+        while (secondRun != filteredArray[0]) {
+            passedHover = secondRun.hoverParent;
+            secondRun = secondRun.nodeParent;
+        }
+    }
+    // return ancestor + correct hover to it
+    return [filteredArray[0], passedHover];
+}
+
+
+
+
+
 
 // first version of TreeNode.changeArms()
 changeArms: function (newArray) {

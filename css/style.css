@@ -1,7 +1,7 @@
 
 
 .container {
-    width: 1000px;
+    width: 1200px;
     height: 500px;
     /* max-height: 300px; */
     overflow-y: scroll;
@@ -9,5 +9,5 @@
 }
 
 .btn.active {
-    background-color: green;
+    background-color: rgb(38, 141, 38);
 }

@@ -1,3 +1,183 @@
+// IDEA : Make nodes initially small, grow as needed!
+
+
+function resolveIntersections(node) {
+    let intersectingObjects = [];
+    let group = null;
+    let objectMembers = [];
+
+    // TO-DO : SHOULD RESET intersectingObjs AFTER MANAGING 1ST INTERS
+    for (object of canvas.getObjects()) {
+        if (object.type == 'polyline' && object != node && object != node.nodeParent) {
+            // create group of node to check
+            objectMembers = [];
+            objectMembers.push(object);
+            for (let text of object.textNodes) {
+                objectMembers.push(text);
+            }
+            // console.log(objectMembers);
+            group = new fabric.Group(objectMembers, {});
+            // console.log(group.aCoords);
+
+            if (node.intersectsWithObject(group)) {
+                intersectingObjects.push({
+                    object: object,
+                    groupCoords: group.aCoords
+                });
+                object.set({ stroke: 'blue' });
+            }
+            // Important to destroy group after intersection checking is done
+            group.destroy();
+        }
+    }
+    // console.log(intersectingObjects);
+
+    if (intersectingObjects.length > 0) {
+        resolveIntersectionX(node, intersectingObjects[0]);
+    }
+
+
+}
+
+
+
+function resolveIntersectionX(node, objectGroup) {
+    let nodeTL = node.aCoords.tl.x;
+    let nodeTR = node.aCoords.tr.x;
+    let objectGroupTL = objectGroup.groupCoords.tl.x;
+    let objectGroupTR = objectGroup.groupCoords.tr.x;
+    let intersection = '';
+
+    if (nodeTL < objectGroupTL && objectGroupTL < nodeTR) intersection = 'right';
+    else intersection = 'left';
+    console.log(intersection);
+
+    // Horizontal movement depends on which kind of intersection it is
+    let movementX = 0;
+    if (intersection == 'right') {
+        movementX = nodeTR - objectGroupTL + 40;
+        ancestorFind = findFirstCommonAncestor(node, objectGroup.object);
+        // objectGroup.object.moveNodeBy(movementX, 0);
+    }
+    else if (intersection == 'left') {
+        movementX = objectGroupTR - nodeTL + 40;
+        ancestorFind = findFirstCommonAncestor(objectGroup.object, node);
+        // node.moveNodeBy(movementX, 0);
+    }
+
+
+    if (ancestorFind != null) {
+        let ancestor = ancestorFind[0];
+        let ancestorHover = ancestorFind[1];
+        let ancestorHoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
+        console.log(ancestorHoverIndex);
+
+        console.log(ancestor.armsArray);
+
+        let armsToChange = [];
+        // Looping through the ancestor's armsArray to update arm coords
+        for (let i = 0; i < ancestor.armsArray.length; i++) {
+            if (i < ancestorHoverIndex) {
+                // left-most hoverCircles need no change of coords
+                armsToChange.push([0, 0]);
+            }
+            else {
+                // right-most hoverCircles must be pushed to the right
+                armsToChange.push([movementX, 0]);
+                // for each arm pushed, push subtree below that arm (if there is a subtree)
+                if (ancestor.hoverCircles[i].childNode != null) {
+                    ancestor.hoverCircles[i].childNode.moveSubtreeBy(movementX, 0);
+                }
+            }
+
+        }
+        console.log(armsToChange);
+
+
+        // update arms
+        ancestor.updateArmCoords(armsToChange);
+    }
+
+}
+
+
+
+
+
+
+// node1, node2,
+// hoverToFind : which hover to return? parentHover going down to node1 or to node2?
+
+// should return ancestor + hoverCircle of ancestor that leads to arg2
+
+
+/**
+ * Finds the first ancestor TreeNode of node1 & node2.
+ * 
+ * @param {*} node1
+ * @param {*} node2
+ * @returns {Object} - An object with 2 elements. index[0] is the ancestor TreeNode, index[1] is the ancestor's hoverCircle that leads to node2.
+ */
+function findFirstCommonAncestor(node1, node2) {
+    let node1Ancestors = [];
+    let node2Ancestors = [];
+    let ancestorFound = false;
+    let filteredArray = [];
+    let hover1 = null;
+    let hover2 = null;
+    let passedHover = null;
+
+    let loopCounter = 0;
+    while (ancestorFound == false) {
+        // Fail-safe to keep method from running infinitely
+        if (loopCounter > 100) {
+            console.error(`${loopCounter} iterations : no ancestor found.`);
+            return null;
+        }
+        loopCounter += 1;
+
+        // save hover info to pass on to super-method
+        hover1 = node1.hoverParent;
+        hover2 = node2.hoverParent;
+
+        if (node1.nodeParent != null) {
+            node1 = node1.nodeParent;
+            node1Ancestors.push(node1);
+        }
+
+        if (node2.nodeParent != null) {
+            node2 = node2.nodeParent;
+            node2Ancestors.push(node2);
+        }
+
+        // Alternative method to filter arrays
+        // var arraysIntersection = node1Ancestors.filter(function(n) {
+        //     return node2Ancestors.indexOf(n) !== -1;
+        // });
+        filteredArray = node1Ancestors.filter(value => node2Ancestors.includes(value));
+        if (filteredArray.length > 0) {
+            ancestorFound = true;
+            console.log('ancestor found');
+            // console.log(filteredArray);
+        }
+    }
+
+    // keep going with the hover side, until we hit the ancestor
+    if (node2 == filteredArray[0]) {
+        passedHover = hover2;
+    }
+    else {
+        // keep going up with node until we hit the ancestor, then save the hover that lead to it
+        while (node2 != filteredArray[0]) {
+            passedHover = node2.hoverParent;
+            node2 = node2.nodeParent;
+        }
+    }
+    // return ancestor + correct hover that leads to node2
+    return [filteredArray[0], passedHover];
+}
+
+
 
 function spaceOutIntersections(node) {
     let intersectingObjects = [];
@@ -78,67 +258,6 @@ function spaceOutIntersections(node) {
 
 }
 
-// node1, node2,
-// hoverToFind : which hover to return? parentHover going down to node1 or to node2?
-function findFirstCommonAncestor(node1, node2, hoverToFind) {
-    let node1Ancestors = [];
-    let node2Ancestors = [];
-    let ancestorFound = false;
-    let filteredArray = [];
-    let hover1 = null;
-    let hover2 = null;
-    let passedHover = null;
-
-    while (ancestorFound == false) {
-        // save hover info to pass on to super-method
-        hover1 = node1.hoverParent;
-        hover2 = node2.hoverParent;
-
-        if (node1.nodeParent != null) {
-            node1 = node1.nodeParent;
-            node1Ancestors.push(node1);
-        }
-
-        if (node2.nodeParent != null) {
-            node2 = node2.nodeParent;
-            node2Ancestors.push(node2);
-        }
-
-        // Alternative method to filter arrays
-        // var arraysIntersection = node1Ancestors.filter(function(n) {
-        //     return node2Ancestors.indexOf(n) !== -1;
-        // });
-        filteredArray = node1Ancestors.filter(value => node2Ancestors.includes(value));
-        if (filteredArray.length > 0) {
-            ancestorFound = true;
-            console.log('ancestor found');
-            // console.log(filteredArray);
-
-            // find out which hover should be passed
-            // if (hover1.parentNode == filteredArray[0]) passedHover = hover1
-            // else passedHover = hover2
-        }
-    }
-
-    // keep going with the hover side, until we hit the ancestor
-    let secondRun = hoverToFind == 'right' ? node2 : node1;
-    if (secondRun == filteredArray[0] && hoverToFind == 'right') {
-        passedHover = hover2;
-    }
-    else if (secondRun == filteredArray[0] && hoverToFind == 'left') {
-        passedHover = hover1;
-    }
-    else {
-        // keep going up with node until we hit the ancestor, then save the hover that lead to it
-        while (secondRun != filteredArray[0]) {
-            passedHover = secondRun.hoverParent;
-            secondRun = secondRun.nodeParent;
-        }
-    }
-    // return ancestor + correct hover to it
-    return [filteredArray[0], passedHover];
-}
-
 
 // function moveNodeBy(node, moveX, moveY) {
 //     // console.log(`horiz offset: ${getHorizOffset(node.armsArray)}`);
@@ -217,8 +336,16 @@ function getNodeWidth(array) {
 /**
  * Sets the global variable 'selectedButton' of canvas.js
  * 
- * @param {string} choice - toolbar button to set as selected
+ * @param {string} button - toolbar button to set as selected
  */
-function setSelectedButton(choice) {
-    selectedButton = choice;
+function setSelectedButton(button) {
+    selectedButton = button.id;
+    // console.log(selectedButton);
+    let buttons = document.getElementsByClassName('btn');
+
+    // console.log(buttons);
+    for (let btn of buttons) {
+        btn.classList.remove('active');
+    }
+    button.classList.add('active');
 }

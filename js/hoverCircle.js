@@ -20,20 +20,41 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.hoverType = hoverType;
         this.parentNode = parentNode;
         this.hasChildNode = false;
+        this.childNode = null;
 
-        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: false });
+        this.set({ hasControls: false, hasBorders: false });
+        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
+        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
         // this.set({ pathOffset: { x: 0, y: 25 } }); //Maybe not for circle
 
-        this.on('mouseover', function (options) {
+        if (this.hoverType == 'top') {
+            this.set({ lockMovementX: true });
+        }
+
+        this.on('mouseover', function (e) {
             // Make circle opaque on hover-in
-            options.target.set('fill', 'rgba(0,255,0,1)');
+            e.target.set('fill', 'rgba(0,255,0,1)');
             canvas.renderAll();
         });
-        this.on('mouseout', function (options) {
+        this.on('mouseout', function (e) {
             // Make circle translucent on hover-out
-            options.target.set('fill', 'rgba(0,255,0,0.1)');
+            // e.target.set('fill', 'rgba(0,255,0,0.1)');
+            e.target.set('fill', 'rgba(0,255,0,0)');
             canvas.renderAll();
         });
+        // this.on('mousedown', function (e) {
+        //     this.origPos = this.getCenterPoint();
+        // });
+        // this.on('mouseup', function (e) {
+        //     delta = this.getCenterPoint().subtract(this.origPos);
+        //     console.log(delta.x, delta.y);
+        //     this.set({ X: this.X + delta.x });
+        //     this.parentNode.updateArmCoords([[0, 0], [delta.x, 0]]);
+
+        //     if (this.childNode != null) {
+        //         this.childNode.moveSubtreeBy(delta.x, 0);
+        //     }
+        // });
     },
 
     _render: function (ctx) {
