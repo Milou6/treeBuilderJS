@@ -24,7 +24,7 @@ function resolveIntersections(node) {
                     object: object,
                     groupCoords: group.aCoords
                 });
-                object.set({ stroke: 'blue' });
+                // object.set({ stroke: 'blue' });
             }
             // Important to destroy group after intersection checking is done
             group.destroy();
@@ -259,24 +259,6 @@ function spaceOutIntersections(node) {
 }
 
 
-// function moveNodeBy(node, moveX, moveY) {
-//     // console.log(`horiz offset: ${getHorizOffset(node.armsArray)}`);
-//     // move the node itself
-//     node.set({ left: node.X + getHorizOffset(node.armsArray) + moveX, top: node.Y + getVertOffset(node.armsArray) + moveY });
-//     node.set({ dirty: true });
-//     // move each of its hoverCircles
-//     for (circle of node.hoverCircles) {
-//         circle.set({ X: circle.X + moveX, Y: circle.Y + moveY });
-//         circle.set({ dirty: true });
-//         console.log('hover moved');
-//         // console.log(circle);
-//     }
-//     // canvas.renderAll();
-// }
-
-
-
-
 
 
 
@@ -348,4 +330,28 @@ function setSelectedButton(button) {
         btn.classList.remove('active');
     }
     button.classList.add('active');
+}
+
+
+/**
+ * When dragging a bottom hoverCircle, on mouse release, check if the drag is legal.
+ * Returns true if drag is illegal (= user wants to move TreeNode arm to the opposite side of node)
+ * , false otherwise.
+ * 
+ * @param {*} hoverCircle - the Circle that we're trying to drag
+ * @param {*} delta - difference between Circle position on mouse:down & mouse:up
+ * @returns {boolean} - is the drag illegal?
+ */
+function wantsToCrossMiddle(hoverCircle, delta) {
+    let parentX = hoverCircle.parentNode.X;
+    let hoverX = hoverCircle.X;
+
+    // if hover was initially to the left of node middle
+    if (hoverX < parentX) {
+        if ((hoverX + delta.x) > parentX) return true;
+    }
+    if (hoverX > parentX) {
+        if ((hoverX + delta.x) < parentX) return true;
+    }
+    return false;
 }

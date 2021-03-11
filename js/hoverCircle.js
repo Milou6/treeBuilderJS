@@ -15,16 +15,17 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
     initialize: function (X, Y, hoverType, parentNode, options) {
         options || (options = {});
         this.callSuper('initialize', options);
-        this.X = X;
-        this.Y = Y;
-        this.hoverType = hoverType;
         this.parentNode = parentNode;
+        this.hoverType = hoverType;
         this.hasChildNode = false;
         this.childNode = null;
+        this.attachedNodeText = null;
+        this.X = X + this.parentNode.pathOffset.x;
+        this.Y = Y - this.parentNode.pathOffset.y;
 
         this.set({ hasControls: false, hasBorders: false });
-        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
-        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
+        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
+        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
         // this.set({ pathOffset: { x: 0, y: 25 } }); //Maybe not for circle
 
         if (this.hoverType == 'top') {
@@ -38,8 +39,8 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         });
         this.on('mouseout', function (e) {
             // Make circle translucent on hover-out
-            // e.target.set('fill', 'rgba(0,255,0,0.1)');
-            e.target.set('fill', 'rgba(0,255,0,0)');
+            e.target.set('fill', 'rgba(0,255,0,0.1)');
+            // e.target.set('fill', 'rgba(0,255,0,0)');
             canvas.renderAll();
         });
         // this.on('mousedown', function (e) {
@@ -58,9 +59,8 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
     },
 
     _render: function (ctx) {
-        // This version offsets the Y coord correctly 
-        // Added "this.parentNode.pathOffset.x", TreeNode init seems good for now...
-        this.set({ left: this.X + this.parentNode.pathOffset.x, top: this.Y - this.parentNode.pathOffset.y });
+        // This version offsets the Y coord correctly
+        this.set({ left: this.X, top: this.Y });
         this.setCoords(); // this line makes the hoverCircle update coords correctly... let's keep that
         this.callSuper('_render', ctx);
     }

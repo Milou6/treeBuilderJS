@@ -31,7 +31,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         let nodeWidth = getNodeWidth(this.armsArray);
 
         this.set({ width: nodeWidth, height: this.vertOffset * 2, originX: 'center', originY: 'top' });
-        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false });
+        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: true });
         this.setCoords();
 
         // Dymanically setting the offset
@@ -51,9 +51,11 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.hoverCircles.push(hoverCircle);
 
             // creating the bottom textNodes
-            var textNode = new NodeText(this.X + point[0]  /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, 'XP'); // The textNodes don't need coord offset apparently
+            var textNode = new NodeText(this.X + point[0]  /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, this, hoverCircle, 'XP'); // The textNodes don't need coord offset apparently
             canvas.add(textNode);
             this.textNodes.push(textNode);
+            // link hoverCircle & textNode together
+            hoverCircle.attachedNodeText = textNode;
         }
         // creating the top hoverCircle
         var topHoverCircle = new HoverCircle(this.X - 12 - this.horizOffset, this.Y - 12 + this.vertOffset, 'top', this);
@@ -123,7 +125,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.points.push({ x: 0, y: 0 });
 
             // resetting correct bottom-hoverCircle coords
-            this.hoverCircles[i].set({ X: this.X + point[0] - 12 - this.horizOffset, Y: this.Y + point[1] - 12 + this.vertOffset });
+            this.hoverCircles[i].set({ X: this.X + point[0] - 12, Y: this.Y + point[1] - 12 });
             this.hoverCircles[i].set({ left: this.X, top: this.Y });
 
             // resetting correct bottom-textNode coords
@@ -132,7 +134,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.textNodes[i].setCoords();
         }
         // resetting correct top-hoverCircle coords
-        this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12 - this.horizOffset, Y: this.Y - 12 + this.vertOffset });
+        this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
     },
 
     /**
