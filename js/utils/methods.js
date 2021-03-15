@@ -332,6 +332,44 @@ function setSelectedButton(button) {
     button.classList.add('active');
 }
 
+function undo() {
+    myHistory.undo();
+}
+
+function redo() {
+    myHistory.redo();
+}
+
+function flattenObjects(array, hist) {
+    array.forEach(function (object, index, array) {
+        // console.log(object);
+
+        if (object.customType == 'circle') {
+            array[index].parentNode = hist.map.get(array[index].parentNode);
+            // console.log(hist.map.get(object.parentNode));
+            // console.log(array[index]);
+            // array[index].childNode = hist.map.get(object.childNode);
+            // array[index].attachedNodeText = hist.map.get(object.attachedNodeText);
+        }
+        else if (object.customType == 'polyline') {
+            object.nodeParent = hist.map.get(object.nodeParent);
+            object.hoverParent = hist.map.get(object.hoverParent);
+
+            object.hoverCircles.forEach(function (item, index) {
+                object.hoverCircles[index] = hist.map.get(item);
+            });
+
+            object.textNodes.forEach(function (item, index) {
+                object.textNodes[index] = hist.map.get(item);
+            });
+        }
+        else if (object.customType == 'i-text') {
+            object.parentNode = hist.map.get(object.parentNode);
+            object.attachedHover = hist.map.get(object.attachedHover);
+        }
+    });
+}
+
 
 /**
  * When dragging a bottom hoverCircle, on mouse release, check if the drag is legal.

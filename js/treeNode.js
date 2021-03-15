@@ -1,6 +1,6 @@
 var TreeNode = fabric.util.createClass(fabric.Polyline, {
     // Type below must be 'polyline' for SVG export to work properly
-    type: 'polyline',
+    // type: 'polyline',
 
     /**
      * Creates a new TreeNode object.
@@ -21,6 +21,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         this.armsArray = armsArray;
         this.nodeParent = nodeParent;
         this.hoverParent = hoverParent;
+        this.customType = 'polyline';
 
         // Arrays containing this node's hoverCircles & textNodes
         this.hoverCircles = [];
@@ -201,27 +202,28 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
 
 
 
-// TRYING TO FIX SVG EXPORT
+// extending toObject for JSON serialization
 // fabric.Object.prototype.toObject = (function (toObject) {
-//     // TreeNode.toObject = (function (toObject) {
-//     return function () {
-//         return fabric.util.object.extend(toObject.call(this), {
-//             // name: this.name,
-//             // X: this.X,
-//             // Y: this.Y,
-//             // armsArray: this.armsArray,
-//             // nodeParent: this.nodeParent,
-//             // hoverParent: this.hoverParent,
-//             // hoverCircles: this.hoverCircles,
-//             // textNodes: this.textNodes,
-//             // testATTR: 'lalalala'
-//         });
-//     };
-// })(fabric.Object.prototype.toObject);
-// })(TreeNode.toObject);
+fabric.Polyline.prototype.toObject = (function (toObject) {
+    return function () {
+        return fabric.util.object.extend(toObject.call(this), {
+            X: this.X,
+            Y: this.Y,
+            armsArray: this.armsArray,
+            nodeParent: this.nodeParent,
+            hoverParent: this.hoverParent,
+            hoverCircles: this.hoverCircles,
+            textNodes: this.textNodes,
+            horizOffset: this.horizOffset,
+            vertOffset: this.vertOffset,
+            nodeWidth: this.nodeWidth,
+            selectable: this.selectable,
+            pathOffset: this.pathOffset
+        });
+    };
+})(fabric.Polyline.prototype.toObject);
 
 // fabric.Object.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
-console.log(fabric.Object.prototype.stateProperties);
-
-console.log(fabric.TreeNode);
+// console.log(fabric.Object.prototype.stateProperties);
+// console.log(fabric.TreeNode);
 

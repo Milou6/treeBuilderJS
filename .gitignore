@@ -3,4 +3,4 @@
 out/
 *.py
 ignore/
-snippets.js
+node_modules

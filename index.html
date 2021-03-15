@@ -6,27 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TreeBuilderJS</title>
 
+    <!-- FabricJS lib -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+    <!-- JQuery lib -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
         crossorigin="anonymous"></script>
-    <!-- <script src="https://raw.githubusercontent.com/lyzerk/fabric-history/master/src/index.js"></script> -->
-    <!-- <script src="./dependencies/fabric-history/index.js" type="module"></script> -->
+    <!-- Lodash lib -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+        integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
+        crossorigin="anonymous"></script>
     <link href="css/style.css" rel="stylesheet">
+    <!-- <script src="https://raw.githubusercontent.com/lyzerk/fabric-history/master/src/index.js"></script> -->
+    <!-- <script src="fabric-history.js"></script> -->
 </head>
 
 
 <body>
-
-    <script>
-        function undo() {
-            canvas.undo();
-        }
-        function redo() {
-            canvas.redo();
-        }
-    </script>
-
     <!-- Toolbar for different kinds of nodes -->
     <div id="main-toolbar">
         <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)">
@@ -41,8 +37,8 @@
             <img src="images/ternary.png" alt="ternaryBranch">
         </button>
 
-        <button onclick="testHistory()">Undo</button>
-        <button onclick="redo()">Redo</button>
+        <button id="undoBtn" onclick="undo()">Undo</button>
+        <button id="redoBtn" onclick="redo()" disabled>Redo</button>
     </div>
 
     <script>
@@ -91,10 +87,12 @@
 
     <!-- Loading all canvas javascript -->
     <script src="js/utils/methods.js"></script>
+    <script src="js/utils/JSONcycle.js"></script>
     <script src="js/nodeText.js"></script>
     <script src="js/hoverCircle.js"></script>
     <script src="js/treeNode.js"></script>
     <script src="canvas.js"></script>
+    <script src="js/history.js"></script>
 
 
 </body>

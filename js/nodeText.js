@@ -1,5 +1,5 @@
 var NodeText = fabric.util.createClass(fabric.IText, {
-    type: 'nodeText',
+    // type: 'nodeText',
 
     initialize: function (X, Y, parentNode, attachedHover, options) {
         options || (options = {});
@@ -9,6 +9,7 @@ var NodeText = fabric.util.createClass(fabric.IText, {
         this.numberLines = 1;
         this.parentNode = parentNode;
         this.attachedHover = attachedHover;
+        this.customType = 'i-text';
 
         this.set({ originX: 'center', originY: 'top' });
         this.set({ left: this.X, top: this.Y, editingBorderColor: 'green', fontSize: 20, textAlign: 'center' /*hasControls: false, */, lockMovementX: true, lockMovementY: true });
@@ -50,7 +51,7 @@ var NodeText = fabric.util.createClass(fabric.IText, {
             let LineNumberDifference = newLineNumber - this.numberLines;
             // check if number of lines has changed from what's stored in attribute
 
-            console.log(LineNumberDifference);
+            // console.log(LineNumberDifference);
             if (LineNumberDifference != 0) {
                 hover.childNode.moveSubtreeBy(0, LineNumberDifference * this.__lineHeights[0]);
             }

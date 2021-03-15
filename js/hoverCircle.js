@@ -1,5 +1,5 @@
 var HoverCircle = fabric.util.createClass(fabric.Circle, {
-    type: 'hoverCircle',
+    // type: 'hoverCircle',
 
     /**
      * Creates a clickable circle that hovers over a TreeNode's arms and top.
@@ -22,6 +22,7 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.attachedNodeText = null;
         this.X = X + this.parentNode.pathOffset.x;
         this.Y = Y - this.parentNode.pathOffset.y;
+        this.customType = 'circle';
 
         this.set({ hasControls: false, hasBorders: false });
         this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
@@ -64,4 +65,34 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.setCoords(); // this line makes the hoverCircle update coords correctly... let's keep that
         this.callSuper('_render', ctx);
     }
+
+    // _toObject: function () {
+    //     return fabric.util.object.extend(toObject.call(this), {
+    //         X: "asd"
+    //         // Y: this.Y,
+    //         // hoverType: this.hoverType
+    //     });
+    // }
 });
+
+
+
+// extending toObject for JSON serialization
+fabric.Circle.prototype.toObject = (function (toObject) {
+    return function () {
+        return fabric.util.object.extend(toObject.call(this), {
+            X: this.X,
+            Y: this.Y,
+            hoverType: this.hoverType,
+            parentNode: this.parentNode,
+            hasChildNode: this.hasChildNode,
+            childNode: this.childNode,
+            attachedNodeText: this.attachedNodeText,
+            lockMovementY: this.lockMovementY,
+            lockMovementX: this.lockMovementX,
+            hasControls: false,
+            hasBorders: false,
+            selectable: this.selectable
+        });
+    };
+})(fabric.Circle.prototype.toObject);

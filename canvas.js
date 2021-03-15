@@ -1,4 +1,5 @@
 // GLOBAL VARIABLES
+
 // which Toolbar button is currently selected
 var selectedButton = 'binaryNode';
 
@@ -7,14 +8,13 @@ var canvas = new fabric.Canvas('treeCanvas', {
 });
 // canvas._historyInit();
 var ctx = canvas.getContext('2d');
+// var history = require('fabric-history');
 // canvas.setZoom(0.5);
 
 // Disabling selection removes bug when shift-clicking top hoverCircles repeatedly creates a hoverCircle group
 canvas.selection = false;
 
-function testHistory() {
-    canvas.undo();
-}
+
 
 // Print coords of mouse on the screen for development
 var Coordstext = new fabric.Text('', { left: 1300, top: 1100, fontSize: 25, selectable: true });
@@ -34,18 +34,29 @@ var line = new fabric.Polyline([{ x: 0, y: 0 }, { x: -80, y: 50 }, { x: 0, y: 0 
 // canvas.add(line);
 
 
-var myNode = new TreeNode(1200, 1600, [[-120, 50], [-90, 50], [-15, 90], [90, 50], [170, 50]], null, null, [],);
+// var myNode = new TreeNode(1200, 1600, [[-120, 50], [-90, 50], [-15, 90], [90, 50], [170, 50]], null, null, [],);
 
 // The nulls here might cause trouble when working on upper tree
 // var node1 = new TreeNode(1200, 1100, [[-160, 70], [80, 50]], null, null, [],);
 var node2 = new TreeNode(1500, 1200, [[-80, 50], [80, 50]], null, null, [],);
 // var node3 = new TreeNode(1800, 1100, [[-80, 50], [160, 70]], null, null, [],);
+
+canvas.add(node2);
+// canvas.add(node1, node2, node3, myNode, rect1);
+
 // var rect1 = new fabric.Rect({
 //     width: 100, height: 100,
 //     top: 1200, left: 1200
 // });
-canvas.add(myNode, node2);
-// canvas.add(node1, node2, node3, myNode, rect1);
+// var rect2 = new fabric.Rect({
+//     width: 100, height: 100,
+//     top: 1400, left: 1200
+// });
+// var rect3 = new fabric.Rect({
+//     width: 100, height: 100,
+//     top: 1200, left: 1400
+// });
+// canvas.add(rect1, rect2, rect3);
 
 // TreeNode.stateProperties = TreeNode.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
 
@@ -83,6 +94,8 @@ canvas.renderAll();
 
 
 
+
+
 var origPos = null;
 // Canvas click events
 canvas.on('mouse:down', function (e) {
@@ -95,6 +108,11 @@ canvas.on('mouse:down', function (e) {
     }
 });
 
+canvas.on('mouse:up:before', function (e) {
+    console.log('BEFORE');
+    // myHistory.undoPush();
+});
+
 canvas.on('mouse:up', function (e) {
     if (e.target != null) {
         var target = e.target;
@@ -102,7 +120,13 @@ canvas.on('mouse:up', function (e) {
         delta = target.getCenterPoint().subtract(origPos);
         console.log(delta.x, delta.y);
 
-        // if the hoverCircle was dragged more than 20px left or right, acivate its movement
+
+        // testing out history without nodes
+        // myHistory.undoPush();
+        // console.log('hist PUSH');
+
+
+        // if the hoverCircle was dragged more than 20px left or right, activate its movement
         if (target.hoverType == 'bottom' && Math.abs(delta.x) > 20) {
 
             // second check : make sure user cannot drag an arm past the middle of its node
@@ -134,7 +158,7 @@ canvas.on('mouse:up', function (e) {
 
         // otherwise, count the 'mouse:up' as a simple click
         else {
-            if (target.type == 'hoverCircle') {
+            if (target.type == 'circle') {
 
                 if (target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'binaryNode') {
                     var newNode = new TreeNode(target.left + 12, target.top + 50, [[-50, 50], [50, 50]], target.parentNode, target, []);
@@ -145,6 +169,8 @@ canvas.on('mouse:up', function (e) {
                     resolveIntersections(newNode);
                     // if the hoverCircle's textNode is multiple lines long, make sure to push new node a bit down
                     target.attachedNodeText.updateVerticalSpace();
+                    myHistory.undoPush();
+                    // console.log(myHistory.undoStack);
                 }
 
                 else if (target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
@@ -185,7 +211,7 @@ canvas.on('mouse:up', function (e) {
 
             } // if (target.type == 'hoverCircle')
 
-            else if (target.type == 'nodeText') {
+            else if (target.type == 'i-text') {
                 // console.log('TEXT');
                 target.enterEditing();
                 // target.setCursorByClick(e);
@@ -197,7 +223,7 @@ canvas.on('mouse:up', function (e) {
 
 
 
-            if (target.type == 'hoverCircle' && target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
+            if (target.type == 'circle' && target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
             }
         } // else
 
@@ -253,6 +279,3 @@ console.log(test);
 
 var link = document.getElementById('downloadlink');
 link.href = makeTextFile();
-
-
-
