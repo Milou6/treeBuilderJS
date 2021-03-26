@@ -1,17 +1,18 @@
 // IDEA : Make nodes initially small, grow as needed!
 
 
-function resolveIntersections(node) {
+function resolveIntersections(node, histAction) {
     let intersectingObjects = [];
     let group = null;
     let objectMembers = [];
 
     // TO-DO : SHOULD RESET intersectingObjs AFTER MANAGING 1ST INTERS
     for (object of canvas.getObjects()) {
-        if (object.type == 'polyline' && object != node && object != node.nodeParent) {
+        if (object.type == 'treeNode' && object != node && object != node.nodeParent) {
             // create group of node to check
             objectMembers = [];
             objectMembers.push(object);
+            // console.log(object);
             for (let text of object.textNodes) {
                 objectMembers.push(text);
             }
@@ -19,7 +20,9 @@ function resolveIntersections(node) {
             group = new fabric.Group(objectMembers, {});
             // console.log(group.aCoords);
 
-            if (node.intersectsWithObject(group)) {
+            node.setCoords();
+            // the 'true' below is important, makes method use absolute Coords
+            if (node.intersectsWithObject(group, true)) {
                 intersectingObjects.push({
                     object: object,
                     groupCoords: group.aCoords
@@ -30,10 +33,10 @@ function resolveIntersections(node) {
             group.destroy();
         }
     }
-    // console.log(intersectingObjects);
+    console.log(intersectingObjects);
 
     if (intersectingObjects.length > 0) {
-        resolveIntersectionX(node, intersectingObjects[0]);
+        resolveIntersectionX(node, intersectingObjects[0], histAction);
     }
 
 
@@ -41,7 +44,7 @@ function resolveIntersections(node) {
 
 
 
-function resolveIntersectionX(node, objectGroup) {
+function resolveIntersectionX(node, objectGroup, histAction) {
     let nodeTL = node.aCoords.tl.x;
     let nodeTR = node.aCoords.tr.x;
     let objectGroupTL = objectGroup.groupCoords.tl.x;
@@ -70,9 +73,9 @@ function resolveIntersectionX(node, objectGroup) {
         let ancestor = ancestorFind[0];
         let ancestorHover = ancestorFind[1];
         let ancestorHoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
-        console.log(ancestorHoverIndex);
+        // console.log(ancestorHoverIndex);
 
-        console.log(ancestor.armsArray);
+        // console.log(ancestor.armsArray);
 
         let armsToChange = [];
         // Looping through the ancestor's armsArray to update arm coords
@@ -87,6 +90,9 @@ function resolveIntersectionX(node, objectGroup) {
                 // for each arm pushed, push subtree below that arm (if there is a subtree)
                 if (ancestor.hoverCircles[i].childNode != null) {
                     ancestor.hoverCircles[i].childNode.moveSubtreeBy(movementX, 0);
+                    let subAction = ['moveSubtree', ancestor.hoverCircles[i].childNode, movementX, 0];
+                    histAction.push(subAction);
+                    // console.log(histAction);
                 }
             }
 
@@ -96,6 +102,8 @@ function resolveIntersectionX(node, objectGroup) {
 
         // update arms
         ancestor.updateArmCoords(armsToChange);
+        let subAction = ['updateArms', ancestor, armsToChange];
+        histAction.push(subAction);
     }
 
 }
@@ -179,84 +187,84 @@ function findFirstCommonAncestor(node1, node2) {
 
 
 
-function spaceOutIntersections(node) {
-    let intersectingObjects = [];
+// function spaceOutIntersections(node) {
+//     let intersectingObjects = [];
 
-    for (object of canvas.getObjects()) {
-        if (object.type == 'treeNode' && object != node && node.intersectsWithObject(object)) {
-            // allNodes.push(object);
-            intersectingObjects.push(object);
-        }
-    }
+//     for (object of canvas.getObjects()) {
+//         if (object.type == 'treeNode' && object != node && node.intersectsWithObject(object)) {
+//             // allNodes.push(object);
+//             intersectingObjects.push(object);
+//         }
+//     }
 
-    for (object of intersectingObjects) {
-        let nodeTL = node.aCoords.tl.x;
-        let nodeTR = node.aCoords.tr.x;
-        let objectTL = object.aCoords.tl.x;
-        let objectTR = object.aCoords.tr.x;
-        let intersection = '';
+//     for (object of intersectingObjects) {
+//         let nodeTL = node.aCoords.tl.x;
+//         let nodeTR = node.aCoords.tr.x;
+//         let objectTL = object.aCoords.tl.x;
+//         let objectTR = object.aCoords.tr.x;
+//         let intersection = '';
 
-        if (nodeTL < objectTL && objectTL < nodeTR) intersection = 'right'
-        else intersection = 'left'
-        console.log(intersection);
+//         if (nodeTL < objectTL && objectTL < nodeTR) intersection = 'right'
+//         else intersection = 'left'
+//         console.log(intersection);
 
-        // let rightIntersection = Math.abs(nodeTR - objectTL);
-        // let leftIntersection = Math.abs(nodeTL - objectTR);
+//         // let rightIntersection = Math.abs(nodeTR - objectTL);
+//         // let leftIntersection = Math.abs(nodeTL - objectTR);
 
-        // intersection = Math.min(rightIntersection, leftIntersection) == rightIntersection ? 'right' : 'left';
+//         // intersection = Math.min(rightIntersection, leftIntersection) == rightIntersection ? 'right' : 'left';
 
-        let ancestorFind = null;
-        let movement = null;
-        if (intersection == 'right') {
-            movement = nodeTR - objectTL + 40;
-            // movement = objectTR - nodeTL + 40;
-            moveNodeBy(object, movement, 0);
-            ancestorFind = findFirstCommonAncestor(node, object, 'right');
-        }
-        else if (intersection == 'left') {
-            movement = objectTR - nodeTL + 40;
-            moveNodeBy(node, movement, 0);
-            ancestorFind = findFirstCommonAncestor(node, object, 'left');
-        }
+//         let ancestorFind = null;
+//         let movement = null;
+//         if (intersection == 'right') {
+//             movement = nodeTR - objectTL + 40;
+//             // movement = objectTR - nodeTL + 40;
+//             moveNodeBy(object, movement, 0);
+//             ancestorFind = findFirstCommonAncestor(node, object, 'right');
+//         }
+//         else if (intersection == 'left') {
+//             movement = objectTR - nodeTL + 40;
+//             moveNodeBy(node, movement, 0);
+//             ancestorFind = findFirstCommonAncestor(node, object, 'left');
+//         }
 
-        let ancestor = ancestorFind[0];
-        console.log('ancestor :');
-        console.log(ancestor);
-        let ancestorHover = ancestorFind[1];
-        console.log(`ancestorHover : ${ancestorHover}`);
-        console.log(ancestorHover);
+//         let ancestor = ancestorFind[0];
+//         console.log('ancestor :');
+//         console.log(ancestor);
+//         let ancestorHover = ancestorFind[1];
+//         console.log(`ancestorHover : ${ancestorHover}`);
+//         console.log(ancestorHover);
 
-        let hoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
-        console.log(`hoverIndex : ${hoverIndex}`);
-        console.log(`movement : ${movement}`);
+//         let hoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
+//         console.log(`hoverIndex : ${hoverIndex}`);
+//         console.log(`movement : ${movement}`);
 
-        // create new armsArray for ancestor, but updating coords of the arm that needs to get longer
-        let newArray = [];
-        for (let i = 0; i < ancestor.armsArray.length; i++) {
-            if (i == hoverIndex) {
-                newArray.push([ancestor.armsArray[i][0] + movement, ancestor.armsArray[i][1]]);
-                // newArray.push([ancestor.armsArray[i][0] + nodeTR - objectTL + 40, ancestor.armsArray[i][1]]);
-            }
-            else {
-                newArray.push(ancestor.armsArray[i]);
-            }
-        }
-        console.log(`newArray: ${newArray}`);
+//         // create new armsArray for ancestor, but updating coords of the arm that needs to get longer
+//         let newArray = [];
+//         for (let i = 0; i < ancestor.armsArray.length; i++) {
+//             if (i == hoverIndex) {
+//                 newArray.push([ancestor.armsArray[i][0] + movement, ancestor.armsArray[i][1]]);
+//                 // newArray.push([ancestor.armsArray[i][0] + nodeTR - objectTL + 40, ancestor.armsArray[i][1]]);
+//             }
+//             else {
+//                 newArray.push(ancestor.armsArray[i]);
+//             }
+//         }
+//         console.log(`newArray: ${newArray}`);
 
-        ancestor.changeArms(newArray);
-        // Alternative to re-render all canvas
-        // canvas.requestRenderAll();
-        canvas.renderAll();
-        console.log(ancestor);
+//         ancestor.changeArms(newArray);
+//         // Alternative to re-render all canvas
+//         // canvas.requestRenderAll();
+//         canvas.renderAll();
+//         console.log(ancestor);
 
-        // TRYING OUT
-        // GOTTA MAKE CHILDREN MOVE TOO...
-        // spaceOutIntersections(ancestor);
+//         // TRYING OUT
+//         // GOTTA MAKE CHILDREN MOVE TOO...
+//         // spaceOutIntersections(ancestor);
 
-    }
+//     }
 
 
-}
+// }
 
 
 
@@ -333,40 +341,66 @@ function setSelectedButton(button) {
 }
 
 function undo() {
-    myHistory.undo();
+    canvasHist.undo();
+    // myHistory.undo();
 }
 
 function redo() {
-    myHistory.redo();
+    canvasHist.redo();
+    // myHistory.redo();
 }
 
-function flattenObjects(array, hist) {
+// array[index] doesnt work here.... need better solution in long-term
+function flattenObjects(array, hist, realArray) {
     array.forEach(function (object, index, array) {
         // console.log(object);
 
-        if (object.customType == 'circle') {
-            array[index].parentNode = hist.map.get(array[index].parentNode);
-            // console.log(hist.map.get(object.parentNode));
-            // console.log(array[index]);
-            // array[index].childNode = hist.map.get(object.childNode);
-            // array[index].attachedNodeText = hist.map.get(object.attachedNodeText);
+        if (object.type == 'hoverCircle') {
+            // console.log('type is circle!!');
+            object.parentNode = (object.parentNode == null ? null : object.parentNode.historyID);
+            object.childNode = (object.childNode == null ? null : object.childNode.historyID);
+            object.attachedNodeText = (object.attachedNodeText == null ? null : object.attachedNodeText.historyID);
         }
-        else if (object.customType == 'polyline') {
-            object.nodeParent = hist.map.get(object.nodeParent);
-            object.hoverParent = hist.map.get(object.hoverParent);
+        else if (object.type == 'treeNode') {
+            object.nodeParent = (object.nodeParent == null ? null : object.nodeParent.historyID);
+            object.hoverParent = (object.hoverParent == null ? null : object.hoverParent.historyID);
 
-            object.hoverCircles.forEach(function (item, index) {
-                object.hoverCircles[index] = hist.map.get(item);
+            object.hoverCircles.forEach(function (item, innerIndex) {
+                object.hoverCircles[innerIndex] = object.hoverCircles[innerIndex].historyID;
             });
 
-            object.textNodes.forEach(function (item, index) {
-                object.textNodes[index] = hist.map.get(item);
+            object.textNodes.forEach(function (item, innerIndex) {
+                // object.textNodes[index] = hist.map.get(item);
+                object.textNodes[innerIndex] = object.textNodes[innerIndex].historyID;
             });
         }
-        else if (object.customType == 'i-text') {
-            object.parentNode = hist.map.get(object.parentNode);
-            object.attachedHover = hist.map.get(object.attachedHover);
+        else if (object.type == 'nodeText') {
+            object.parentNode = (object.parentNode == null ? null : object.parentNode.historyID);
+            object.attachedHover = object.attachedHover.historyID;
         }
+
+        // if (object.customType == 'circle') {
+        //     object.parentNode = hist.map.get(realArray[index].parentNode);
+        //     object.childNode = hist.map.get(realArray[index].childNode);
+        //     object.attachedNodeText = hist.map.get(realArray[index].attachedNodeText);
+        // }
+        // else if (object.customType == 'polyline') {
+        //     object.nodeParent = hist.map.get(realArray[index].nodeParent);
+        //     object.hoverParent = hist.map.get(realArray[index].hoverParent);
+
+        //     object.hoverCircles.forEach(function (item, innerIndex) {
+        //         object.hoverCircles[innerIndex] = hist.map.get(realArray[index].hoverCircles[innerIndex]);
+        //     });
+
+        //     object.textNodes.forEach(function (item, innerIndex) {
+        //         // object.textNodes[index] = hist.map.get(item);
+        //         object.textNodes[innerIndex] = hist.map.get(realArray[index].textNodes[innerIndex]);
+        //     });
+        // }
+        // else if (object.customType == 'i-text') {
+        //     object.parentNode = hist.map.get(realArray[index].parentNode);
+        //     object.attachedHover = hist.map.get(realArray[index].attachedHover);
+        // }
     });
 }
 
@@ -381,6 +415,7 @@ function flattenObjects(array, hist) {
  * @returns {boolean} - is the drag illegal?
  */
 function wantsToCrossMiddle(hoverCircle, delta) {
+    // console.log('WANTSTOCROSS');
     let parentX = hoverCircle.parentNode.X;
     let hoverX = hoverCircle.X;
 
@@ -392,4 +427,94 @@ function wantsToCrossMiddle(hoverCircle, delta) {
         if ((hoverX + delta.x) < parentX) return true;
     }
     return false;
+}
+
+
+
+function reviveCanvasObject(o, object) {
+    // console.log(o);
+    // console.log(object);
+    if (object.customType == 'hoverCircle') {
+        object.on('mouseover', function (e) {
+            // Make circle opaque on hover-in
+            e.target.set('fill', 'rgba(0,255,0,1)');
+            canvas.renderAll();
+        });
+        object.on('mouseout', function (e) {
+            // Make circle translucent on hover-out
+            e.target.set('fill', 'rgba(0,255,0,0.1)');
+            // e.target.set('fill', 'rgba(0,255,0,0)');
+            canvas.renderAll();
+        });
+
+        // console.log(object);
+        object.parentNode = findObjByID(object.parentNode, 'treeNode');
+        object.childNode = findObjByID(object.childNode, 'treeNode');
+        object.attachedNodeText = findObjByID(object.attachedNodeText, 'nodeText');
+    }
+
+    else if (object.customType == 'nodeText') {
+        object.on('changed', function (e) {
+            console.log("change");
+            // this.numberLines = this.textLines.length;
+            console.log(this.numberLines);
+            this.updateVerticalSpace();
+
+        });
+        object.on('editing:exited', function (e) {
+            console.log('exited');
+            if (this.text == "") {
+                this.text = "..";
+            }
+        });
+        object.on('editing:entered', function (e) {
+            if (this.text == "..") {
+                this.set({ text: "", textLines: [] });
+                // this._text = [];
+                // this._textBeforeEdit = "";
+            }
+        });
+
+        object.parentNode = findObjByID(object.parentNode, 'treeNode');
+        object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
+    }
+
+    else if (object.customType == 'treeNode') {
+        object.nodeParent = findObjByID(object.nodeParent, 'treeNode');
+        object.hoverParent = findObjByID(object.hoverParent, 'circhoverCirclele');
+
+        object.hoverCircles.forEach(function (item, innerIndex) {
+            // console.log(innerIndex);
+            object.hoverCircles[innerIndex] = findObjByID(object.hoverCircles[innerIndex], 'hoverCircle');
+            // console.log(object.hoverCircles[innerIndex]);
+        });
+
+        object.textNodes.forEach(function (item, innerIndex) {
+            // console.log(innerIndex);
+            object.textNodes[innerIndex] = findObjByID(object.textNodes[innerIndex], 'nodeText');
+        });
+    }
+}
+
+
+function setHistoryID() {
+    historyIDCounter += 1;
+    return historyIDCounter;
+}
+
+function findObjByID(objectID, objectType) {
+    let objs = canvas.getObjects(objectType);
+    let result = null;
+    // console.log(objs);
+    // console.log(objectID);
+
+    objs.forEach(function (object) {
+        if (object.historyID == objectID) {
+            // console.log('OBJ FOUND');
+            result = object;
+        }
+    });
+
+    if (result == null) console.log("Obj not found by ID");
+    return result;
 }

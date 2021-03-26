@@ -1,6 +1,6 @@
-var TreeNode = fabric.util.createClass(fabric.Polyline, {
+fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
     // Type below must be 'polyline' for SVG export to work properly
-    // type: 'polyline',
+    type: 'treeNode',
 
     /**
      * Creates a new TreeNode object.
@@ -22,6 +22,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         this.nodeParent = nodeParent;
         this.hoverParent = hoverParent;
         this.customType = 'polyline';
+        this.historyID = setHistoryID();
 
         // Arrays containing this node's hoverCircles & textNodes
         this.hoverCircles = [];
@@ -32,7 +33,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         let nodeWidth = getNodeWidth(this.armsArray);
 
         this.set({ width: nodeWidth, height: this.vertOffset * 2, originX: 'center', originY: 'top' });
-        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: true });
+        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false });
         this.setCoords();
 
         // Dymanically setting the offset
@@ -47,35 +48,67 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.points.push({ x: 0, y: 0 });
 
             // creating the bottom hoverCircles for each arm
-            var hoverCircle = new HoverCircle(this.X + point[0] - 12 - this.horizOffset, this.Y + point[1] - 12 + this.vertOffset, 'bottom', this);
+            var hoverCircle = new fabric.HoverCircle(this.X + point[0] - 12 - this.horizOffset, this.Y + point[1] - 12 + this.vertOffset, 'bottom', this);
             canvas.add(hoverCircle);
             this.hoverCircles.push(hoverCircle);
 
             // creating the bottom textNodes
-            var textNode = new NodeText(this.X + point[0]  /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, this, hoverCircle, 'XP'); // The textNodes don't need coord offset apparently
+            var textNode = new fabric.NodeText(this.X + point[0]  /*- this.horizOffset*/, this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12, this, hoverCircle, 'XP'); // The textNodes don't need coord offset apparently
             canvas.add(textNode);
             this.textNodes.push(textNode);
             // link hoverCircle & textNode together
             hoverCircle.attachedNodeText = textNode;
         }
         // creating the top hoverCircle
-        var topHoverCircle = new HoverCircle(this.X - 12 - this.horizOffset, this.Y - 12 + this.vertOffset, 'top', this);
+        var topHoverCircle = new fabric.HoverCircle(this.X - 12 - this.horizOffset, this.Y - 12 + this.vertOffset, 'top', this);
         canvas.add(topHoverCircle);
         this.hoverCircles.push(topHoverCircle);
 
         // Correcting the positioning of TreeNode on canvas
         this.moveNodeBy(this.horizOffset, 0);
 
-        this.on('drag:enter', function (e) {
-            // console.log(e);
-            console.log("dragenter");
-        });
+
+        // this.on('drag:enter', function (e) {
+        //     // console.log(e);
+        //     console.log("dragenter");
+        // });
     },
 
     _render: function (ctx) {
         this.callSuper('_render', ctx);
         console.log('rendering');
+        // send node to back, to make sure hoverCircles are clickable
+        canvas.sendToBack(this);
     },
+
+    // ** CHANGE: export the custom method when serializing
+    // toObject: function () {
+    //     return fabric.util.object.extend(this.callSuper('toObject'), {
+    //         X: this.X,
+    //         Y: this.Y,
+    //         armsArray: this.armsArray,
+    //         nodeParent: this.nodeParent,
+    //         hoverParent: this.hoverParent,
+    //         hoverCircles: this.hoverCircles,
+    //         textNodes: this.textNodes,
+    //         horizOffset: this.horizOffset,
+    //         vertOffset: this.vertOffset,
+    //         nodeWidth: this.nodeWidth,
+    //         selectable: this.selectable,
+    //         pathOffset: this.pathOffset,
+    //         customType: this.customType,
+    //         historyID: this.historyID,
+
+    //         updateArmCoords: this.updateArmCoords,
+    //         moveNodeBy: this.moveNodeBy,
+    //         moveSubtreeBy: this.moveSubtreeBy,
+    //         getChildNodes: this.getChildNodes
+    //     });
+    // },
+
+    // _fromObject: function (object, callback) {
+    //     return fabric.Object._fromObject('Polyline', object, callback);
+    // },
 
     /**
      * Updates the coords of each arm of the TreeNode.
@@ -88,6 +121,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
      * @param {Array} coordUpdates - Array containing the changes to make to each arm
      */
     updateArmCoords: function (coordUpdates) {
+        // console.log('UPDATINGARMS');
         if (coordUpdates.length != this.armsArray.length) {
             console.error("updateArmCoords: new array length different from old array length");
         }
@@ -97,11 +131,13 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.armsArray[i][0] = this.armsArray[i][0] + coordUpdates[i][0];
             // setting new Y of each arm
             this.armsArray[i][1] = this.armsArray[i][1] + coordUpdates[i][1];
+            // console.log('changing arms');
         }
+        // console.log(this.armsArray);
 
         // Difference between the horizOffset of old & new arm coords arrays
         let horizOffsetDifference = getHorizOffset(this.armsArray) - this.horizOffset; // dont set it just yet
-        console.log(horizOffsetDifference);
+        // console.log(horizOffsetDifference);
 
         // We need to move the TreeNode before redrawing the arms, 
         // and also before recalculating new this.horizOffset
@@ -117,6 +153,8 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         this.set({ width: this.nodeWidth, height: this.vertOffset * 2 });
         this.set({ pathOffset: { x: this.horizOffset, y: this.vertOffset } });
         this.set({ X: this.X - horizOffsetDifference });
+        // Line below fixes width/height issues
+        this.setCoords();
 
         let point = [];
         for (let i = 0; i < this.armsArray.length; i++) {
@@ -136,7 +174,10 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
         }
         // resetting correct top-hoverCircle coords
         this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
+        canvas.renderAll();
     },
+
+
 
     /**
      * Move the TreeNode in the canvas.
@@ -166,6 +207,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
             text.set({ left: text.X, top: text.Y, dirty: true });
             text.setCoords();
         }
+        // canvas.renderAll();
     },
 
     /**
@@ -175,7 +217,7 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
      * @param {*} moveY - how much vertical movement (negative value moves the TreeNode upwards)
      */
     moveSubtreeBy: function (moveX, moveY) {
-        console.log("Moving subtree");
+        // console.log("Moving subtree");
         // console.log(this.getChildNodes());
         this.moveNodeBy(moveX, moveY);
 
@@ -201,10 +243,23 @@ var TreeNode = fabric.util.createClass(fabric.Polyline, {
 });
 
 
+fabric.TreeNode.fromObject = function (object, callback) {
+    console.log('fromObject() called');
+    return fabric.Object._fromObject('TreeNode', object, callback);
+};
+
+// fabric.TreeNode.fromObject = function (object, callback) {
+//     var _enlivenedObjects;
+//     fabric.util.enlivenObjects(object.objects, function (enlivenedObjects) {
+//         delete object.objects;
+//         _enlivenedObjects = enlivenedObjects;
+//     });
+//     return new fabric.TreeNode(_enlivenedObjects, object);
+// };
+
 
 // extending toObject for JSON serialization
-// fabric.Object.prototype.toObject = (function (toObject) {
-fabric.Polyline.prototype.toObject = (function (toObject) {
+fabric.TreeNode.prototype.toObject = (function (toObject) {
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
             X: this.X,
@@ -218,10 +273,23 @@ fabric.Polyline.prototype.toObject = (function (toObject) {
             vertOffset: this.vertOffset,
             nodeWidth: this.nodeWidth,
             selectable: this.selectable,
-            pathOffset: this.pathOffset
+            pathOffset: this.pathOffset,
+            customType: this.customType,
+            historyID: this.historyID,
+
+            updateArmCoords: this.updateArmCoords,
+            moveNodeBy: this.moveNodeBy,
+            moveSubtreeBy: this.moveSubtreeBy,
+            getChildNodes: this.getChildNodes
         });
     };
-})(fabric.Polyline.prototype.toObject);
+})(fabric.TreeNode.prototype.toObject);
+
+
+// standard options type:
+// fabric.Polyline.fromObject = function (object, callback) {
+//     return fabric.Object._fromObject('Polyline', object, callback);
+// }
 
 // fabric.Object.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
 // console.log(fabric.Object.prototype.stateProperties);

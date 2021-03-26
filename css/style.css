@@ -11,3 +11,7 @@
 .btn.active {
     background-color: rgb(38, 141, 38);
 }
+
+#historyContainer {
+    /* display: none; */
+}

@@ -4,3 +4,4 @@ out/
 *.py
 ignore/
 node_modules
+testing.json

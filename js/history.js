@@ -9,20 +9,21 @@ class CanvasHistory {
         this.redoStack = [];
         this.map = new Map();
         this.mapIndex = 0;
+        this.histCanvas = new fabric.Canvas('historyCanvas', {
+        });
 
         // Push initial canvas to undoStack
         // this.undoStack.push(JSON.stringify(this.canvas));
         // this.undoStack.push(JSON.decycle(this.canvas.getObjects()));
 
         // store existing canvas objects in map
-        let canvasObjects = this.canvas.getObjects();
+        // let canvasObjects = this.canvas.getObjects();
 
-        for (let index in canvasObjects) {
-            // console.log(canvasObjects[index]);
-            this.map.set(canvasObjects[index], this.mapIndex);
-            this.mapIndex += 1;
-        }
-        console.log(this.map);
+        // for (let index in canvasObjects) {
+        //     this.map.set(canvasObjects[index], this.mapIndex);
+        //     this.mapIndex += 1;
+        // }
+        // console.log(this.map);
 
     }
 
@@ -36,114 +37,104 @@ class CanvasHistory {
     undoPush() {
         console.log('UNDO PUSH');
 
-        // VERSION : with decycle/retrocycle...
-        // // let canvasState = JSON.stringify(this.canvas);
-        // this.undoStack.push(JSON.decycle(this.canvas.getObjects()));
-
-        // // Version below returns a non-flattened array..... wrong
-        // // let flattenedObjects = JSON.decycle(this.canvas.getObjects());
-
-        // console.log(this.undoStack);
-        // VERSION : with decycle/retrocycle...
-
-
 
         // SET 1 : 1 map
         let canvasRegularObjects = this.canvas.getObjects();
-        // let canvasFlattenedObjects = this.canvas.getObjects();
-        // let canvasFlattenedObjects = canvasRegularObjects.slice(0);
-
         // Works, but different structure??
         // var canvasFlattenedObjects = $.map(canvasRegularObjects, function (obj) {
         //     return $.extend(true, {}, obj);
         // });
 
-        // I freaking love Lodash
-        let canvasFlattenedObjects = _.cloneDeep(canvasRegularObjects);
+        // I freaking love Lodash (might have to check rfdc too...)
+        let canvasFlattenedObjects = _.cloneDeep(canvasRegularObjects); // FIX BACK
+        flattenObjects(canvasFlattenedObjects);
+        flattenObjects(canvasRegularObjects);
 
+        // console.log('FLAT');
+        // console.log(canvasFlattenedObjects);
+        // console.log('REG');
+        // console.log(canvasRegularObjects);
+        // console.log(this.canvas);
 
-        canvasFlattenedObjects[1].childNode = 666;
-        flattenObjects(canvasFlattenedObjects, this);
-        // this.canvas._objects = [];
-        console.log('FLAT');
-        console.log(canvasFlattenedObjects);
-        console.log('REG');
-        console.log(canvasRegularObjects);
-        console.log(this.canvas);
+        // console.log(canvasRegularObjects[0] == canvasFlattenedObjects[0]);
 
+        // this.histCanvas = new fabric.Canvas('historyCanvas', {
+        // });
+        // clear histCanvas
+        this.histCanvas.clear();
+        this.histCanvas.add(...canvasRegularObjects);
 
+        // var rect = new fabric.Rect({
+        //     left: 1500,
+        //     top: 1200,
+        //     fill: 'red',
+        //     width: 20,
+        //     height: 20,
+        //     angle: 30
+        // });
+        // this.histCanvas.add(rect);
+        // this.histCanvas.renderAll();
 
+        // FOR DEBUG ONLY
+        this.histCanvas.on('mouse:up', function (e) {
+            if (e.target != null) {
+                console.log(e.target);
+            }
+        });
+
+        // store the "flattened" canvas to stack
+        // this.undoStack.push(this.histCanvas.toJSON());
+        this.undoStack.push(JSON.stringify(this.histCanvas));
+        // console.log(JSON.stringify(this.histCanvas));
+
+        // clear histCanvas again after!!!
+        // this.histCanvas.clear();
+        // this.histCanvas.renderAll();
 
         // Enable Undo button
-        $('#undoBtn').prop('disabled', false);
+        if (this.undoStack.length > 1) {
+            $('#undoBtn').prop('disabled', false);
+        }
     }
 
     undo() {
         console.log('UNDO');
-
-        // BASE CASE : create a node, save it to JSON then try to load into canvas
-        var test = new TreeNode(1200, 1200, [[-80, 50], [80, 50]], null, null, [],);
-        this.canvas.add(test);
-
-        // remove the node
-        this.canvas.remove(test.hoverCircles[0], test.hoverCircles[1], test.hoverCircles[2], test.textNodes[0], test.textNodes[1]);
-        test.hoverCircles = [];
-        test.textNodes = [];
-
-        console.log(test);
-        console.log(test.toObject());
-
-        // save node as JSON
-        // var stringed = this.canvas.toJSON();
-        var stringed = JSON.stringify(this.canvas); // these are both the same!
-
-        console.log(stringed);
-
-        this.canvas.loadFromJSON(stringed, canvas.renderAll.bind(canvas), function (o, object) {
-            // console.log(o);
-            // console.log(object);
-            console.log('RECREATING');
-        });
-
-
-        // VERSION : with decycle/retrocycle...
         // this.redoStack.push(this.undoStack.pop());
+
+        // console.log(this.undoStack[this.undoStack.length - 1]);
         // this.canvas.clear();
-        // this.canvas.renderAll();
-        // let flattenedObjects = this.undoStack[this.undoStack.length - 1];
-        // // console.log(this.undoStack);
-        // // console.log(this.undoStack[this.undoStack.length - 1]);
-        // let regularObjects = JSON.retrocycle(flattenedObjects);
-        // console.log(regularObjects);
-        // // console.log(flattenedObjects);
+        this.canvas.renderAll();
+        let test = JSON.parse(this.undoStack[0]);
+        // let test = this.undoStack;
+        console.log(test);
 
-        // // for (let x in regularObjects) {
-        // //     console.log(regularObjects[x]);
-        // //     this.canvas.add(regularObjects[x]);
-        // // }
+        // console.log(this.canvas[0] == test.objects[0]);
 
-        // // this.canvas._objects = [...regularObjects];
-        // regularObjects[1].parentNode = 0;
-        // regularObjects[1].childNode = 0;
-        // regularObjects[1].attachedNodeText = 0;
-        // regularObjects[1].canvas = null;
-
-        // setTimeout(this.canvas.add(regularObjects[1]), 10000);
-        // console.log(this.canvas);
-        // this.canvas.renderAll();
-        // VERSION : with decycle/retrocycle...
-
-
-        // this.redoStack.push(this.undoStack.pop());
-        // console.log(this.undoStack.length - 1);
-        // this.canvas.loadFromJSON(this.undoStack[this.undoStack.length - 1], function () {
-        //     canvas.renderAll();
-        //     console.log("reloading from JSON");
+        // var rect = new fabric.Rect({
+        //     left: 1500,
+        //     top: 1200,
+        //     fill: 'red',
+        //     width: 20,
+        //     height: 20,
+        //     angle: 30
         // });
 
+        // let stringed = JSON.stringify(rect);
+        // this.canvas.add(rect);
 
+        this.canvas.loadFromJSON(test, this.canvas.renderAll.bind(this.canvas), function (o, object) {
+            console.log('reviver');
 
+        });
 
+        // this.canvas.loadFromJSON(this.undoStack[this.undoStack.length - 1], canvas.renderAll.bind(canvas)
+        // , function (o, object) {
+        //     console.log('REVIVER');
+        //     // reviveCanvasObject(o, object);
+        //     // object = fabric.Polyline.fromObject(object);
+
+        // }
+        // );
 
         // Enable the Redo button
         $('#redoBtn').prop('disabled', false);
@@ -154,8 +145,6 @@ class CanvasHistory {
         }
 
 
-
-
     } // END undo()
 
     redo() {
@@ -163,9 +152,9 @@ class CanvasHistory {
 
         let state = this.redoStack.pop();
 
-        this.canvas.loadFromJSON(state, function () {
-            canvas.renderAll();
-            console.log("reloading from JSON");
+        this.canvas.loadFromJSON(state, canvas.renderAll.bind(canvas), function (o, object) {
+            // console.log('REVIVER');
+            reviveCanvasObject(o, object);
         });
         this.undoStack.push(state);
 
@@ -178,9 +167,6 @@ class CanvasHistory {
         }
     }
 
-
-
-
 }
 
 var myHistory = new CanvasHistory(canvas);
@@ -190,15 +176,15 @@ console.log(myHistory.undoStack);
 
 
 // Making sure history map updates on object adding
-myHistory.canvas.on('object:added', function (e) {
-    // console.log("OBJECT CREATED");
-    myHistory.mapAdd(e.target);
-});
-myHistory.canvas.on('object:removed', function (e) {
-    console.log("OBJECT REMOVED");
-    myHistory.map.delete(e.target);
-});
+// myHistory.canvas.on('object:added', function (e) {
+//     // console.log("OBJECT CREATED");
+//     myHistory.mapAdd(e.target);
+// });
+// myHistory.canvas.on('object:removed', function (e) {
+//     console.log("OBJECT REMOVED");
+//     myHistory.map.delete(e.target);
+// });
 
 
-// UNDO PUSH TEST
-myHistory.undoPush();
+// UNDO-PUSH TEST
+// myHistory.undoPush();

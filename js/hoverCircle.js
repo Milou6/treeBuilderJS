@@ -1,5 +1,5 @@
-var HoverCircle = fabric.util.createClass(fabric.Circle, {
-    // type: 'hoverCircle',
+fabric.HoverCircle = fabric.util.createClass(fabric.Circle, {
+    type: 'hoverCircle',
 
     /**
      * Creates a clickable circle that hovers over a TreeNode's arms and top.
@@ -23,10 +23,11 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.X = X + this.parentNode.pathOffset.x;
         this.Y = Y - this.parentNode.pathOffset.y;
         this.customType = 'circle';
+        this.historyID = setHistoryID();
 
         this.set({ hasControls: false, hasBorders: false });
-        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
-        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
+        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
+        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
         // this.set({ pathOffset: { x: 0, y: 25 } }); //Maybe not for circle
 
         if (this.hoverType == 'top') {
@@ -40,8 +41,8 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         });
         this.on('mouseout', function (e) {
             // Make circle translucent on hover-out
-            e.target.set('fill', 'rgba(0,255,0,0.1)');
-            // e.target.set('fill', 'rgba(0,255,0,0)');
+            // e.target.set('fill', 'rgba(0,255,0,0.1)');
+            e.target.set('fill', 'rgba(0,255,0,0)');
             canvas.renderAll();
         });
         // this.on('mousedown', function (e) {
@@ -64,7 +65,17 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.set({ left: this.X, top: this.Y });
         this.setCoords(); // this line makes the hoverCircle update coords correctly... let's keep that
         this.callSuper('_render', ctx);
-    }
+    },
+
+    // ** CHANGE: export the custom method when serializing
+    toObject: function () {
+        return fabric.util.object.extend(this.callSuper('toObject'), {
+            // updateArmCoords: this.updateArmCoords,
+            // moveNodeBy: this.moveNodeBy,
+            // moveSubtreeBy: this.moveSubtreeBy,
+            // getChildNodes: this.getChildNodes
+        });
+    },
 
     // _toObject: function () {
     //     return fabric.util.object.extend(toObject.call(this), {
@@ -75,6 +86,10 @@ var HoverCircle = fabric.util.createClass(fabric.Circle, {
     // }
 });
 
+
+fabric.HoverCircle.fromObject = function (object, callback) {
+    // console.log(object)
+};
 
 
 // extending toObject for JSON serialization
@@ -92,7 +107,9 @@ fabric.Circle.prototype.toObject = (function (toObject) {
             lockMovementX: this.lockMovementX,
             hasControls: false,
             hasBorders: false,
-            selectable: this.selectable
+            selectable: this.selectable,
+            customType: this.customType,
+            historyID: this.historyID
         });
     };
 })(fabric.Circle.prototype.toObject);

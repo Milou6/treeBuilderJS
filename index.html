@@ -12,6 +12,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
         crossorigin="anonymous"></script>
+    <!-- JQuery contextmenu -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
+        integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
+        integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
+        crossorigin="anonymous"></script>
+    <!-- JQuery contextmenu -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
+        integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.css"
+        integrity="sha512-EF5k2tHv4ShZB7zESroCVlbLaZq2n8t1i8mr32tgX0cyoHc3GfxuP7IoT8w/pD+vyoq7ye//qkFEqQao7Ofrag=="
+        crossorigin="anonymous" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.ui.position.js"
+        integrity="sha512-vBR2rismjmjzdH54bB2Gx+xSe/17U0iHpJ1gkyucuqlTeq+Q8zwL8aJDIfhQtnWMVbEKMzF00pmFjc9IPjzR7w=="
+        crossorigin="anonymous"></script>
     <!-- Lodash lib -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
         integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
@@ -37,8 +55,25 @@
             <img src="images/ternary.png" alt="ternaryBranch">
         </button>
 
-        <button id="undoBtn" onclick="undo()">Undo</button>
+        <button id="undoBtn" onclick="undo()" disabled>Undo</button>
         <button id="redoBtn" onclick="redo()" disabled>Redo</button>
+
+        <button id="zoomIn" class="btn" onclick="zoomInCanvas()">
+            <img src="images/zoomIn.png" alt="zoomIn">
+        </button>
+        <button id="zoomOut" class="btn" onclick="zoomOutCanvas()">
+            <img src="images/zoomOut.png" alt="zoomOut">
+        </button>
+
+        <button id="saveCanvas" onclick="saveCanvas()">Save Canvas</button>
+        <button onclick="clearCanvas()">CLEAR Canvas</button>
+        <!-- <button onclick="loadCanvas()">LOAD Canvas</button> -->
+        <input type="file" id="fileLoader" name="filename" accept=".json">
+
+        <button id="save">Save to JSON</button>
+        <button id="restore">Restore form JSON</button>
+
+        <button class="context-menu-one btn btn-neutral">right click me</button>
     </div>
 
     <script>
@@ -50,13 +85,11 @@
             // });
 
             // scroll the canvas container to first node
-            // $(".container").scrollTop(2000);
-            // $(".container").scrollLeft(2000);
             $(".container").scrollTop(1000);
-            $(".container").scrollLeft(1000);
+            $(".container").scrollLeft(900);
 
             document.addEventListener('keyup', (event) => {
-                if (['1', '2', '3'].includes(event.key)) {
+                if (['1', '2', '3', '4', '5'].includes(event.key)) {
                     // console.log(event.key);
                     $(`.btn`).removeClass('active');
                     $(`.btn:nth-child(${event.key}`).addClass('active');
@@ -65,18 +98,56 @@
                 }
             });
 
+            $("#save").on('click', function () {
+                store = canvas.toJSON();
+                console.log(store);
+            });
+
+            $("#restore").on('click', function () {
+                canvas.loadFromJSON(store, function () {
+                    console.log('restored:');
+                });
+            });
+
+            // $.contextMenu({
+            //     // define which elements trigger this menu
+            //     selector: ".context-menu-one",
+            //     // define the elements of the menu
+            //     items: {
+            //         foo: { name: "Foo", callback: function (key, opt) { alert("Foo!"); } },
+            //         bar: { name: "Bar", callback: function (key, opt) { alert("Bar!") } }
+            //     }
+            //     // there's more, have a look at the demos and docs...
+            // });
+
+            // $('.context-menu-one').on('click', function (e) {
+            //     console.log('clicked', this);
+            // })
+
         });
     </script>
 
 
 
-    <a download="canvas.svg" id="downloadlink">Download</a>
+    <a download="canvas.svg" id="downloadlink" onclick="makeTextFile()">
+        <button type="button">Download</button>
+    </a>
 
     <!-- The canvas running the tree-building javascript -->
     <div class="container">
-        <canvas id="treeCanvas" width="3000" height="3000"></canvas>
+        <!-- <canvas id="treeCanvas" width="1000" height="500"></canvas> -->
+        <canvas id="treeCanvas" width="3000" height="2000"></canvas>
+        <div id="contextmenu-output"></div>
     </div>
+
+    <!-- <div class="testing">
+        <button>aaa</button>
+    </div> -->
+
     <!-- <h2 id="coords"></h2> -->
+    <!-- <div id="historyContainer" class="container">
+        <canvas id="historyCanvas" width="3000" height="3000"></canvas>
+    </div> -->
 
     <style type="text/css">
         canvas {
@@ -84,15 +155,105 @@
         }
     </style>
 
+    <script>
+        // $.contextMenu({
+        //     // selector: 'canvas',
+        //     // selector: '.upper-canvas',
+        //     selector: '.canvas-container',
+        //     callback: function (key, options) {
+        //         var m = "clicked: " + key;
+        //         window.console && console.log(m) || alert(m);
+        //     },
+        //     items: {
+        //         "edit": { name: "Edit", icon: "edit" },
+        //         "cut": { name: "Cut", icon: "cut" },
+        //         copy: { name: "Copy", icon: "copy" },
+        //         "paste": { name: "Paste", icon: "paste" },
+        //         "delete": { name: "Delete", icon: "delete" },
+        //         "sep1": "---------",
+        //         "quit": {
+        //             name: "Quit", icon: function () {
+        //                 return 'context-menu-icon context-menu-icon-quit';
+        //             }
+        //         }
+        //     }
+        // });
+
+
+        window.onload = function () {
+
+            //Add right-click event monitoring on the upper-layer object of the canvas
+            $(".upper-canvas").contextmenu(rightClickFunct);
+
+            //Initialize the right-click menu
+            $.contextMenu({
+                selector: '#contextmenu-output',
+                trigger: 'none',
+                items: {
+                    "edit": { name: "Edit", icon: "edit" }
+                },
+                build: function ($trigger, e) {
+                    //The build method of the build menu item will be executed every right click
+                    return {
+                        callback: contextMenuClick,
+                        items: contextMenuItems
+                    };
+                },
+            });
+        }
+
+        //Right click event response
+        function rightClickFunct(event) {
+            var pointer = canvas.getPointer(event.originalEvent);
+            console.log(pointer);
+            showContextMenu(event);
+
+            //Block the system right-click menu
+            event.preventDefault();
+            return false;
+        }
+
+        var contextMenuItems;
+        //Right-click menu item click
+        function showContextMenu(event/*, object*/) {
+            // console.log(event);
+
+            //Define the right-click menu item
+            contextMenuItems = {
+                // "delete": { name: "delete", icon: "delete", data: object },
+                "delete": { name: "delete", icon: "delete" },
+                "sep1": "---------",
+                "add": { name: "Add", icon: "add" },
+            };
+            //Right-click menu display position
+            var position = {
+                x: event.clientX,
+                y: event.clientY
+            }
+
+            $('#contextmenu-output').contextMenu(position);
+        }
+
+        //Right-click menu : item click
+        function contextMenuClick(key, options) {
+            if (key == "delete") {
+                console.log('DELETE');
+            } else if (key == "add") {
+                console.log('ADD');
+            }
+        }
+    </script>
+
 
     <!-- Loading all canvas javascript -->
     <script src="js/utils/methods.js"></script>
-    <script src="js/utils/JSONcycle.js"></script>
+    <!-- <script src="js/utils/JSONcycle.js"></script> -->
     <script src="js/nodeText.js"></script>
     <script src="js/hoverCircle.js"></script>
     <script src="js/treeNode.js"></script>
+    <script src="js/utils/historyV2.js"></script>
     <script src="canvas.js"></script>
-    <script src="js/history.js"></script>
+    <!-- <script src="js/history.js"></script> -->
 
 
 </body>
