@@ -518,3 +518,31 @@ function findObjByID(objectID, objectType) {
     if (result == null) console.log("Obj not found by ID");
     return result;
 }
+
+function correctViewBox(SVG) {
+    // vars here represent top-left corner, and bottom-right corner
+    let tlX = 5000, tlY = 5000;
+    let brX = 0, brY = 0;
+
+    for (let obj of canvas.getObjects()) {
+        // console.log(obj);
+        if (obj.aCoords.tl.x < tlX) tlX = obj.aCoords.tl.x;
+        if (obj.aCoords.tl.y < tlY) tlY = obj.aCoords.tl.y;
+        if (obj.aCoords.br.x > brX) brX = obj.aCoords.br.x;
+        if (obj.aCoords.br.y > brY) brY = obj.aCoords.br.y;
+    }
+    // let SVGcoords = { tl: { x: tlX, y: tlY }, br: { x: brX, y: brY } };
+    // console.log(SVGcoords);
+    let width = Math.ceil(brX) - Math.floor(tlX);
+    let height = Math.ceil(brY) - Math.floor(tlY);
+    let newViewbox = `viewBox="${Math.floor(tlX)} ${Math.floor(tlY)} ${width} ${height}"`;
+    // console.log(newViewbox);
+
+    SVG = SVG.replaceAll(/viewBox="0 0 3000 2000"/g, newViewbox);
+    SVG = SVG.replaceAll(/width="3000"/g, `width="${width}"`);
+    SVG = SVG.replaceAll(/height="2000"/g, `height="${height}"`);
+    // RegeEx-of-doom to remove all the circles in SVG file
+    SVG = SVG.replaceAll(/<g transform="matrix(.+?)\n<circle.+?\/>\n<\/g>/g, '');
+    SVG = SVG.replaceAll('treeNode', 'polyline');
+    return SVG;
+}

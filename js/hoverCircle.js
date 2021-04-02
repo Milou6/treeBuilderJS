@@ -26,8 +26,8 @@ fabric.HoverCircle = fabric.util.createClass(fabric.Circle, {
         this.historyID = setHistoryID();
 
         this.set({ hasControls: false, hasBorders: false });
-        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
-        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
+        this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0.1)', selectable: true, lockMovementY: true });
+        // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
         // this.set({ pathOffset: { x: 0, y: 25 } }); //Maybe not for circle
 
         if (this.hoverType == 'top') {
@@ -41,8 +41,8 @@ fabric.HoverCircle = fabric.util.createClass(fabric.Circle, {
         });
         this.on('mouseout', function (e) {
             // Make circle translucent on hover-out
-            // e.target.set('fill', 'rgba(0,255,0,0.1)');
-            e.target.set('fill', 'rgba(0,255,0,0)');
+            e.target.set('fill', 'rgba(0,255,0,0.1)');
+            // e.target.set('fill', 'rgba(0,255,0,0)');
             canvas.renderAll();
         });
         // this.on('mousedown', function (e) {

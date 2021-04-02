@@ -2,11 +2,19 @@
 
 // which Toolbar button is currently selected
 var selectedButton = 'binaryNode';
+// ID for JSON flattening
 var historyIDCounter = 0;
+// Global node shape
+var nodeShape = [[-60, 30], [60, 30]];
+// All nodeTexts for fast retrieval
+var allTexts = null; // NOT USED YET, BUT COULD SPEED UP POINTERS
+// setSelectedButton(document.getElementById('arrow'));
+var arrowStart = null;
+var arrowEnd = null;
 
 
 var canvas = new fabric.Canvas('treeCanvas', {
-    fireRightClick: true,
+    // fireRightClick: true,
     // line below not needed with jquery contextmenu
     // stopContextMenu: true
 });
@@ -47,6 +55,43 @@ canvas.add(Coordstext);
 canvas.on('mouse:move', function (e) {
     // we have to use absolutePointer, otherwise zoom messes up the text Coords!!
     Coordstext.set({ text: `X : ${e.absolutePointer.x.toFixed(0)},  Y : ${e.absolutePointer.y.toFixed(0)}` });
+
+    // ALL LOGIC FOR CREATING ARROWS DOWN HERE
+    if (selectedButton == 'arrow') {
+        allTexts = canvas.getObjects('nodeText');
+
+        for (let text of allTexts) {
+            let textCenter = text.getCenterPoint();
+            if (Math.abs(textCenter.x - e.absolutePointer.x) < 90 && Math.abs(textCenter.y - e.absolutePointer.y) < 90) {
+
+                // for (let pointer of text.pointerCircles) {
+                for (let i = 0; i < text.numberLines * 2; i++) {
+                    let point = text.pointerCircles[i];
+                    // let point2 = text.pointerCircles[i * 2];
+                    // ... check distance of possible point to mouse ...
+                    if (Math.abs(point.left - e.absolutePointer.x) < 60 && Math.abs(point.top - e.absolutePointer.y) < 20) {
+                        // ... and set opacity accordingly
+                        point.set({ opacity: 0.4 });
+                        if (!canvas.contains(point)) {
+                            canvas.add(point);
+                        }
+                    }
+                    // else { point.set({ opacity: 0 }); }
+                    else { canvas.remove(point); }
+
+
+                }
+
+            } // first if Math.abs
+
+            else {
+                for (point of text.pointerCircles) {
+                    // point.set({ opacity: 0 });
+                    canvas.remove(point);
+                }
+            }
+        }
+    }
     canvas.renderAll();
 });
 
@@ -69,8 +114,11 @@ var node2 = new fabric.TreeNode(1500, 1200, [[-80, 50], [80, 50]], null, null, [
 
 canvas.add(node2);
 
+// CAN PROBS DELETE THIS LATER
 fabric.NodeText.prototype.stateProperties.push('textLines');
-console.log(fabric.NodeText.prototype.stateProperties);
+// console.log(fabric.NodeText.prototype.stateProperties);
+
+
 // canvas.add(node1, node2, node3, myNode, rect1);
 
 // var rect1 = new fabric.Rect({
@@ -144,6 +192,7 @@ canvas.on('mouse:down', function (e) {
 });
 
 canvas.on('mouse:move', function (e) {
+    // This is for dragging the canvas w/ the mouse 
     if (this.panning && e && e.e) {
         let delta = new fabric.Point(e.e.movementX, e.e.movementY);
         canvas.relativePan(delta);
@@ -194,7 +243,7 @@ canvas.on('mouse:up', function (e) {
                 // console.log(target);
                 let hoverIndex = parent.hoverCircles.indexOf(target);
 
-                for (circle of parent.hoverCircles) {
+                for (circle of parent.hoverCircles) { // WHAT the hell does this do??
                     if (circle.historyID == target.historyID) {
                         hoverIndex = parent.hoverCircles.indexOf(circle);
                     }
@@ -226,12 +275,30 @@ canvas.on('mouse:up', function (e) {
             canvasHist.undoPush(histAction);
         }
 
+        else if (target.type == 'arrowHandler' && Math.abs(delta.x) > 3) {
+            // console.log('HANDLER ACTION');
+            // checking that handler move is permitted
+            if (target.isMovePermitted(target.getCenterPoint())) {
+                console.log('PERMITTED');
+            }
+            else {
+                // if move not permitted
+                target.set({
+                    left: target.arrow.left - target.arrow.endCoords.x,
+                    top: target.arrow.top - (target.arrow.endCoords.y / 2)
+                });
+                target.setCoords();
+
+            }
+        }
+
         // otherwise, count the 'mouse:up' as a simple click
         else {
             if (target.type == 'hoverCircle') {
 
-                if (target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'binaryNode') {
-                    var newNode = new fabric.TreeNode(target.left + 12, target.top + 50, [[-50, 50], [50, 50]], target.parentNode, target, []);
+                if (target.hoverType == 'bottom' && !target.hasChildNode && target.attachedNodeText.attachedTriangle == null && selectedButton == 'binaryNode') {
+                    // var newNode = new fabric.TreeNode(target.left + 12, target.top + 50, [[-50, 50], [50, 50]], target.parentNode, target, []);
+                    var newNode = new fabric.TreeNode(target.left + 12 + 30, target.top + 30, nodeShape, target.parentNode, target, []);
                     canvas.add(newNode);
                     // set boolean on hoverCircle to disable adding new children to it
                     target.hasChildNode = true;
@@ -239,7 +306,7 @@ canvas.on('mouse:up', function (e) {
 
                     resolveIntersections(newNode, histAction);
                     // if the hoverCircle's textNode is multiple lines long, make sure to push new node a bit down
-                    target.attachedNodeText.updateVerticalSpace();
+                    target.attachedNodeText.setInitVerticalSpace();
                     histAction.push(['addedChild', target, target.childNode]);
                     histAction.push(['nodeAdded', newNode]);
                     console.log(histAction);
@@ -249,7 +316,7 @@ canvas.on('mouse:up', function (e) {
                     // console.log(myHistory.undoStack);
                 }
 
-                else if (target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
+                else if (target.hoverType == 'bottom' && !target.hasChildNode && target.attachedNodeText.attachedTriangle == null && selectedButton == 'singleNode') {
                     var newNode = new fabric.TreeNode(target.left + 12, target.top + 60, [[0, 60]], target.parentNode, target, []);
                     canvas.add(newNode);
                     // set boolean on hoverCircle to disable adding new children to it
@@ -257,7 +324,7 @@ canvas.on('mouse:up', function (e) {
                     target.childNode = newNode;
 
                     resolveIntersections(newNode, histAction);
-                    target.attachedNodeText.updateVerticalSpace();
+                    target.attachedNodeText.setInitVerticalSpace();
 
                     histAction.push(['addedChild', target, target.childNode]);
                     histAction.push(['nodeAdded', newNode]);
@@ -308,6 +375,34 @@ canvas.on('mouse:up', function (e) {
 
             }
 
+            else if (target.type == 'pointerCircle' && selectedButton == 'arrow') {
+                // console.log('touch');
+                if (arrowStart == null) {
+                    arrowStart = target;
+                }
+                else {
+                    arrowEnd = target;
+                }
+
+                if (arrowStart != null && arrowEnd != null) {
+                    // create arrow
+                    console.log('ARROW!!!');
+                    let newArrow = new fabric.Arrow(arrowStart, arrowEnd, []);
+                    canvas.add(newArrow);
+                    canvas.renderAll();
+
+
+                    // reset global vars at the end
+                    arrowStart = null;
+                    arrowEnd = null;
+                }
+
+
+
+
+
+            } // arrow
+
 
 
             if (target.type == 'hoverCircle' && target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
@@ -339,52 +434,47 @@ canvas.on('mouse:up', function (e) {
 // });
 
 
-// console.log(canvas.historyUndo);
 
 
-// console.log(JSON.stringify(canvas));
-// console.log(canvas.toJSON());
 
-// Function below saves the initial canvas to SVG format.
-var textFile = null;
-makeTextFile = function () {
-    var data = new Blob([canvas.toSVG()], { type: 'text' });
-    // var data = new Blob([text], {type: 'text/plain'});
-
-    // If we are replacing a previously generated file we need to
-    // manually revoke the object URL to avoid memory leaks.
-    if (textFile !== null) {
-        window.URL.revokeObjectURL(textFile);
-    }
-
-    textFile = window.URL.createObjectURL(data);
+// Function below saves the canvas to SVG format.
+var globalURL = null;
+var myLink = null;
+SVGDownload = function (e) {
+    console.log(e);
+    // e.preventDefault();
+    let canvasSVG = canvas.toSVG();
+    var data = new Blob([canvasSVG], { type: 'text' });
+    // If we are replacing a previously generated file we need to manually revoke the object URL to avoid memory leaks.
+    if (myLink !== null) { window.URL.revokeObjectURL(textFile); }
 
     var reader = new FileReader();
     reader.onload = function () {
-        console.log(reader.result);
+        var modifSVG = reader.result;
+        modifSVG = correctViewBox(modifSVG);
+
+        var modifData = new Blob([modifSVG], { type: 'text' });
+        var myLink = window.URL.createObjectURL(modifData);
+        console.log(myLink);
+
+        // var link = document.getElementById('downloadlink');
+        globalURL = myLink;
+    }
+    reader.onloadend = function () {
+        // set download link to Download button
+        var anchor = document.getElementById('CanvasDownload');
+        anchor.href = globalURL;
+        anchor.click();
     }
     reader.readAsText(data);
-
-    // // returns a URL you can use as a href
-    // return textFile;
-
-    var link = document.getElementById('downloadlink');
-    link.href = textFile;
+    // console.log(reader.result);
 };
-
-// var test = makeTextFile();
-// console.log(test);
-
-// var link = document.getElementById('downloadlink');
-// link.href = makeTextFile();
-
 
 
 
 
 
 function saveCanvas() {
-
     let canvasFlattenedObjects = _.cloneDeep(canvas.getObjects());
     flattenObjects(canvasFlattenedObjects);
 
@@ -440,8 +530,3 @@ fileSelector.addEventListener('change', (event) => {
 
     reader.readAsText(fileList[0]);
 });
-
-
-// '{"objects":[{ "type": "treeNode", "version": "4.3.1", "originX": "center", "originY": "top", "left": 500, "top": 200, "width": 160, "height": 50, "fill": "rgba(255, 255, 255, 1)", "stroke": "black", "strokeWidth": 1, "strokeDashArray": null, "strokeLineCap": "butt", "strokeDashOffset": 0, "strokeLineJoin": "miter", "strokeUniform": false, "strokeMiterLimit": 4, "scaleX": 1, "scaleY": 1, "angle": 0, "flipX": false, "flipY": false, "opacity": 1, "shadow": null, "visible": true, "backgroundColor": "", "fillRule": "nonzero", "paintFirst": "fill", "globalCompositeOperation": "source-over", "skewX": 0, "skewY": 0, "points": [ { "x": -80, "y": 50 }, { "x": 0, "y": 0 }, { "x": 80, "y": 50 }, { "x": 0, "y": 0 } ], "X": 500, "Y": 200, "armsArray": [ [ -80, 50 ], [ 80, 50 ] ], "nodeParent": null, "hoverParent": null, "hoverCircles": [ 2, 4, 6 ], "textNodes": [ 3, 5 ], "horizOffset": 0, "vertOffset": 25, "selectable": false, "pathOffset": { "x": 0, "y": 25 }, "customType": "polyline", "historyID": 1 }]}'
-
-// '{"objects":[{"type":"rect","left":50,"top":50,"width":20,"height":20,"fill":"green","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"rx":0,"ry":0},{"type":"circle","left":100,"top":100,"width":100,"height":100,"fill":"red","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"selectable":true,"hasControls":true,"hasBorders":true,"hasRotatingPoint":false,"transparentCorners":true,"perPixelTargetFind":false,"radius":50}],"background":"rgba(0, 0, 0, 0)"}'

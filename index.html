@@ -13,12 +13,12 @@
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
         crossorigin="anonymous"></script>
     <!-- JQuery contextmenu -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
         integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
         integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script> -->
     <!-- JQuery contextmenu -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
         integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
@@ -53,6 +53,9 @@
 
         <button id="ternaryNode" class="btn" onclick="setSelectedButton(this)">
             <img src="images/ternary.png" alt="ternaryBranch">
+        </button>
+        <button id="arrow" class="btn" onclick="setSelectedButton(this)">
+            <img src="images/arrow.png" alt="arrow">
         </button>
 
         <button id="undoBtn" onclick="undo()" disabled>Undo</button>
@@ -129,9 +132,11 @@
 
 
 
-    <a download="canvas.svg" id="downloadlink" onclick="makeTextFile()">
+    <a download="canvas.svg" id="downloadlink" onclick="SVGDownload(event)">
         <button type="button">Download</button>
     </a>
+    <!-- this 2nd anchor is the one who actually downloads the SVG -->
+    <a href="" download="canvas.svg" id="CanvasDownload"></a>
 
     <!-- The canvas running the tree-building javascript -->
     <div class="container">
@@ -156,31 +161,10 @@
     </style>
 
     <script>
-        // $.contextMenu({
-        //     // selector: 'canvas',
-        //     // selector: '.upper-canvas',
-        //     selector: '.canvas-container',
-        //     callback: function (key, options) {
-        //         var m = "clicked: " + key;
-        //         window.console && console.log(m) || alert(m);
-        //     },
-        //     items: {
-        //         "edit": { name: "Edit", icon: "edit" },
-        //         "cut": { name: "Cut", icon: "cut" },
-        //         copy: { name: "Copy", icon: "copy" },
-        //         "paste": { name: "Paste", icon: "paste" },
-        //         "delete": { name: "Delete", icon: "delete" },
-        //         "sep1": "---------",
-        //         "quit": {
-        //             name: "Quit", icon: function () {
-        //                 return 'context-menu-icon context-menu-icon-quit';
-        //             }
-        //         }
-        //     }
-        // });
-
-
         window.onload = function () {
+
+            // GLOBAL VAR
+            var contextMenuObject = null;
 
             //Add right-click event monitoring on the upper-layer object of the canvas
             $(".upper-canvas").contextmenu(rightClickFunct);
@@ -189,12 +173,13 @@
             $.contextMenu({
                 selector: '#contextmenu-output',
                 trigger: 'none',
-                items: {
-                    "edit": { name: "Edit", icon: "edit" }
-                },
+                // items: {
+                //     "edit": { name: "Edit", icon: "edit" }
+                // },
                 build: function ($trigger, e) {
                     //The build method of the build menu item will be executed every right click
                     return {
+                        // No parentheses in method down here!!
                         callback: contextMenuClick,
                         items: contextMenuItems
                     };
@@ -205,8 +190,22 @@
         //Right click event response
         function rightClickFunct(event) {
             var pointer = canvas.getPointer(event.originalEvent);
-            console.log(pointer);
-            showContextMenu(event);
+            let found = false;
+            // let objectClicked = null;
+
+            for (let obj of canvas.getObjects()) {
+                // figuring out if a treeNode was right-clicked
+                if ((obj.type == 'treeNode' || obj.type == 'nodeText') && obj.containsPoint(pointer, null, true)) {
+                    contextMenuObject = obj;
+                    found = true;
+                }
+            }
+            if (found == false) contextMenuObject = null;
+            else {
+                // only show menu if SOMETHING was clicked!
+                showContextMenu(event);
+            }
+            console.log(contextMenuObject);
 
             //Block the system right-click menu
             event.preventDefault();
@@ -215,31 +214,222 @@
 
         var contextMenuItems;
         //Right-click menu item click
-        function showContextMenu(event/*, object*/) {
+        function showContextMenu(event) {
             // console.log(event);
 
             //Define the right-click menu item
-            contextMenuItems = {
-                // "delete": { name: "delete", icon: "delete", data: object },
-                "delete": { name: "delete", icon: "delete" },
-                "sep1": "---------",
-                "add": { name: "Add", icon: "add" },
-            };
+            if (contextMenuObject == null) {
+                contextMenuItems = {
+                    // empty Menu?
+                    "sep1": "---------",
+                }
+            }
+            else if (contextMenuObject.type == 'treeNode' && contextMenuObject.nodeParent != null) {
+                contextMenuItems = {
+                    // "delete": { name: "delete", icon: "delete", data: object },
+                    "delete": { name: "Delete node", icon: "delete" },
+                    "add": { name: "Add node here", icon: "add" },
+                    "sep1": "---------",
+                    "edit": { name: "Toggle 3rd arm", icon: "edit" }
+                };
+            }
+            else if (contextMenuObject.type == 'treeNode') {       //NOT IDEAL STRUCT, HAVE TO REFACTOR
+                contextMenuItems = {
+                    "delete": { name: "Delete node", icon: "delete" },
+                    // "add": { name: "Add node here", icon: "add" },
+                    "sep1": "---------",
+                    "edit": { name: "Toggle 3rd arm", icon: "edit" }
+                }
+            }
+            else if (contextMenuObject.type == 'nodeText') {
+                contextMenuItems = {
+                    "toggleTriangle": { name: "Toggle △", icon: "edit" }
+                    // "toggleTriangle": { name: "Toggle △", icon: "fa-exclamation-triangle" }
+                }
+            }
             //Right-click menu display position
             var position = {
                 x: event.clientX,
                 y: event.clientY
             }
-
             $('#contextmenu-output').contextMenu(position);
         }
 
         //Right-click menu : item click
         function contextMenuClick(key, options) {
+            // console.log(options);
             if (key == "delete") {
                 console.log('DELETE');
-            } else if (key == "add") {
-                console.log('ADD');
+                // let node = contextMenuObject;
+                // let histAction = [];
+
+                // histAction.push(['nodeRemoved', node]);
+                // canvasHist.undoPush(histAction);
+
+            }
+
+            else if (key == "add") {
+                // console.log('ADD');
+
+                let node = contextMenuObject;
+                console.log(node);
+                let parent = node.nodeParent;
+                let hoverIndex = parent.hoverCircles.indexOf(node.hoverParent);
+                // console.log(hoverIndex);
+
+                let histAction = [];
+
+                let subtreeMove = 0;
+                if (hoverIndex == 0) {
+                    subtreeMove = -50;
+                }
+                else { subtreeMove = 50; }
+
+                // add new node on top of clicked one ...
+                var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 50, [[-50, 50], [50, 50]], parent, parent.hoverCircles[hoverIndex], []);
+                canvas.add(newNode);
+                parent.hoverCircles[hoverIndex].childNode = newNode;
+
+                newNode.hoverCircles[hoverIndex].hasChildNode = true;
+                newNode.hoverCircles[hoverIndex].childNode = node;
+
+                node.hoverParent = newNode.hoverCircles[hoverIndex];
+                node.nodeParent = newNode;
+                // ... and push clicked node down
+                node.moveSubtreeBy(subtreeMove, 50 + 50 - 12);
+
+                // replace nodeText correctly
+                let hoverCircleText = parent.hoverCircles[hoverIndex].attachedNodeText.text;
+                newNode.textNodes[hoverIndex].text = hoverCircleText;
+                parent.hoverCircles[hoverIndex].attachedNodeText.text = 'XP';
+
+                histAction.push(['textEdited', parent.hoverCircles[hoverIndex].attachedNodeText, hoverCircleText, 'XP']);
+                histAction.push(['nodeAdded', newNode]);
+                histAction.push(['addedBetweenNode', node, parent, hoverIndex, newNode]);
+                histAction.push(['moveSubtree', node, subtreeMove, 50 + 50 - 12]);
+
+                // push to history
+                canvasHist.undoPush(histAction);
+
+
+
+
+                // var newNode = new fabric.TreeNode(target.X + 12 - 50, target.Y - 60 - 20, [[-50, 50], [50, 50]], null, null, []);
+                // canvas.add(newNode);
+
+            }
+
+            else if (key == "edit") {
+                // console.log('EDIT');
+                let node = contextMenuObject;
+                let histAction = [];
+
+                if (node.textNodes.length == 2) {
+
+                    // create a new armsArray with 3 sets of coords instead of 2
+                    let newArmX = node.armsArray[0][0] + node.armsArray[1][0];
+                    let newArmY = node.armsArray[0][1];
+                    let newArmsArray = [node.armsArray[0], [newArmX, newArmY], node.armsArray[1]];
+
+                    // saving some stuff from old node
+                    let text1 = node.textNodes[0].text;
+                    let text2 = node.textNodes[1].text;
+                    let child1 = node.hoverCircles[0].childNode;
+                    let child2 = node.hoverCircles[1].childNode;
+                    let parentHover = node.hoverParent;
+
+
+                    // new ternary node that replaces binary one
+                    var newNode = new fabric.TreeNode(node.X, node.Y, newArmsArray, node.nodeParent, node.hoverParent, []);
+                    // resetting stuff saved above
+                    newNode.textNodes[0].text = text1;
+                    newNode.textNodes[2].text = text2;
+                    newNode.hoverCircles[0].childNode = child1;
+                    newNode.hoverCircles[0].hasChildNode = newNode.hoverCircles[0].childNode == null ? false : true;
+                    newNode.hoverCircles[2].childNode = child2;
+                    newNode.hoverCircles[2].hasChildNode = newNode.hoverCircles[2].childNode == null ? false : true;
+                    parentHover.childNode = newNode;
+
+                    canvas.add(newNode);
+                    node.delete();
+
+                    histAction.push(['nodeAdded', newNode]);
+                    histAction.push(['nodeRemoved', node]);
+                    histAction.push(['3rdArmAdded', node, newNode]);
+                    canvasHist.undoPush(histAction);
+
+
+                }
+
+
+            }
+
+            else if (key == 'toggleTriangle' && !contextMenuObject.attachedHover.hasChildNode) {
+                let textNode = contextMenuObject;
+                let histAction = [];
+
+                let line1 = textNode.textLines[0];
+                let line2 = textNode.textLines[1];
+                // console.log(line2);
+
+                // if (line2 != null) {
+                // console.log('works');
+                if (textNode.attachedTriangle == null) {
+                    if (line2 == null) {
+                        // var newTriangle = new fabric.TreeTriangle(textNode.X, textNode.Y, textNode, []);
+                        var newTriangle = new fabric.TreeTriangle(0, 25, textNode, []);
+                        canvas.add(newTriangle);
+                        canvas.renderAll();
+
+                        // push text down to accomodate triangle
+                        textNode.attachedTriangle = newTriangle;
+                        // textNode.set({ Y: textNode.Y + 35 });
+                        // textNode.set({ top: textNode.Y, dirty: true });
+                        // textNode.setCoords();
+                        canvas.renderAll();
+                    }
+
+                    // if 2 lines of text or more
+                    else {
+                        var newTriangle = new fabric.TreeTriangle(0, 25, textNode, []);
+                        textNode.attachedTriangle = newTriangle;
+                        // canvas.renderAll();
+
+                        let secondaryText = new fabric.NodeText(textNode.X, textNode.Y + 60, textNode.parentNode, textNode.attachedHover, line2);
+                        // link new text to primary text
+                        textNode.secondaryText = secondaryText;
+                        // textNode.parentNode.textNodes.push(secondaryText);
+                        canvas.add(newTriangle, secondaryText);
+
+                        // remove 2nd line from primary text
+                        textNode.text = line1;
+
+                        // push text down to accomodate triangle
+                        // textNode.set({ Y: textNode.Y + 35 });
+                        // textNode.set({ top: textNode.Y, dirty: true });
+                        // textNode.setCoords();
+                        canvas.renderAll();
+                    }
+                }
+
+                // IF TRIANGLES IS ALREADY THERE, REMOVE IT
+                else {
+                    if (textNode.secondaryText != null) {
+                        let secondaryText = textNode.secondaryText;
+
+                        // re-add secondary text to primary text
+                        textNode.text = textNode.text.concat('\n', secondaryText.text);
+                        // remove secondary text and triangle
+                        canvas.remove(textNode.secondaryText);
+                    }
+                    canvas.remove(textNode.attachedTriangle);
+                    textNode.attachedTriangle = null;
+                    canvas.renderAll();
+                }
+
+
+
+                // } // if line2
             }
         }
     </script>
@@ -251,6 +441,9 @@
     <script src="js/nodeText.js"></script>
     <script src="js/hoverCircle.js"></script>
     <script src="js/treeNode.js"></script>
+    <script src="js/treeTriangle.js"></script>
+    <script src="js/arrow.js"></script>
+    <script src="js/pointerCircle.js"></script>
     <script src="js/utils/historyV2.js"></script>
     <script src="canvas.js"></script>
     <!-- <script src="js/history.js"></script> -->

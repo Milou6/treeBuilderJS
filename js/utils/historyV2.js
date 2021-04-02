@@ -33,6 +33,10 @@ class CanvasHistory {
         if (this.undoStack.length > 0) {
             $('#undoBtn').prop('disabled', false);
         }
+
+        // Everytime an Action is made, we should clear the redoStack!?
+        this.redoStack.length = 0;
+        $('#redoBtn').prop('disabled', true);
     }
 
     undo() {
@@ -56,8 +60,6 @@ class CanvasHistory {
         if (this.undoStack.length == 0) {
             $('#undoBtn').prop('disabled', true);
         }
-
-
     } // END undo()
 
     redo() {
@@ -89,6 +91,7 @@ class CanvasHistory {
             hover.hasChildNode = false;
         }
 
+        // remove node and resolve parenthood
         else if (subAction[0] == 'upperNodeAdded') {
             subAction[1].hoverParent = null;
             subAction[1].nodeParent = null;
@@ -101,6 +104,7 @@ class CanvasHistory {
             this.canvas.remove(subAction[2]);
         }
 
+        // simply remove node
         else if (subAction[0] == 'nodeAdded') {
             let node = subAction[1];
 
@@ -108,6 +112,10 @@ class CanvasHistory {
                 this.canvas.remove(circle);
             }
             for (let text of node.textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.remove(pointer);
+                    console.log('pointer');
+                }
                 this.canvas.remove(text);
             }
             this.canvas.remove(node);
@@ -144,6 +152,36 @@ class CanvasHistory {
             canvas.renderAll();
         }
 
+        // 1: old node, 2: old parent , 3: hoverIndex (to re-bind hoverParent), 4: in.between node
+        else if (subAction[0] == 'addedBetweenNode') {
+            // re-bind the hoverParent using passed index
+            subAction[1].hoverParent = subAction[2].hoverCircles[subAction[3]];
+            subAction[1].nodeParent = subAction[2];
+
+            // re-bind childNode of parent's hoverCircle
+            subAction[2].hoverCircles[subAction[3]].childNode = subAction[1];
+        }
+
+        else if (subAction[0] == 'nodeRemoved') {
+            let node = subAction[1];
+            for (let circle of node.hoverCircles) {
+                this.canvas.add(circle);
+            }
+            for (let text of node.textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.add(pointer);
+                }
+                this.canvas.add(text);
+            }
+            this.canvas.add(node);
+        }
+
+        else if (subAction[0] == '3rdArmAdded') {
+            subAction[1].hoverParent.childNode = subAction[1];
+        }
+
+
+
 
 
 
@@ -175,6 +213,9 @@ class CanvasHistory {
                 this.canvas.add(circle);
             }
             for (let text of node.textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.add(pointer);
+                }
                 this.canvas.add(text);
             }
             this.canvas.add(node);
@@ -202,6 +243,34 @@ class CanvasHistory {
             subAction[1].set({ text: subAction[3] });
             subAction[1].updateVerticalSpace();
             canvas.renderAll();
+        }
+
+        // 1: old node, 2: old parent , 3: hoverIndex (to re-bind hoverParent), 4: in.between node
+        else if (subAction[0] == 'addedBetweenNode') {
+            // re-bind the hoverParent using passed index
+            subAction[1].hoverParent = subAction[4].hoverCircles[subAction[3]];
+            subAction[1].nodeParent = subAction[4];
+
+            // re-bind childNode of parent's hoverCircle
+            subAction[2].hoverCircles[subAction[3]].childNode = subAction[4];
+        }
+
+        else if (subAction[0] == 'nodeRemoved') {
+            let node = subAction[1];
+            for (let circle of node.hoverCircles) {
+                this.canvas.remove(circle);
+            }
+            for (let text of node.textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.remove(pointer);
+                }
+                this.canvas.remove(text);
+            }
+            this.canvas.remove(node);
+        }
+
+        else if (subAction[0] == '3rdArmAdded') {
+            subAction[1].hoverParent.childNode = subAction[2];
         }
     }
 

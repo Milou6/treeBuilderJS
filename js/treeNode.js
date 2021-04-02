@@ -171,6 +171,19 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
             this.textNodes[i].set({ X: this.X + point[0]  /*- this.horizOffset*/, Y: this.Y + point[1] /*+ this.vertOffset*/ + 25 - 12 });
             this.textNodes[i].set({ left: this.textNodes[i].X, top: this.textNodes[i].Y });
             this.textNodes[i].setCoords();
+            // this.textNodes[i].alreadyHasPointers = false; // FKIN LINES BREAKING MY CODE
+            // this.textNodes[i].deletePointers();
+
+            // if text has attached triangle, move as well
+            if (this.textNodes[i].attachedTriangle != null) {
+                let tri = this.textNodes[i].attachedTriangle;
+                tri.set({ left: this.textNodes[i].X + tri.relativeX, top: this.textNodes[i].Y + tri.relativeY, dirty: true });
+                tri.setCoords();
+                // move secondary text if present
+                this.textNodes[i].moveSecondaryText();
+            }
+            // move text pointerCircles as well
+            this.textNodes[i].updatePointerCircles();
         }
         // resetting correct top-hoverCircle coords
         this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
@@ -206,12 +219,21 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
             text.set({ X: text.X + moveX, Y: text.Y + moveY });
             text.set({ left: text.X, top: text.Y, dirty: true });
             text.setCoords();
+            // if text has attached triangle, move as well
+            if (text.attachedTriangle != null) {
+                let tri = text.attachedTriangle;
+                tri.set({ left: text.X + tri.relativeX, top: text.Y + tri.relativeY, dirty: true });
+                tri.setCoords();
+                // move secondary text if present
+                text.moveSecondaryText();
+            }
+            // move text pointerCircles as well
+            text.updatePointerCircles();
         }
-        // canvas.renderAll();
     },
 
     /**
-     * Move the TreeNode object and all of its subtree (all nodes descended from it)
+     * Move the TreeNode object and all of its subtree (all nodes descended from it) recursively.
      * 
      * @param {*} moveX - how much horizontal movement (negative value moves the TreeNode to the left)
      * @param {*} moveY - how much vertical movement (negative value moves the TreeNode upwards)
@@ -224,6 +246,8 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
         for (child of this.getChildNodes()) {
             child.moveSubtreeBy(moveX, moveY);
         }
+
+        canvas.renderAll();
     },
 
     /**
@@ -239,13 +263,23 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
         }
         // if (result.length > 0) result.pop();
         return result;
+    },
+
+    delete: function () {
+        for (let circle of this.hoverCircles) {
+            this.canvas.remove(circle);
+        }
+        for (let text of this.textNodes) {
+            this.canvas.remove(text);
+        }
+        this.canvas.remove(this);
     }
 });
 
 
 fabric.TreeNode.fromObject = function (object, callback) {
     console.log('fromObject() called');
-    return fabric.Object._fromObject('TreeNode', object, callback);
+    return fabric.Object._fromObject('Polyline', object, callback, 'points'); // TY @asturur
 };
 
 // fabric.TreeNode.fromObject = function (object, callback) {
