@@ -13,20 +13,12 @@
         integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
         crossorigin="anonymous"></script>
     <!-- JQuery contextmenu -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
-        integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
-        integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
-        crossorigin="anonymous"></script> -->
-    <!-- JQuery contextmenu -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.min.js"
         integrity="sha512-kvg/Lknti7OoAw0GqMBP8B+7cGHvp4M9O9V6nAYG91FZVDMW3Xkkq5qrdMhrXiawahqU7IZ5CNsY/wWy1PpGTQ=="
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.contextMenu.css"
         integrity="sha512-EF5k2tHv4ShZB7zESroCVlbLaZq2n8t1i8mr32tgX0cyoHc3GfxuP7IoT8w/pD+vyoq7ye//qkFEqQao7Ofrag=="
         crossorigin="anonymous" />
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.ui.position.js"
         integrity="sha512-vBR2rismjmjzdH54bB2Gx+xSe/17U0iHpJ1gkyucuqlTeq+Q8zwL8aJDIfhQtnWMVbEKMzF00pmFjc9IPjzR7w=="
         crossorigin="anonymous"></script>
@@ -35,12 +27,27 @@
         integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
         crossorigin="anonymous"></script>
     <link href="css/style.css" rel="stylesheet">
-    <!-- <script src="https://raw.githubusercontent.com/lyzerk/fabric-history/master/src/index.js"></script> -->
-    <!-- <script src="fabric-history.js"></script> -->
 </head>
 
 
 <body>
+
+    <div id="top-menu">
+        <!-- <a id="loadFileBtn" onclick="clickFileLoader()">Load from file</a> -->
+        <!-- <label for="filename">Load from file</label> -->
+        <input type="file" id="fileLoader" name="filename" accept=".json">
+        <a href="" download="canvasObjects.json" id="canvasJSONDownload"></a>
+
+        <!-- <a href="" onclick="saveCanvasToJSON()">Save to JSON</a> -->
+        <button id="save" onclick="saveCanvasToJSON()">Save to JSON</button>
+
+        <a download="canvas.svg" id="downloadlink" onclick="SVGDownload(event)">
+            <button type="button">Download as Image</button>
+        </a>
+        <!-- this 2nd anchor is the one who actually downloads the SVG -->
+        <a href="" download="canvas.svg" id="CanvasDownload"></a>
+    </div>
+
     <!-- Toolbar for different kinds of nodes -->
     <div id="main-toolbar">
         <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)">
@@ -68,26 +75,14 @@
             <img src="images/zoomOut.png" alt="zoomOut">
         </button>
 
-        <button id="saveCanvas" onclick="saveCanvas()">Save Canvas</button>
-        <button onclick="clearCanvas()">CLEAR Canvas</button>
-        <!-- <button onclick="loadCanvas()">LOAD Canvas</button> -->
-        <input type="file" id="fileLoader" name="filename" accept=".json">
 
-        <button id="save">Save to JSON</button>
-        <button id="restore">Restore form JSON</button>
-
-        <button class="context-menu-one btn btn-neutral">right click me</button>
     </div>
+
 
     <script>
         $(document).ready(function () {
-            // Set 'active' color to selected button
-            // $('button').on('click', function () {
-            //     $('button').removeClass('active');
-            //     $(this).addClass('active');
-            // });
 
-            // scroll the canvas container to first node
+            // scroll to middle of the fabricJS canvas
             $(".container").scrollTop(1000);
             $(".container").scrollLeft(900);
 
@@ -96,73 +91,40 @@
                     // console.log(event.key);
                     $(`.btn`).removeClass('active');
                     $(`.btn:nth-child(${event.key}`).addClass('active');
-                    // console.log($(`.btn:nth-child(${event.key}`));
                     setSelectedButton($(`.btn:nth-child(${event.key}`)[0]);
                 }
             });
 
-            $("#save").on('click', function () {
-                store = canvas.toJSON();
-                console.log(store);
-            });
-
-            $("#restore").on('click', function () {
-                canvas.loadFromJSON(store, function () {
-                    console.log('restored:');
-                });
-            });
-
-            // $.contextMenu({
-            //     // define which elements trigger this menu
-            //     selector: ".context-menu-one",
-            //     // define the elements of the menu
-            //     items: {
-            //         foo: { name: "Foo", callback: function (key, opt) { alert("Foo!"); } },
-            //         bar: { name: "Bar", callback: function (key, opt) { alert("Bar!") } }
-            //     }
-            //     // there's more, have a look at the demos and docs...
+            // $("#save").on('click', function () {
+            //     store = canvas.toJSON();
+            //     console.log(store);
             // });
 
-            // $('.context-menu-one').on('click', function (e) {
-            //     console.log('clicked', this);
-            // })
+            // $("#restore").on('click', function () {
+            //     canvas.loadFromJSON(store, function () {
+            //         console.log('restored:');
+            //     });
+            // });
 
         });
     </script>
 
 
 
-    <a download="canvas.svg" id="downloadlink" onclick="SVGDownload(event)">
-        <button type="button">Download</button>
-    </a>
-    <!-- this 2nd anchor is the one who actually downloads the SVG -->
-    <a href="" download="canvas.svg" id="CanvasDownload"></a>
-
-    <!-- The canvas running the tree-building javascript -->
+    <a id="mailBtn" href="mailto:someone@somewhere.com?subject=treeBuilderJS: Bug Report">?</a>
     <div class="container">
-        <!-- <canvas id="treeCanvas" width="1000" height="500"></canvas> -->
+        <!-- The canvas running the tree-building javascript -->
         <canvas id="treeCanvas" width="3000" height="2000"></canvas>
+        <!-- <canvas id="treeCanvas" width="1000" height="500"></canvas> -->
         <div id="contextmenu-output"></div>
     </div>
 
-    <!-- <div class="testing">
-        <button>aaa</button>
-    </div> -->
-
-    <!-- <h2 id="coords"></h2> -->
     <!-- <div id="historyContainer" class="container">
         <canvas id="historyCanvas" width="3000" height="3000"></canvas>
     </div> -->
 
-    <style type="text/css">
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
-
     <script>
         window.onload = function () {
-
             // GLOBAL VAR
             var contextMenuObject = null;
 
@@ -445,6 +407,7 @@
     <script src="js/arrow.js"></script>
     <script src="js/pointerCircle.js"></script>
     <script src="js/utils/historyV2.js"></script>
+    <script src="js/canvasEventHandlers.js"></script>
     <script src="canvas.js"></script>
     <!-- <script src="js/history.js"></script> -->
 

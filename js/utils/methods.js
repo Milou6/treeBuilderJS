@@ -45,6 +45,7 @@ function resolveIntersections(node, histAction) {
 
 
 function resolveIntersectionX(node, objectGroup, histAction) {
+    console.log('INTERSECTION');
     let nodeTL = node.aCoords.tl.x;
     let nodeTR = node.aCoords.tr.x;
     let objectGroupTL = objectGroup.groupCoords.tl.x;
@@ -53,7 +54,7 @@ function resolveIntersectionX(node, objectGroup, histAction) {
 
     if (nodeTL < objectGroupTL && objectGroupTL < nodeTR) intersection = 'right';
     else intersection = 'left';
-    console.log(intersection);
+    // console.log(intersection);
 
     // Horizontal movement depends on which kind of intersection it is
     let movementX = 0;
@@ -165,7 +166,7 @@ function findFirstCommonAncestor(node1, node2) {
         filteredArray = node1Ancestors.filter(value => node2Ancestors.includes(value));
         if (filteredArray.length > 0) {
             ancestorFound = true;
-            console.log('ancestor found');
+            // console.log('ancestor found');
             // console.log(filteredArray);
         }
     }
@@ -340,15 +341,7 @@ function setSelectedButton(button) {
     button.classList.add('active');
 }
 
-function undo() {
-    canvasHist.undo();
-    // myHistory.undo();
-}
 
-function redo() {
-    canvasHist.redo();
-    // myHistory.redo();
-}
 
 // array[index] doesnt work here.... need better solution in long-term
 function flattenObjects(array, hist, realArray) {
@@ -376,32 +369,19 @@ function flattenObjects(array, hist, realArray) {
         }
         else if (object.type == 'nodeText') {
             object.parentNode = (object.parentNode == null ? null : object.parentNode.historyID);
+            // console.log(object.attachedHover);
             object.attachedHover = object.attachedHover.historyID;
+            // console.log(object.attachedHover);
+
+            object.pointerCircles.forEach(function (item, innerIndex) {
+                object.pointerCircles[innerIndex] = object.pointerCircles[innerIndex].historyID;
+            })
         }
+        // else if (object.type == 'arrow') {
 
-        // if (object.customType == 'circle') {
-        //     object.parentNode = hist.map.get(realArray[index].parentNode);
-        //     object.childNode = hist.map.get(realArray[index].childNode);
-        //     object.attachedNodeText = hist.map.get(realArray[index].attachedNodeText);
-        // }
-        // else if (object.customType == 'polyline') {
-        //     object.nodeParent = hist.map.get(realArray[index].nodeParent);
-        //     object.hoverParent = hist.map.get(realArray[index].hoverParent);
-
-        //     object.hoverCircles.forEach(function (item, innerIndex) {
-        //         object.hoverCircles[innerIndex] = hist.map.get(realArray[index].hoverCircles[innerIndex]);
-        //     });
-
-        //     object.textNodes.forEach(function (item, innerIndex) {
-        //         // object.textNodes[index] = hist.map.get(item);
-        //         object.textNodes[innerIndex] = hist.map.get(realArray[index].textNodes[innerIndex]);
-        //     });
-        // }
-        // else if (object.customType == 'i-text') {
-        //     object.parentNode = hist.map.get(realArray[index].parentNode);
-        //     object.attachedHover = hist.map.get(realArray[index].attachedHover);
         // }
     });
+    return array;
 }
 
 
@@ -434,67 +414,81 @@ function wantsToCrossMiddle(hoverCircle, delta) {
 function reviveCanvasObject(o, object) {
     // console.log(o);
     // console.log(object);
-    if (object.customType == 'hoverCircle') {
-        object.on('mouseover', function (e) {
-            // Make circle opaque on hover-in
-            e.target.set('fill', 'rgba(0,255,0,1)');
-            canvas.renderAll();
-        });
-        object.on('mouseout', function (e) {
-            // Make circle translucent on hover-out
-            e.target.set('fill', 'rgba(0,255,0,0.1)');
-            // e.target.set('fill', 'rgba(0,255,0,0)');
-            canvas.renderAll();
-        });
-
-        // console.log(object);
-        object.parentNode = findObjByID(object.parentNode, 'treeNode');
-        object.childNode = findObjByID(object.childNode, 'treeNode');
-        object.attachedNodeText = findObjByID(object.attachedNodeText, 'nodeText');
+    if (object.type == 'hoverCircle') {
+        reviveHoverCircle(object);
+    }
+    else if (object.type == 'nodeText') {
+        reviveNodeText(object);
+    }
+    else if (object.type == 'treeNode') {
+        reviveTreeNode(object);
+    }
+    else if (object.type == 'text') {
+        canvas.remove(object);
     }
 
-    else if (object.customType == 'nodeText') {
-        object.on('changed', function (e) {
-            console.log("change");
-            // this.numberLines = this.textLines.length;
-            console.log(this.numberLines);
-            this.updateVerticalSpace();
-
-        });
-        object.on('editing:exited', function (e) {
-            console.log('exited');
-            if (this.text == "") {
-                this.text = "..";
-            }
-        });
-        object.on('editing:entered', function (e) {
-            if (this.text == "..") {
-                this.set({ text: "", textLines: [] });
-                // this._text = [];
-                // this._textBeforeEdit = "";
-            }
-        });
-
-        object.parentNode = findObjByID(object.parentNode, 'treeNode');
-        object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
-    }
-
-    else if (object.customType == 'treeNode') {
-        object.nodeParent = findObjByID(object.nodeParent, 'treeNode');
-        object.hoverParent = findObjByID(object.hoverParent, 'circhoverCirclele');
-
-        object.hoverCircles.forEach(function (item, innerIndex) {
-            // console.log(innerIndex);
-            object.hoverCircles[innerIndex] = findObjByID(object.hoverCircles[innerIndex], 'hoverCircle');
-            // console.log(object.hoverCircles[innerIndex]);
-        });
-
-        object.textNodes.forEach(function (item, innerIndex) {
-            // console.log(innerIndex);
-            object.textNodes[innerIndex] = findObjByID(object.textNodes[innerIndex], 'nodeText');
-        });
+    // update global var historyIDCounter, so that new objects don't get same ID as loaded objects
+    if (historyIDCounter < object.historyID) {
+        historyIDCounter = object.historyID + 1;
     }
 }
+
+function reviveHoverCircle(object) {
+    object.on('mouseover', hoverCircleMouseOver);
+    object.on('mouseout', hoverCircleMouseOut);
+
+    object.parentNode = findObjByID(object.parentNode, 'treeNode');
+    object.childNode = findObjByID(object.childNode, 'treeNode');
+    object.attachedNodeText = findObjByID(object.attachedNodeText, 'nodeText');
+}
+
+function reviveNodeText(object) {
+    object.on('changed', nodeTextChanged);
+    object.on('editing:exited', nodeTextEditingExited);
+    object.on('editing:entered', nodeTextEditingEntered);
+
+    object.parentNode = findObjByID(object.parentNode, 'treeNode');
+    object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
+
+    // object.pointerCircles.forEach(function (item, innerIndex) {
+    //     object.pointerCircles[innerIndex] = findObjByID(object.pointerCircles[innerIndex], 'pointerCircle');
+    // });
+}
+
+function reviveTreeNode(object) {
+    object.nodeParent = findObjByID(object.nodeParent, 'treeNode');
+    object.hoverParent = findObjByID(object.hoverParent, 'hoverCircle');
+
+    // console.log(object.hoverCircles);
+    object.hoverCircles.forEach(function (item, innerIndex) {
+        object.hoverCircles[innerIndex] = findObjByID(object.hoverCircles[innerIndex], 'hoverCircle');
+    });
+
+    object.textNodes.forEach(function (item, innerIndex) {
+        object.textNodes[innerIndex] = findObjByID(object.textNodes[innerIndex], 'nodeText');
+    });
+
+    canvas.sendToBack(object);
+}
+
+// function resetToFabricInstance(o, object) {
+//     // console.log(o);
+//     // console.log(object);
+//     if (object.type == 'hoverCircle') {
+//         resetHoverCircle(object);
+//     }
+//     else if (object.type == 'nodeText') {
+//         resetNodeText(object);
+//     }
+//     else if (object.type == 'treeNode') {
+//         resetTreeNode(object);
+//     }
+// }
+
+// function resetHoverCircle(obj) {
+//     resetObject = new fabric.HoverCircle(obj.X, obj.Y, obj.hoverType, obj.parentNode);
+//     resetObject.historyID = obj.historyID;
+// }
 
 
 function setHistoryID() {
@@ -503,20 +497,23 @@ function setHistoryID() {
 }
 
 function findObjByID(objectID, objectType) {
-    let objs = canvas.getObjects(objectType);
-    let result = null;
-    // console.log(objs);
-    // console.log(objectID);
+    // no need to iterate if property is null
+    if (objectID != null) {
+        let objs = canvas.getObjects(objectType);
+        let result = null;
 
-    objs.forEach(function (object) {
-        if (object.historyID == objectID) {
-            // console.log('OBJ FOUND');
-            result = object;
-        }
-    });
+        objs.forEach(function (object) {
+            if (object.historyID == objectID) {
+                // console.log('OBJ FOUND');
+                result = object;
+            }
+        });
 
-    if (result == null) console.log("Obj not found by ID");
-    return result;
+        if (result == null) console.error(`Obj ${objectID}, type ${objectType} not found by ID`);
+        return result;
+
+    }
+    else { return null; }
 }
 
 function correctViewBox(SVG) {

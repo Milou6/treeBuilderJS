@@ -1,3 +1,11 @@
+canvas {
+    border: 1px solid black;
+}
+
+#top-menu{
+    /* display: flex; */
+    margin: 0 0 20px 0;
+}
 
 
 .container {
@@ -5,6 +13,7 @@
     height: 500px;
     /* max-height: 300px; */
     overflow-y: scroll;
+    /* position: fixed; */
 
 }
 
@@ -15,3 +24,42 @@
 #historyContainer {
     /* display: none; */
 }
+
+#mailBtn {
+    text-decoration: none;
+    position: absolute;
+    left: 1100px;
+    top: 150px;
+    height: 70px;
+    width: 70px;
+    z-index: 10;
+    font-size:40px;
+    text-align: center;
+    
+    font-family:Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    line-height: 70px;
+
+
+    color: white;
+    background-color: rgba(132, 0, 255,0.9);
+    border-radius: 50%;
+}
+
+input[type='file'] {
+    color: rgba(0, 0, 0, 0)
+  }
+
+  #fileLoader {
+      /* display: none; */
+  }
+
+  #loadFileBtn {
+    color: aliceblue;
+    background-color: rgba(132, 0, 255,0.9);
+    font-size:20px;
+    height: 70px;
+    width: 70px;
+    cursor: pointer;
+  }
+

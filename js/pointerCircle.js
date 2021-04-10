@@ -29,6 +29,7 @@ fabric.PointerCircle = fabric.util.createClass(fabric.Circle, {
 
 fabric.PointerCircle.fromObject = function (object, callback) {
     // console.log(object)
+    return fabric.Object._fromObject('Circle', object, callback);
 };
 
 // extending toObject for JSON serialization

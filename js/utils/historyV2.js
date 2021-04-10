@@ -275,3 +275,14 @@ class CanvasHistory {
     }
 
 }
+
+
+function undo() {
+    canvasHist.undo();
+    // myHistory.undo();
+}
+
+function redo() {
+    canvasHist.redo();
+    // myHistory.redo();
+}
