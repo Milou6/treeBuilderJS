@@ -4,6 +4,7 @@ fabric.PointerCircle = fabric.util.createClass(fabric.Circle, {
     initialize: function (options) {
         options || (options = {});
         this.callSuper('initialize', options);
+        this.arrow = null;
         this.historyID = setHistoryID();
 
         this.set({ originX: 'center', originY: 'center' });
@@ -18,11 +19,11 @@ fabric.PointerCircle = fabric.util.createClass(fabric.Circle, {
     },
 
     // ** CHANGE: export the custom method when serializing
-    toObject: function () {
-        return fabric.util.object.extend(this.callSuper('toObject'), {
-            // updateVerticalSpace: this.updateVerticalSpace
-        });
-    },
+    // toObject: function () {
+    //     return fabric.util.object.extend(this.callSuper('toObject'), {
+    //         // updateVerticalSpace: this.updateVerticalSpace
+    //     });
+    // },
 
 });
 
@@ -32,19 +33,20 @@ fabric.PointerCircle.fromObject = function (object, callback) {
     return fabric.Object._fromObject('Circle', object, callback);
 };
 
-// extending toObject for JSON serialization
-// fabric.IText.prototype.toObject = (function (toObject) {
-//     return function () {
-//         return fabric.util.object.extend(toObject.call(this), {
-//             X: this.X,
-//             Y: this.Y,
-//             numberLines: this.hoverType,
-//             parentNode: this.parentNode,
-//             attachedHover: this.hasChildNode,
-//             lockMovementY: this.lockMovementY,
-//             lockMovementX: this.lockMovementX,
-//             customType: this.customType,
-//             historyID: this.historyID
-//         });
-//     };
-// })(fabric.IText.prototype.toObject);
+fabric.PointerCircle.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
+    return function () {
+        return fabric.util.object.extend(toObject.call(this), {
+            arrow: this.arrow,
+            historyID: this.historyID,
+        });
+    };
+})(fabric.PointerCircle.prototype.toObject);
+
+fabric.Circle.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
+    return function () {
+        return fabric.util.object.extend(toObject.call(this), {
+            arrow: this.arrow,
+            historyID: this.historyID,
+        });
+    };
+})(fabric.Circle.prototype.toObject);

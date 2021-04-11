@@ -75,6 +75,8 @@
             <img src="images/zoomOut.png" alt="zoomOut">
         </button>
 
+        <button id="render" onclick="renderBoundingRect()">BoundingRect()</button>
+
 
     </div>
 
@@ -83,7 +85,8 @@
         $(document).ready(function () {
 
             // scroll to middle of the fabricJS canvas
-            $(".container").scrollTop(1000);
+            $(".container").scrollTop(1180);
+            // $(".container").scrollTop(1000);
             $(".container").scrollLeft(900);
 
             document.addEventListener('keyup', (event) => {

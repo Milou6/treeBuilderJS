@@ -180,6 +180,14 @@ class CanvasHistory {
             subAction[1].hoverParent.childNode = subAction[1];
         }
 
+        else if (subAction[0] == 'arrowAdded') {
+            let arrow = subAction[1];
+            arrow.arrowStart.arrow = null;
+            arrow.arrowEnd.arrow = null;
+            canvas.remove(arrow.tipStart, arrow.tipEnd, arrow.circleHandler, arrow);
+            canvas.renderAll();
+        }
+
 
 
 
@@ -271,6 +279,14 @@ class CanvasHistory {
 
         else if (subAction[0] == '3rdArmAdded') {
             subAction[1].hoverParent.childNode = subAction[2];
+        }
+
+        else if (subAction[0] == 'arrowAdded') {
+            let arrow = subAction[1];
+            arrow.arrowStart.arrow = arrow;
+            arrow.arrowEnd.arrow = arrow;
+            canvas.add(arrow.tipStart, arrow.tipEnd, arrow.circleHandler, arrow);
+            canvas.renderAll();
         }
     }
 

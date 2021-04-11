@@ -52,8 +52,9 @@ fabric.IText.prototype.initPointers = function () {
             originY: 'center',
             opacity: 0,
             selectable: false,
-            // textNode: this
+            textSide: 'left'
         });
+        pointerCircle1.setCoords();
         var pointerCircle2 = new fabric.PointerCircle({
             radius: 7,
             fill: 'purple',
@@ -63,10 +64,12 @@ fabric.IText.prototype.initPointers = function () {
             originY: 'center',
             opacity: 0,
             selectable: false,
-            // textNode: this
+            textSide: 'right'
         });
-        canvas.add(pointerCircle1, pointerCircle2);
+        pointerCircle2.setCoords();
+        //Gotta push to array before adding to canvas??? WTF
         this.pointerCircles.push(pointerCircle1, pointerCircle2);
+        canvas.add(pointerCircle1, pointerCircle2);
     }
 
     canvas.renderAll();
@@ -83,20 +86,31 @@ fabric.IText.prototype.updatePointerCircles = function () {
     let circleRightX = startCoordRight.x + 10;
 
     let pointerIterator = 0;
+    let arrowsToMove = new Set();
     for (let i = 0; i < 6; i++) {
         let circleY = startCoordLeft.y + i * this.__lineHeights[0] + (this.__lineHeights[0] / 2);
-        // if (pointerIterator % 2 == 0) {
-        //     coordLeft = circleLeftX;
-        // }
-        // else { coordLeft = circleRightX; }
 
         // setting left pointer
         this.pointerCircles[pointerIterator].set({ left: circleLeftX, top: circleY, dirty: true });
+        this.pointerCircles[pointerIterator].setCoords();
+        if (this.pointerCircles[pointerIterator].arrow != null) {
+            globalArrowsToUpdate.add(this.pointerCircles[pointerIterator].arrow);
+        }
         pointerIterator += 1;
         // setting right pointer
         this.pointerCircles[pointerIterator].set({ left: circleRightX, top: circleY, dirty: true });
+        this.pointerCircles[pointerIterator].setCoords();
+        if (this.pointerCircles[pointerIterator].arrow != null) {
+            // this.pointerCircles[pointerIterator].arrow.updateArrowPosition();
+            globalArrowsToUpdate.add(this.pointerCircles[pointerIterator].arrow);
+        }
         pointerIterator += 1;
     }
+
+    // update arrow positions
+    // for (let arrow of arrowsToMove) {
+    //     arrow.updateArrowPosition();
+    // }
 }
 
 
@@ -222,7 +236,9 @@ fabric.IText.prototype.toObject = (function (toObject) {
 
 
 
+
 function nodeTextChanged(e) {
+    // console.log('CHANGE');
     // this.numberLines = this.textLines.length;
     this.updateVerticalSpace();
     // if #lines changed, allow pointers to be recreated

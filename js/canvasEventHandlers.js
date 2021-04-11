@@ -28,8 +28,8 @@ function canvasMouseMove(e) {
                             canvas.add(point);
                         }
                     }
-                    // else { point.set({ opacity: 0 }); }
-                    else { canvas.remove(point); }
+                    else { point.set({ opacity: 0 }); }
+                    // else { canvas.remove(point); }
 
 
                 }
@@ -38,8 +38,8 @@ function canvasMouseMove(e) {
 
             else {
                 for (point of text.pointerCircles) {
-                    // point.set({ opacity: 0 });
-                    canvas.remove(point);
+                    point.set({ opacity: 0 });
+                    // canvas.remove(point);
                 }
             }
         }
@@ -268,10 +268,18 @@ function canvasMouseUp(e) {
 
                 if (arrowStart != null && arrowEnd != null) {
                     // create arrow
-                    console.log('ARROW!!!');
+                    // console.log('ARROW!!!');
                     let newArrow = new fabric.Arrow(arrowStart, arrowEnd, []);
                     canvas.add(newArrow);
                     canvas.renderAll();
+
+                    // link pointerCircles to the new arrow
+                    arrowStart.arrow = newArrow;
+                    arrowEnd.arrow = newArrow;
+
+                    // add move to history
+                    histAction.push(['arrowAdded', newArrow]);
+                    canvasHist.undoPush(histAction);
 
 
                     // reset global vars at the end

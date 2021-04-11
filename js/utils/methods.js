@@ -377,9 +377,19 @@ function flattenObjects(array, hist, realArray) {
                 object.pointerCircles[innerIndex] = object.pointerCircles[innerIndex].historyID;
             })
         }
-        // else if (object.type == 'arrow') {
-
-        // }
+        else if (object.type == 'arrow') {
+            object.arrowStart = (object.arrowStart == null ? null : object.arrowStart.historyID);
+            object.arrowEnd = (object.arrowEnd == null ? null : object.arrowEnd.historyID);
+            object.tipStart = (object.tipStart == null ? null : object.tipStart.historyID);
+            object.tipEnd = (object.tipEnd == null ? null : object.tipEnd.historyID);
+            object.circleHandler = (object.circleHandler == null ? null : object.circleHandler.historyID);
+        }
+        else if (object.type == 'circleHandler') {
+            object.arrow = (object.arrow == null ? null : object.arrow.historyID);
+        }
+        else if (object.type == 'pointerCircle') {
+            object.arrow = (object.arrow == null ? null : object.arrow.historyID);
+        }
     });
     return array;
 }
@@ -423,6 +433,15 @@ function reviveCanvasObject(o, object) {
     else if (object.type == 'treeNode') {
         reviveTreeNode(object);
     }
+    else if (object.type == 'arrow') {
+        reviveArrow(object);
+    }
+    else if (object.type == 'circleHandler') {
+        reviveCircleHandler(object);
+    }
+    else if (object.type == 'pointerCircle') {
+        revivePointerCircle(object);
+    }
     else if (object.type == 'text') {
         canvas.remove(object);
     }
@@ -450,9 +469,9 @@ function reviveNodeText(object) {
     object.parentNode = findObjByID(object.parentNode, 'treeNode');
     object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
 
-    // object.pointerCircles.forEach(function (item, innerIndex) {
-    //     object.pointerCircles[innerIndex] = findObjByID(object.pointerCircles[innerIndex], 'pointerCircle');
-    // });
+    object.pointerCircles.forEach(function (item, innerIndex) {
+        object.pointerCircles[innerIndex] = findObjByID(object.pointerCircles[innerIndex], 'pointerCircle');
+    });
 }
 
 function reviveTreeNode(object) {
@@ -469,6 +488,28 @@ function reviveTreeNode(object) {
     });
 
     canvas.sendToBack(object);
+}
+
+function reviveArrow(object) {
+    object.arrowStart = findObjByID(object.arrowStart, 'pointerCircle');
+    object.arrowEnd = findObjByID(object.arrowEnd, 'pointerCircle');
+    object.tipStart = findObjByID(object.tipStart, 'triangle');
+    object.tipEnd = findObjByID(object.tipEnd, 'triangle');
+    object.circleHandler = findObjByID(object.circleHandler, 'circleHandler');
+
+    object.updateArrowPosition(); // Makes arrow behave correctly after loadFromJSON
+}
+
+function reviveCircleHandler(object) {
+    object.arrow = findObjByID(object.arrow, 'arrow');
+
+    object.on('mouseover', circleHandlerMouseOver);
+    object.on('mouseout', circleHandlerMouseOut);
+    object.on('moved', circleHandlerMoved);
+}
+
+function revivePointerCircle(object) {
+    object.arrow = findObjByID(object.arrow, 'arrow');
 }
 
 // function resetToFabricInstance(o, object) {

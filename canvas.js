@@ -12,6 +12,7 @@ var allTexts = null; // NOT USED YET, BUT COULD SPEED UP POINTERS
 var arrowStart = null;
 var arrowEnd = null;
 fabric.Object.NUM_FRACTION_DIGITS = 2; // DOESNT SEEM TO WORK FOR SVG EXPORT
+var globalArrowsToUpdate = new Set();
 
 
 var canvas = new fabric.Canvas('treeCanvas', {
@@ -90,9 +91,13 @@ canvas.add(root);
 canvas.renderAll();
 
 // FASTER DEBUG FOR ARROWS
-canvas.fire('mouse:up', { target: canvas._objects[16] });
-canvas.fire('mouse:up', { target: canvas._objects[46] });
-setSelectedButton(document.getElementById('arrow'));
+// canvas.fire('mouse:up', { target: canvas._objects[16] });
+// canvas.fire('mouse:up', { target: canvas._objects[46] });
+
+// canvas.fire('mouse:up', { target: canvas._objects[62] });
+// canvas.fire('mouse:up', { target: canvas._objects[92] });
+// canvas.fire('mouse:up', { target: canvas._objects[122] });
+// setSelectedButton(document.getElementById('arrow'));
 
 
 
@@ -129,24 +134,34 @@ setSelectedButton(document.getElementById('arrow'));
 
 
 
-// Uncomment block below to make boundingRects visible for all objects
-// canvas.on("after:render", function (opt) {
-//     canvas.contextContainer.strokeStyle = '#FF0000';
-//     canvas.forEachObject(function (obj) {
-//         if (obj.type != 'pointerCircle') {
-//             var bound = obj.getBoundingRect();
-//             if (bound) {
-//                 canvas.contextContainer.strokeRect(
-//                     bound.left + 0.5,
-//                     bound.top + 0.5,
-//                     bound.width,
-//                     bound.height
-//                 );
-//             }
+var globalBounding = false;
+function renderBoundingRect() {
+    if (!globalBounding) {
+        canvas.on("after:render", function (opt) {
+            canvas.contextContainer.strokeStyle = '#FF0000';
+            canvas.forEachObject(function (obj) {
+                if (obj.type != 'pointerCircle') {
+                    var bound = obj.getBoundingRect();
+                    if (bound) {
+                        canvas.contextContainer.strokeRect(
+                            bound.left + 0.5,
+                            bound.top + 0.5,
+                            bound.width,
+                            bound.height
+                        );
+                    }
 
-//         }
-//     }); // forEach
-// });
+                }
+            }); // forEach
+        });
+        globalBounding = true;
+    }
+    else {
+        canvas.off("after:render");
+        globalBounding = false;
+    }
+
+}
 
 
 
