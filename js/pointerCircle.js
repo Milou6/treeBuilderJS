@@ -38,6 +38,8 @@ fabric.PointerCircle.prototype.toObject = (function (toObject) { // The .prototy
         return fabric.util.object.extend(toObject.call(this), {
             arrow: this.arrow,
             historyID: this.historyID,
+            textSide: this.textSide,
+            textNode: this.textNode
         });
     };
 })(fabric.PointerCircle.prototype.toObject);
@@ -47,6 +49,11 @@ fabric.Circle.prototype.toObject = (function (toObject) { // The .prototype SHOU
         return fabric.util.object.extend(toObject.call(this), {
             arrow: this.arrow,
             historyID: this.historyID,
+            textSide: this.textSide,
+            textNode: this.textNode
         });
     };
 })(fabric.Circle.prototype.toObject);
+
+fabric.PointerCircle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "historyID", "textSide", "textNode"]);
+fabric.Circle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "historyID", "textSide", "textNode"]);

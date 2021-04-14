@@ -389,6 +389,10 @@ function flattenObjects(array, hist, realArray) {
         }
         else if (object.type == 'pointerCircle') {
             object.arrow = (object.arrow == null ? null : object.arrow.historyID);
+            object.textNode = (object.textNode == null ? null : object.textNode.historyID);
+        }
+        else if (object.type == 'triangle') {
+            object.pointer = (object.pointer == null ? null : object.pointer.historyID);
         }
     });
     return array;
@@ -441,6 +445,9 @@ function reviveCanvasObject(o, object) {
     }
     else if (object.type == 'pointerCircle') {
         revivePointerCircle(object);
+    }
+    else if (object.type == 'triangle') {
+        reviveTriangle(object);
     }
     else if (object.type == 'text') {
         canvas.remove(object);
@@ -510,6 +517,12 @@ function reviveCircleHandler(object) {
 
 function revivePointerCircle(object) {
     object.arrow = findObjByID(object.arrow, 'arrow');
+    object.textNode = findObjByID(object.textNode, 'nodeText');
+}
+
+function reviveTriangle(object) {
+    object.pointer = findObjByID(object.pointer, 'pointerCircle');
+
 }
 
 // function resetToFabricInstance(o, object) {

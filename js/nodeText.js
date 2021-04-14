@@ -21,6 +21,68 @@ fabric.IText.prototype.updateVerticalSpace = function () {
 
 }
 
+var globalColorCircles = []; // global var for textNode Color Menu
+fabric.IText.prototype.showColorMenu = function () {
+    let colorLeft = { x: this.aCoords.tl.x - 20, y: this.aCoords.tl.y };
+    let colorRight = { x: this.aCoords.tr.x + 20, y: this.aCoords.tr.y };
+    let colorArray = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+    let colorIndex = 0;
+
+    for (let i = 0; i < 6; i++) {
+        let colorCircle = new fabric.Circle({
+            left: colorIndex < 3 ? colorLeft.x : colorRight.x,
+            // making right-side circles have correct y
+            top: i < 3 ? colorLeft.y + 30 * i : colorLeft.y + 30 * (i - 3),
+            originX: 'center',
+            originY: 'center',
+            fill: colorArray[colorIndex],
+            radius: 10,
+            selectable: false,
+            textNode: this
+        });
+        colorCircle.on('mouseover', getSelectionIndexes);
+        colorCircle.on('mousedown', setSelectionColor);  // events to color selection (or whole text)
+        colorCircle.on('mouseout', resizeColorCircle);
+        canvas.add(colorCircle);
+        globalColorCircles.push(colorCircle);
+        colorIndex += 1;
+    }
+    canvas.renderAll();
+}
+
+var selectionStart = null; // Global vars to keep selection indexes from one event to another
+var selectionEnd = null;
+function getSelectionIndexes() {
+    selectionStart = this.textNode.selectionStart;
+    selectionEnd = this.textNode.selectionEnd;
+    this.set({ radius: 12 });
+}
+function setSelectionColor() {
+    if (selectionStart == selectionEnd) { // If no selection exists, select whole text
+        selectionStart = 0;
+        selectionEnd = this.textNode._text.length;
+    }
+    this.textNode.setSelectionStart(selectionStart);
+    this.textNode.setSelectionEnd(selectionEnd);
+    let style = { fill: this.fill } // Add circle color to style object
+    this.textNode.setSelectionStyles(style);
+    // this.textNode.enterEditing();
+}
+function resizeColorCircle() { this.set({ radius: 10 }); }
+
+// Push color circle as textNode gets wider/shorter
+fabric.IText.prototype.updateColorMenu = function () {
+    let index = 0;
+    for (let colorCircle of globalColorCircles) {
+        if (index < 3) { colorCircle.set({ left: this.aCoords.tl.x - 20 }); }
+        else { colorCircle.set({ left: this.aCoords.tr.x + 20 }); }
+        colorCircle.setCoords();
+        index += 1;
+    }
+}
+
+
+
 fabric.IText.prototype.moveSecondaryText = function () {
     if (this.secondaryText != null) {
         let sec = this.secondaryText;
@@ -52,7 +114,8 @@ fabric.IText.prototype.initPointers = function () {
             originY: 'center',
             opacity: 0,
             selectable: false,
-            textSide: 'left'
+            textSide: 'left',
+            textNode: this
         });
         pointerCircle1.setCoords();
         var pointerCircle2 = new fabric.PointerCircle({
@@ -64,7 +127,8 @@ fabric.IText.prototype.initPointers = function () {
             originY: 'center',
             opacity: 0,
             selectable: false,
-            textSide: 'right'
+            textSide: 'right',
+            textNode: this
         });
         pointerCircle2.setCoords();
         //Gotta push to array before adding to canvas??? WTF
@@ -107,10 +171,11 @@ fabric.IText.prototype.updatePointerCircles = function () {
         pointerIterator += 1;
     }
 
-    // update arrow positions
-    // for (let arrow of arrowsToMove) {
-    //     arrow.updateArrowPosition();
-    // }
+    // update arrows positioning if needed
+    for (let arrow of globalArrowsToUpdate) {
+        arrow.updateArrowPosition();
+    }
+    globalArrowsToUpdate.clear();
 }
 
 
@@ -137,7 +202,9 @@ fabric.NodeText = fabric.util.createClass(fabric.IText, {
         // this.alreadyHasPointers = false;
 
         this.set({ originX: 'center', originY: 'top' });
-        this.set({ left: this.X, top: this.Y, editingBorderColor: 'green', hasControls: false, fontSize: 20, textAlign: 'center' /*hasControls: false, */, lockMovementX: true, lockMovementY: true });
+        this.set({
+            left: this.X, top: this.Y, hasControls: false, fontSize: 20, textAlign: 'center' /*hasControls: false, */, lockMovementX: true, lockMovementY: true, padding: 4
+        });
 
         this.setCoords();
         this.initPointers();
@@ -203,6 +270,8 @@ fabric.NodeText.prototype.toObject = (function (toObject) {
 
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
+            showColorMenu: this.showColorMenu,
+            updateColorMenu: this.updateColorMenu,
             initPointers: this.initPointers,
             updatePointerCircles: this.updatePointerCircles
         });
@@ -228,6 +297,8 @@ fabric.IText.prototype.toObject = (function (toObject) {
 
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
+            showColorMenu: this.showColorMenu,
+            updateColorMenu: this.updateColorMenu,
             initPointers: this.initPointers,
             updatePointerCircles: this.updatePointerCircles
         });
@@ -241,6 +312,9 @@ function nodeTextChanged(e) {
     // console.log('CHANGE');
     // this.numberLines = this.textLines.length;
     this.updateVerticalSpace();
+    this.updatePointerCircles();
+    this.updateColorMenu();
+    this.setCoords(); // Prevents clashes when textNodes overlapping...
     // if #lines changed, allow pointers to be recreated
     // this.alreadyHasPointers = false;
     // this.deletePointers();
@@ -249,8 +323,15 @@ function nodeTextChanged(e) {
 
 function nodeTextEditingExited(e) {
     console.log('exited');
+    // remove the Color circles of nodeText
+    for (color of globalColorCircles) {
+        canvas.remove(color);
+    }
+    globalColorCircles.length = 0;
+    canvas.renderAll();
+
     if (this.text == "") {
-        this.text = "..";
+        this.text = "...";
     }
     let histAction = [];
     histAction.push(['textEdited', this, this.oldText, this.text]);
@@ -265,11 +346,14 @@ function nodeTextEditingExited(e) {
 }
 
 function nodeTextEditingEntered(e) {
-    if (this.text == "..") {
+    if (this.text == "...") {
         this.set({ text: "", textLines: [] });
         // this._text = [];
         // this._textBeforeEdit = "";
     }
     this.oldText = this._textBeforeEdit;
+
+    // Create color circles to choose from
+    this.showColorMenu();
 }
 

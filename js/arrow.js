@@ -1,10 +1,34 @@
 fabric.Polyline.prototype.arrowInitSequence = function () {
+    // let width = 
+    if (this.arrowEnd.left > this.arrowStart.left) {
+        this.direction = 'rightwards';
+        // if the wrong pointer selected, correct it
+        if (this.arrowStart.textSide == 'left') {
+            // get pointerCircle just across from current one
+            let index = this.arrowStart.textNode.pointerCircles.indexOf(this.arrowStart) + 1;
+            // remove .arrow attr
+            this.arrowStart.arrow = null;
+            this.arrowStart = this.arrowStart.textNode.pointerCircles[index];
+            this.arrowStart.arrow = this;
+        }
+
+    }
+    else {
+        this.direction = 'leftwards';
+        // if the wrong pointer selected, correct it
+        if (this.arrowStart.textSide == 'right') {
+            // get pointerCircle just across from current one
+            let index = this.arrowStart.textNode.pointerCircles.indexOf(this.arrowStart) - 1;
+            // remove .arrow attr
+            this.arrowStart.arrow = null;
+            this.arrowStart = this.arrowStart.textNode.pointerCircles[index];
+            this.arrowStart.arrow = this;
+        }
+    }
+
+
     this.distanceStartEndX = Math.abs(this.arrowStart.left - this.arrowEnd.left);
     this.distanceStartEndY = Math.abs(this.arrowStart.top - this.arrowEnd.top);
-    // let width = 
-    if (this.arrowEnd.left > this.arrowStart.left) { this.direction = 'rightwards'; }
-    else { this.direction = 'leftwards'; }
-
     if (this.direction == 'leftwards') {
         // this.set({ width: this.endCoords.x, height: this.endCoords.y, originX: 'right', originY: 'bottom' });
         this.set({ width: this.distanceStartEndX, height: this.distanceStartEndY, originX: 'right', originY: 'bottom' });
@@ -46,7 +70,8 @@ fabric.Polyline.prototype.arrowInitSequence = function () {
         this.set({ pathOffset: { x: +this.width / 2, y: -this.height / 2 } });
     }
 
-    this.sendBackwards();
+    // this.sendBackwards();
+    canvas.sendToBack(this);
 }
 
 fabric.Polyline.prototype.initArrowHandlers = function () {
@@ -96,17 +121,23 @@ fabric.Polyline.prototype.initArrowTips = function () {
     let angleTip1 = this.arrowStart.textSide == 'left' ? 90 : 270;
     let angleTip2 = this.arrowEnd.textSide == 'left' ? 90 : 270;
 
+    let nudgeTip1 = this.arrowStart.textSide == 'left' ? +5 : -5;
     let nudgeTip2 = this.arrowEnd.textSide == 'left' ? +5 : -5;
 
     let tip1 = new fabric.Triangle({
         width: 10,
         height: 10,
         fill: 'black',
-        left: this.arrowStart.left,
+        hasControls: false,
+        hasBorders: false,
+        selectable: false,
+        padding: 4,
+        left: this.arrowStart.left + nudgeTip1,
         top: this.arrowStart.top,
         originX: 'center',
         originY: 'center',
         angle: angleTip1,
+        pointer: this.arrowStart,
         historyID: setHistoryID()
     });
     this.tipStart = tip1;
@@ -114,11 +145,16 @@ fabric.Polyline.prototype.initArrowTips = function () {
         width: 10,
         height: 10,
         fill: 'black',
+        hasControls: false,
+        hasBorders: false,
+        selectable: false,
+        padding: 4,
         left: this.arrowEnd.left + nudgeTip2,
         top: this.arrowEnd.top,
         originX: 'center',
         originY: 'center',
         angle: angleTip2,
+        pointer: this.arrowEnd,
         historyID: setHistoryID()
     });
     this.tipEnd = tip2;
@@ -142,6 +178,9 @@ fabric.Polyline.prototype.updateArrowPosition = function () {
         left: this.arrowEnd.left + nudgeTip2,
         top: this.arrowEnd.top,
     });
+
+    this.sendBackwards();
+    canvas.sendToBack(this);
     this.tipStart.setCoords();
     this.tipEnd.setCoords();
 }
@@ -192,7 +231,7 @@ fabric.Arrow.prototype.toObject = (function (toObject) { // The .prototype SHOUL
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
             arrowStart: this.arrowStart,
-            arrowEnd: this.arrowEndowEnd,
+            arrowEnd: this.arrowEnd,
             tipStart: this.tipStart,
             tipEnd: this.tipEnd,
             circleHandler: this.circleHandler,
@@ -212,7 +251,7 @@ fabric.Polyline.prototype.toObject = (function (toObject) { // The .prototype SH
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
             arrowStart: this.arrowStart,
-            arrowEnd: this.arrowEndowEnd,
+            arrowEnd: this.arrowEnd,
             tipStart: this.tipStart,
             tipEnd: this.tipEnd,
             circleHandler: this.circleHandler,
@@ -229,18 +268,19 @@ fabric.Polyline.prototype.toObject = (function (toObject) { // The .prototype SH
 })(fabric.Polyline.prototype.toObject);
 
 // extending toObject for JSON serialization
-fabric.Arrow.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            arrowStart: this.arrowStart,
-            arrowEnd: this.arrowEnd,
+// fabric.Arrow.prototype.toObject = (function (toObject) {
+//     return function () {
+//         return fabric.util.object.extend(toObject.call(this), {
+//             arrowStart: this.arrowStart,
+//             arrowEnd: this.arrowEnd,
 
-            initArrowHandlers: this.initArrowHandlers
-        });
-    };
-})(fabric.Arrow.prototype.toObject);
+//             initArrowHandlers: this.initArrowHandlers
+//         });
+//     };
+// })(fabric.Arrow.prototype.toObject);
 
 fabric.Arrow.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
+fabric.Polyline.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
 
 
 // standard options type:
@@ -333,6 +373,38 @@ function circleHandlerMoved() {
         this.relativeY = this.top - this.arrow.arrowStart.top;
     }
 
+
+    // Switching pointerCircles of arrowEnd from left to right side if needed
+    if (this.arrow.direction == 'rightwards') {
+        let arrowCrossesOverText = Math.abs(this.relativeX) > Math.abs(this.arrow.arrowStart.left - this.arrow.arrowEnd.left);
+        // if extended arrow crosses over text, gotta switch arrowEnd to right one
+        if (this.arrow.arrowEnd.textSide == 'left' && arrowCrossesOverText) {
+            let index = this.arrow.arrowEnd.textNode.pointerCircles.indexOf(this.arrow.arrowEnd) + 1;
+            // remove .arrow attr
+            this.arrow.arrowEnd.arrow = null;
+            this.arrow.arrowEnd = this.arrow.arrowEnd.textNode.pointerCircles[index];
+            this.arrow.arrowEnd.arrow = this.arrow;
+            // console.log(this.arrow.arrowEnd);
+            // gotta replace the tip too
+            this.arrow.tipEnd.set({ left: this.arrow.arrowEnd.left - 5, angle: 270 });
+        }
+    }
+    // direction = leftwards
+    else {
+        let arrowCrossesOverText = Math.abs(this.relativeX) > Math.abs(this.arrow.arrowStart.left - this.arrow.arrowEnd.left);
+        // if extended arrow crosses over text, gotta switch arrowEnd to left one
+        if (this.arrow.arrowEnd.textSide == 'right' && arrowCrossesOverText) {
+            let index = this.arrow.arrowEnd.textNode.pointerCircles.indexOf(this.arrow.arrowEnd) - 1;
+            // remove .arrow attr
+            this.arrow.arrowEnd.arrow = null;
+            this.arrow.arrowEnd = this.arrow.arrowEnd.textNode.pointerCircles[index];
+            this.arrow.arrowEnd.arrow = this.arrow;
+            // gotta replace the tip too
+            this.arrow.tipEnd.set({ left: this.arrow.arrowEnd.left + 5, angle: 90 });
+        }
+    }
+
+
     // After out-of-bounds check, we can continue
     // recalc the arrow boundingRect
     this.arrow.set({ width: Math.abs(this.left - this.arrow.arrowStart.left), height: Math.abs(this.top - this.arrow.arrowEnd.top) });
@@ -403,6 +475,7 @@ fabric.Circle.prototype.toObject = (function (toObject) {
 })(fabric.Circle.prototype.toObject);
 
 fabric.CircleHandler.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "relativeX", "relativeY"]);
+fabric.Circle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "relativeX", "relativeY"]);
 
 
 
@@ -483,6 +556,7 @@ fabric.CircleHandler.prototype.stateProperties = fabric.Object.prototype.statePr
 fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
+            pointer: this.pointer,
             historyID: this.historyID
         });
     };

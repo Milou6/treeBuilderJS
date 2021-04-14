@@ -51,28 +51,30 @@
     <!-- Toolbar for different kinds of nodes -->
     <div id="main-toolbar">
         <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)">
-            <img src="images/branch_act.png" alt="binaryBranch">
+            <img src="images/branch_actV2.png" alt="binaryBranch">
         </button>
 
         <button id="singleNode" class="btn" onclick="setSelectedButton(this)">
-            <img src="images/node_act.png" alt="singleBranch">
+            <img src="images/node_actV2.png" alt="singleBranch">
         </button>
 
         <button id="ternaryNode" class="btn" onclick="setSelectedButton(this)">
-            <img src="images/ternary.png" alt="ternaryBranch">
+            <img src="images/ternaryV2.png" alt="ternaryBranch">
         </button>
         <button id="arrow" class="btn" onclick="setSelectedButton(this)">
-            <img src="images/arrow.png" alt="arrow">
+            <img src="images/arrowV2.png" alt="arrow">
         </button>
 
-        <button id="undoBtn" onclick="undo()" disabled>Undo</button>
-        <button id="redoBtn" onclick="redo()" disabled>Redo</button>
+        <button id="undoBtn" class="undoRedo" onclick="undo()" disabled>↩️</button>
+        <button id="redoBtn" class="undoRedo" onclick="redo()" disabled>↪️</button>
 
-        <button id="zoomIn" class="btn" onclick="zoomInCanvas()">
-            <img src="images/zoomIn.png" alt="zoomIn">
+        <button id="zoomIn" class="btn zoom push" onclick="zoomInCanvas()">
+            <!-- <img src="images/zoomIn.png" alt="zoomIn"> -->
+            🔎+
         </button>
-        <button id="zoomOut" class="btn" onclick="zoomOutCanvas()">
-            <img src="images/zoomOut.png" alt="zoomOut">
+        <button id="zoomOut" class="btn zoom" onclick="zoomOutCanvas()">
+            <!-- <img src="images/zoomOut.png" alt="zoomOut"> -->
+            🔍-
         </button>
 
         <button id="render" onclick="renderBoundingRect()">BoundingRect()</button>
@@ -85,8 +87,8 @@
         $(document).ready(function () {
 
             // scroll to middle of the fabricJS canvas
-            $(".container").scrollTop(1180);
-            // $(".container").scrollTop(1000);
+            $(".container").scrollTop(1000);
+            // $(".container").scrollTop(1180);
             $(".container").scrollLeft(900);
 
             document.addEventListener('keyup', (event) => {
@@ -114,7 +116,7 @@
 
 
 
-    <a id="mailBtn" href="mailto:someone@somewhere.com?subject=treeBuilderJS: Bug Report">?</a>
+    <a id="mailBtn" href="mailto:emile.haas@etu.unige.com?subject=treeBuilderJS: Bug Report">?</a>
     <div class="container">
         <!-- The canvas running the tree-building javascript -->
         <canvas id="treeCanvas" width="3000" height="2000"></canvas>
@@ -412,7 +414,6 @@
     <script src="js/utils/historyV2.js"></script>
     <script src="js/canvasEventHandlers.js"></script>
     <script src="canvas.js"></script>
-    <!-- <script src="js/history.js"></script> -->
 
 
 </body>

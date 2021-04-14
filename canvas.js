@@ -63,6 +63,8 @@ canvas.on('mouse:up', canvasMouseUp);
 
 // var root = new fabric.TreeNode(1500, 1200, [[-80, 50], [80, 50]], null, null, [],);
 var root = new fabric.TreeNode(1500, 1200, _.cloneDeep(nodeShape), null, null, [],);
+// var root = new fabric.TreeNode(1500, 1200, [[-60, 50], [60, 50]], null, null, [],);
+
 // var node2 = new fabric.TreeNode(1700, 1200, [[-80, 50], [30, 50]], null, null, [],);
 // var node3 = new fabric.TreeNode(1900, 1200, [[-30, 50], [80, 50]], null, null, [],);
 

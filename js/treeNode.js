@@ -77,10 +77,10 @@ fabric.Polyline.prototype.updateArmCoords = function (coordUpdates) {
     }
 
     // update arrows positioning if needed
-    for (let arrow of globalArrowsToUpdate) {
-        arrow.updateArrowPosition();
-    }
-    globalArrowsToUpdate.clear();
+    // for (let arrow of globalArrowsToUpdate) {
+    //     arrow.updateArrowPosition();
+    // }
+    // globalArrowsToUpdate.clear();
 
     // resetting correct top-hoverCircle coords
     // this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
@@ -131,10 +131,10 @@ fabric.Polyline.prototype.moveNodeBy = function (moveX, moveY) {
     }
 
     // update arrows positioning if needed
-    for (let arrow of globalArrowsToUpdate) {
-        arrow.updateArrowPosition();
-    }
-    globalArrowsToUpdate.clear();
+    //     for (let arrow of globalArrowsToUpdate) {
+    //         arrow.updateArrowPosition();
+    //     }
+    //     globalArrowsToUpdate.clear();
 }
 
 fabric.Polyline.prototype.moveSubtreeBy = function (moveX, moveY) {

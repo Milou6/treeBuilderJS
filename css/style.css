@@ -8,6 +8,28 @@ canvas {
 }
 
 
+#main-toolbar {
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* justify-content: ; */
+    align-content: space-between;
+}
+.push {
+    /* margin-left: auto; */
+    justify-self:flex-end;
+}
+
+#main-toolbar button {
+    display: flex;
+    margin: 0 5px 0 5px;
+}
+
+
+
+
+
 .container {
     width: 1200px;
     height: 500px;
@@ -17,19 +39,36 @@ canvas {
 
 }
 
+button img {
+    height: 100px;
+    width: 100px;
+}
+
 .btn.active {
-    background-color: rgb(38, 141, 38);
+    background-color: rgb(31, 21, 180);
 }
 
 #historyContainer {
     /* display: none; */
 }
 
+.undoRedo {
+    align-self: flex-end;
+    font-size:30px;
+}
+
+.zoom {
+    font-size:30px;
+    /* height: 50px; */
+    /* width: 100px; */
+    align-self: flex-end;
+}
+
 #mailBtn {
     text-decoration: none;
     position: absolute;
     left: 1100px;
-    top: 150px;
+    top: 160px;
     height: 70px;
     width: 70px;
     z-index: 10;

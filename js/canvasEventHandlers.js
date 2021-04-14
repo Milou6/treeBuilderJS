@@ -21,7 +21,7 @@ function canvasMouseMove(e) {
                     let point = text.pointerCircles[i];
                     // let point2 = text.pointerCircles[i * 2];
                     // ... check distance of possible point to mouse ...
-                    if (Math.abs(point.left - e.absolutePointer.x) < 60 && Math.abs(point.top - e.absolutePointer.y) < 20) {
+                    if (Math.abs(point.left - e.absolutePointer.x) < 60 && Math.abs(point.top - e.absolutePointer.y) < 20 && point.arrow == null) {
                         // ... and set opacity accordingly
                         point.set({ opacity: 0.4 });
                         if (!canvas.contains(point)) {
@@ -47,10 +47,13 @@ function canvasMouseMove(e) {
     canvas.renderAll();
 }
 
+var globalTriangleSelected = null;
 function canvasMouseDown(e) {
     if (e.target != null) {
         var target = e.target;
         origPos = target.getCenterPoint();
+        if (target.type == 'triangle') { globalTriangleSelected = target; } // For arrowTip moving
+        // console.log(globalTriangleSelected);
     }
 
     else {
@@ -175,6 +178,7 @@ function canvasMouseUp(e) {
                     }
                     else {
                         var newNode = new fabric.TreeNode(target.left + 12, target.top + 30, [[-50, 30], [50, 30]], target.parentNode, target, []);
+                        // var newNode = new fabric.TreeNode(target.left + 12, target.top + 40, [[-60, 50], [60, 50]], target.parentNode, target, []);
                     }
                     // var newNode = new fabric.TreeNode(target.left + 12, target.top + 50, [[-50, 50], [50, 50]], target.parentNode, target, []);
                     canvas.add(newNode);
@@ -257,6 +261,34 @@ function canvasMouseUp(e) {
 
             }
 
+            // this one must come before the basic arrow event below
+            else if (target.type == 'pointerCircle' && selectedButton == 'arrow' && globalTriangleSelected != null) {
+                // only perform move if both pointers on the same side of nodeText
+                if (globalTriangleSelected.pointer.textSide == target.textSide) {
+                    console.log('TRI MOVE');
+                    let arrow = globalTriangleSelected.pointer.arrow;
+                    if (arrow.tipStart == globalTriangleSelected) {
+                        arrow.tipStart.pointer.arrow = null;
+                        // update attrib of arrow tip
+                        arrow.tipStart.pointer = target;
+                        // arrow.tipStart.pointer.arrow = arrow;
+                        arrow.arrowStart = target;
+                        arrow.arrowStart.arrow = arrow;
+                        // recalculate arrow Position
+                        arrow.updateArrowPosition();
+                    }
+                    else {
+                        arrow.tipEnd.pointer.arrow = null;
+                        // update attrib of arrow tip
+                        arrow.tipEnd.pointer = target;
+                        // arrow.tipStart.pointer.arrow = arrow;
+                        arrow.arrowEnd = target;
+                        arrow.arrowEnd.arrow = arrow;
+                        arrow.updateArrowPosition();
+                    }
+                }
+            }
+
             else if (target.type == 'pointerCircle' && selectedButton == 'arrow') {
                 // console.log('touch');
                 if (arrowStart == null) {
@@ -267,8 +299,10 @@ function canvasMouseUp(e) {
                 }
 
                 if (arrowStart != null && arrowEnd != null) {
+                    // before making arrow, check if arrowStart/arrowEnd need a SWAP
+                    if (arrowStart.top < arrowEnd.top) { [arrowStart, arrowEnd] = [arrowEnd, arrowStart]; }
+
                     // create arrow
-                    // console.log('ARROW!!!');
                     let newArrow = new fabric.Arrow(arrowStart, arrowEnd, []);
                     canvas.add(newArrow);
                     canvas.renderAll();
@@ -295,8 +329,9 @@ function canvasMouseUp(e) {
 
 
 
-            if (target.type == 'hoverCircle' && target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
-            }
+
+            // if (target.type == 'hoverCircle' && target.hoverType == 'bottom' && !target.hasChildNode && selectedButton == 'singleNode') {
+            // }
         } // else
 
 
@@ -304,4 +339,5 @@ function canvasMouseUp(e) {
     }
     // for zoom function
     this.panning = false;
+    globalTriangleSelected = null;
 }

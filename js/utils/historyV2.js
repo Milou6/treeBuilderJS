@@ -25,7 +25,7 @@ class CanvasHistory {
 
 
     undoPush(action) {
-        console.log('UNDO-PUSH');
+        // console.log('UNDO-PUSH');
 
         this.undoStack.push(action);
 
