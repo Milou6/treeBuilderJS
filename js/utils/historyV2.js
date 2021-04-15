@@ -1,6 +1,3 @@
-// console.log(canvas._objects[1].type);
-// console.log(JSON.stringify(canvas));
-
 class CanvasHistory {
 
     constructor(canvas) {

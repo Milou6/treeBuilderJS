@@ -150,7 +150,6 @@ fabric.IText.prototype.updatePointerCircles = function () {
     let circleRightX = startCoordRight.x + 10;
 
     let pointerIterator = 0;
-    let arrowsToMove = new Set();
     for (let i = 0; i < 6; i++) {
         let circleY = startCoordLeft.y + i * this.__lineHeights[0] + (this.__lineHeights[0] / 2);
 
@@ -251,59 +250,7 @@ fabric.NodeText.fromObject = function (object, callback) {
 };
 
 // extending toObject for JSON serialization
-fabric.NodeText.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            numberLines: this.numberLines,
-            parentNode: this.parentNode,
-            attachedHover: this.attachedHover,
-            attachedTriangle: this.attachedTriangle,
-            secondaryText: this.secondaryText,
-            lockMovementX: this.lockMovementX,
-            lockMovementY: this.lockMovementY,
-            customType: this.customType,
-            historyID: this.historyID,
-            oldText: this.oldText,
-            pointerCircles: this.pointerCircles,
 
-            updateVerticalSpace: this.updateVerticalSpace,
-            moveSecondaryText: this.moveSecondaryText,
-            showColorMenu: this.showColorMenu,
-            updateColorMenu: this.updateColorMenu,
-            initPointers: this.initPointers,
-            updatePointerCircles: this.updatePointerCircles
-        });
-    };
-})(fabric.NodeText.prototype.toObject);
-
-fabric.IText.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            numberLines: this.numberLines,
-            parentNode: this.parentNode,
-            attachedHover: this.attachedHover,
-            attachedTriangle: this.attachedTriangle,
-            secondaryText: this.secondaryText,
-            lockMovementX: this.lockMovementX,
-            lockMovementY: this.lockMovementY,
-            customType: this.customType,
-            historyID: this.historyID,
-            oldText: this.oldText,
-            pointerCircles: this.pointerCircles,
-
-            updateVerticalSpace: this.updateVerticalSpace,
-            moveSecondaryText: this.moveSecondaryText,
-            showColorMenu: this.showColorMenu,
-            updateColorMenu: this.updateColorMenu,
-            initPointers: this.initPointers,
-            updatePointerCircles: this.updatePointerCircles
-        });
-    };
-})(fabric.IText.prototype.toObject);
 
 
 

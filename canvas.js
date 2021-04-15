@@ -71,11 +71,6 @@ var root = new fabric.TreeNode(1500, 1200, _.cloneDeep(nodeShape), null, null, [
 canvas.add(root);
 // canvas.add(root, node2, node3);
 
-// CAN PROBS DELETE THIS LATER
-// fabric.NodeText.prototype.stateProperties.push('textLines');
-// console.log(fabric.NodeText.prototype.stateProperties);
-
-// TreeNode.stateProperties = TreeNode.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
 
 
 // Block below to test TreeNode's methods moveNodeBy() & updateArmCoords()
@@ -323,10 +318,10 @@ function saveCanvasToJSON() {
     let canvasRegularObjects = canvas.getObjects();
     let canvasFlattenedObjects = flattenObjects(_.cloneDeep(canvasRegularObjects));
 
-    // console.log('FLAT');
-    // console.log(canvasFlattenedObjects);
-    // console.log('REG');
-    // console.log(canvasRegularObjects);
+    console.log('FLAT');
+    console.log(canvasFlattenedObjects);
+    console.log('REG');
+    console.log(canvasRegularObjects);
 
     histCanvas.clear();
     histCanvas.add(...canvasFlattenedObjects);

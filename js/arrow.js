@@ -1,5 +1,4 @@
 fabric.Polyline.prototype.arrowInitSequence = function () {
-    // let width = 
     if (this.arrowEnd.left > this.arrowStart.left) {
         this.direction = 'rightwards';
         // if the wrong pointer selected, correct it
@@ -46,7 +45,8 @@ fabric.Polyline.prototype.arrowInitSequence = function () {
             { x: -this.distanceStartEndX, y: -this.distanceStartEndY }
         );
 
-        // without offset, path starts on middle of boundingRect
+        // without offset, path would start on middle of boundingRect
+        // (instead of bottom corner as we want)
         this.set({ pathOffset: { x: -this.width / 2, y: -this.height / 2 } });
     }
 
@@ -71,7 +71,7 @@ fabric.Polyline.prototype.arrowInitSequence = function () {
     }
 
     // this.sendBackwards();
-    canvas.sendToBack(this);
+    // canvas.sendToBack(this); //Maybe this is adding arrow a 2nd time
 }
 
 fabric.Polyline.prototype.initArrowHandlers = function () {
@@ -166,6 +166,7 @@ fabric.Polyline.prototype.initArrowTips = function () {
 fabric.Polyline.prototype.updateArrowPosition = function () {
     this.arrowInitSequence();
     this.circleHandler.set({ left: this.left + this.points[2].x, top: this.top + this.points[2].y });
+    this.circleHandler.bringToFront();
     this.circleHandler.setCoords();
 
     // update arrowTip positions
@@ -178,11 +179,11 @@ fabric.Polyline.prototype.updateArrowPosition = function () {
         left: this.arrowEnd.left + nudgeTip2,
         top: this.arrowEnd.top,
     });
+    this.tipStart.setCoords();
+    this.tipEnd.setCoords();
 
     this.sendBackwards();
     canvas.sendToBack(this);
-    this.tipStart.setCoords();
-    this.tipEnd.setCoords();
 }
 
 
@@ -211,7 +212,7 @@ fabric.Arrow = fabric.util.createClass(fabric.Polyline, {
         this.arrowInitSequence();
         this.initArrowHandlers();
         this.initArrowTips();
-        // this.sendBackwards();
+        this.sendBackwards();
     },
 
     _render: function (ctx) {
@@ -226,75 +227,6 @@ fabric.Arrow.fromObject = function (object, callback) {
     console.log('fromObject() called');
     return fabric.Object._fromObject('Polyline', object, callback, 'points');
 };
-
-fabric.Arrow.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            arrowStart: this.arrowStart,
-            arrowEnd: this.arrowEnd,
-            tipStart: this.tipStart,
-            tipEnd: this.tipEnd,
-            circleHandler: this.circleHandler,
-            historyID: this.historyID,
-            handlers: this.handlers,
-
-            arrowInitSequence: this.arrowInitSequence,
-            initArrowHandlers: this.initArrowHandlers,
-            initArrowTips: this.initArrowTips,
-            updateArrowPosition: this.updateArrowPosition
-
-        });
-    };
-})(fabric.Arrow.prototype.toObject);
-
-fabric.Polyline.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            arrowStart: this.arrowStart,
-            arrowEnd: this.arrowEnd,
-            tipStart: this.tipStart,
-            tipEnd: this.tipEnd,
-            circleHandler: this.circleHandler,
-            historyID: this.historyID,
-            handlers: this.handlers,
-
-            arrowInitSequence: this.arrowInitSequence,
-            initArrowHandlers: this.initArrowHandlers,
-            initArrowTips: this.initArrowTips,
-            updateArrowPosition: this.updateArrowPosition
-
-        });
-    };
-})(fabric.Polyline.prototype.toObject);
-
-// extending toObject for JSON serialization
-// fabric.Arrow.prototype.toObject = (function (toObject) {
-//     return function () {
-//         return fabric.util.object.extend(toObject.call(this), {
-//             arrowStart: this.arrowStart,
-//             arrowEnd: this.arrowEnd,
-
-//             initArrowHandlers: this.initArrowHandlers
-//         });
-//     };
-// })(fabric.Arrow.prototype.toObject);
-
-fabric.Arrow.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
-fabric.Polyline.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
-
-
-// standard options type:
-// fabric.Polyline.fromObject = function (object, callback) {
-//     return fabric.Object._fromObject('Polyline', object, callback);
-// }
-
-// fabric.Object.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes"]);
-// console.log(fabric.Object.prototype.stateProperties);
-// console.log(fabric.TreeNode);
-
-
-
-
 
 
 
@@ -439,44 +371,14 @@ function circleHandlerMoved() {
 
     canvas.renderAll();
     canvas.sendToBack(this.arrow);
-    this.bringToFront();
+    this.bringToFront(); //Handler always in front
     this.setCoords();
 }
-
-
-
 
 fabric.CircleHandler.fromObject = function (object, callback) {
     // console.log('fromObject() called');
     return fabric.Object._fromObject('Circle', object, callback);
 };
-
-// extending toObject for JSON serialization
-fabric.CircleHandler.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            arrow: this.arrow,
-            historyID: this.historyID,
-            relativeX: this.relativeX,
-            relativeY: this.relativeY
-        });
-    };
-})(fabric.CircleHandler.prototype.toObject);
-
-fabric.Circle.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            arrow: this.arrow,
-            historyID: this.historyID,
-            relativeX: this.relativeX,
-            relativeY: this.relativeY
-        });
-    };
-})(fabric.Circle.prototype.toObject);
-
-fabric.CircleHandler.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "relativeX", "relativeY"]);
-fabric.Circle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrow", "relativeX", "relativeY"]);
-
 
 
 
@@ -553,11 +455,3 @@ fabric.Circle.prototype.stateProperties = fabric.Object.prototype.statePropertie
 
 
 
-fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            pointer: this.pointer,
-            historyID: this.historyID
-        });
-    };
-})(fabric.Triangle.prototype.toObject);

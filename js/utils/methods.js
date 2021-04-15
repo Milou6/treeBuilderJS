@@ -378,7 +378,9 @@ function flattenObjects(array, hist, realArray) {
             })
         }
         else if (object.type == 'arrow') {
+            console.log(object.arrowStart);
             object.arrowStart = (object.arrowStart == null ? null : object.arrowStart.historyID);
+            console.log(object.arrowStart);
             object.arrowEnd = (object.arrowEnd == null ? null : object.arrowEnd.historyID);
             object.tipStart = (object.tipStart == null ? null : object.tipStart.historyID);
             object.tipEnd = (object.tipEnd == null ? null : object.tipEnd.historyID);

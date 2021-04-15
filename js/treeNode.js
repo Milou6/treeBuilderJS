@@ -76,12 +76,6 @@ fabric.Polyline.prototype.updateArmCoords = function (coordUpdates) {
         this.textNodes[i].updatePointerCircles();
     }
 
-    // update arrows positioning if needed
-    // for (let arrow of globalArrowsToUpdate) {
-    //     arrow.updateArrowPosition();
-    // }
-    // globalArrowsToUpdate.clear();
-
     // resetting correct top-hoverCircle coords
     // this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
     this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
@@ -320,70 +314,6 @@ fabric.TreeNode.fromObject = function (object, callback) {
 // };
 
 
-// extending toObject for JSON serialization
-fabric.TreeNode.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            armsArray: this.armsArray,
-            nodeParent: this.nodeParent,
-            hoverParent: this.hoverParent,
-            hoverCircles: this.hoverCircles,
-            textNodes: this.textNodes,
-            horizOffset: this.horizOffset,
-            vertOffset: this.vertOffset,
-            nodeWidth: this.nodeWidth,
-            selectable: this.selectable,
-            pathOffset: this.pathOffset,
-            customType: this.customType,
-            historyID: this.historyID,
-            isOnTreeSpine: this.isOnTreeSpine,
 
-            updateArmCoords: this.updateArmCoords,
-            moveNodeBy: this.moveNodeBy,
-            moveSubtreeBy: this.moveSubtreeBy,
-            getChildNodes: this.getChildNodes,
-            delete: this.delete
-        });
-    };
-})(fabric.TreeNode.prototype.toObject);
-
-fabric.Polyline.prototype.toObject = (function (toObject) { // The .prototype SHOULD be there, it seems
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            armsArray: this.armsArray,
-            nodeParent: this.nodeParent,
-            hoverParent: this.hoverParent,
-            hoverCircles: this.hoverCircles,
-            textNodes: this.textNodes,
-            horizOffset: this.horizOffset,
-            vertOffset: this.vertOffset,
-            nodeWidth: this.nodeWidth,
-            selectable: this.selectable,
-            pathOffset: this.pathOffset,
-            customType: this.customType,
-            historyID: this.historyID,
-            isOnTreeSpine: this.isOnTreeSpine,
-
-            updateArmCoords: this.updateArmCoords,
-            moveNodeBy: this.moveNodeBy,
-            moveSubtreeBy: this.moveSubtreeBy,
-            getChildNodes: this.getChildNodes,
-            delete: this.delete
-        });
-    };
-})(fabric.Polyline.prototype.toObject);
-
-// fabric.NodeText.prototype.stateProperties.push('textLines');
-// console.log(fabric.NodeText.prototype.stateProperties);
-
-
-// console.log(fabric.TreeNode.prototype.stateProperties);
-fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy"]);
-// console.log(fabric.TreeNode.prototype.stateProperties);
-// console.log(fabric.TreeNode);
 
 // fabric.TreeNode.async = true;

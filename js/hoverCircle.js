@@ -77,50 +77,6 @@ fabric.HoverCircle.fromObject = function (object, callback) {
     return fabric.Object._fromObject('Circle', object, callback);
 };
 
-fabric.HoverCircle.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            hoverType: this.hoverType,
-            parentNode: this.parentNode,
-            hasChildNode: this.hasChildNode,
-            childNode: this.childNode,
-            attachedNodeText: this.attachedNodeText,
-            lockMovementY: this.lockMovementY,
-            lockMovementX: this.lockMovementX,
-            hasControls: false,
-            hasBorders: false,
-            selectable: this.selectable,
-            customType: this.customType,
-            historyID: this.historyID
-        });
-    };
-})(fabric.HoverCircle.prototype.toObject);
-
-// extending toObject for JSON serialization
-fabric.Circle.prototype.toObject = (function (toObject) {
-    return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-            X: this.X,
-            Y: this.Y,
-            hoverType: this.hoverType,
-            parentNode: this.parentNode,
-            hasChildNode: this.hasChildNode,
-            childNode: this.childNode,
-            attachedNodeText: this.attachedNodeText,
-            lockMovementY: this.lockMovementY,
-            lockMovementX: this.lockMovementX,
-            hasControls: false,
-            hasBorders: false,
-            selectable: this.selectable,
-            customType: this.customType,
-            historyID: this.historyID,
-            // adding pointerCircle attributes too ???
-
-        });
-    };
-})(fabric.Circle.prototype.toObject);
 
 
 function hoverCircleMouseOver(e) {

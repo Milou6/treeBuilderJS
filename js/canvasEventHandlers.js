@@ -8,6 +8,7 @@ function canvasMouseMove(e) {
         canvas.relativePan(delta);
     }
 
+
     // ALL LOGIC FOR CREATING ARROWS DOWN HERE
     if (selectedButton == 'arrow') {
         allTexts = canvas.getObjects('nodeText');
@@ -24,9 +25,9 @@ function canvasMouseMove(e) {
                     if (Math.abs(point.left - e.absolutePointer.x) < 60 && Math.abs(point.top - e.absolutePointer.y) < 20 && point.arrow == null) {
                         // ... and set opacity accordingly
                         point.set({ opacity: 0.4 });
-                        if (!canvas.contains(point)) {
-                            canvas.add(point);
-                        }
+                        // if (!canvas.contains(point)) { // Not re-adding pointers anymore
+                        //     canvas.add(point);
+                        // }
                     }
                     else { point.set({ opacity: 0 }); }
                     // else { canvas.remove(point); }
@@ -265,7 +266,7 @@ function canvasMouseUp(e) {
             else if (target.type == 'pointerCircle' && selectedButton == 'arrow' && globalTriangleSelected != null) {
                 // only perform move if both pointers on the same side of nodeText
                 if (globalTriangleSelected.pointer.textSide == target.textSide) {
-                    console.log('TRI MOVE');
+                    console.log('ARROW TRIANGLE MOVE');
                     let arrow = globalTriangleSelected.pointer.arrow;
                     if (arrow.tipStart == globalTriangleSelected) {
                         arrow.tipStart.pointer.arrow = null;
@@ -298,7 +299,7 @@ function canvasMouseUp(e) {
                     arrowEnd = target;
                 }
 
-                if (arrowStart != null && arrowEnd != null) {
+                if (arrowStart != null && arrowEnd != null && arrowStart != arrowEnd) {
                     // before making arrow, check if arrowStart/arrowEnd need a SWAP
                     if (arrowStart.top < arrowEnd.top) { [arrowStart, arrowEnd] = [arrowEnd, arrowStart]; }
 
@@ -310,6 +311,9 @@ function canvasMouseUp(e) {
                     // link pointerCircles to the new arrow
                     arrowStart.arrow = newArrow;
                     arrowEnd.arrow = newArrow;
+
+                    console.log('ARROWWWWWWWWW');
+                    console.log(newArrow);
 
                     // add move to history
                     histAction.push(['arrowAdded', newArrow]);
