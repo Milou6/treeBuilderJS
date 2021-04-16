@@ -60,12 +60,22 @@ function resolveIntersectionX(node, objectGroup, histAction) {
     let movementX = 0;
     if (intersection == 'right') {
         movementX = nodeTR - objectGroupTL + 40;
-        ancestorFind = findFirstCommonAncestor(node, objectGroup.object);
+        try {
+            ancestorFind = findFirstCommonAncestor(node, objectGroup.object);
+        }
+        catch {
+            console.log('Couldnt find common ancestor!!');
+        }
         // objectGroup.object.moveNodeBy(movementX, 0);
     }
     else if (intersection == 'left') {
         movementX = objectGroupTR - nodeTL + 40;
-        ancestorFind = findFirstCommonAncestor(objectGroup.object, node);
+        try {
+            ancestorFind = findFirstCommonAncestor(objectGroup.object, node);
+        }
+        catch {
+            console.log('Couldnt find common ancestor!!');
+        }
         // node.moveNodeBy(movementX, 0);
     }
 

@@ -92,7 +92,11 @@ function canvasMouseUp(e) {
         if (target.hoverType == 'bottom' && Math.abs(delta.x) > 20) {
 
             // second check : make sure user cannot drag an arm past the middle of its node
-            if (!wantsToCrossMiddle(target, delta)) {
+            // the 'isMiddleArm' boolean used to allow middle arm of ternary nodes to move both ways
+            let isMiddleArm = target.parentNode.armsArray.length > 2 && target.parentNode.hoverCircles.indexOf(target) == 1;
+            console.log(isMiddleArm);
+            console.log(wantsToCrossMiddle(target, delta));
+            if (!wantsToCrossMiddle(target, delta) || isMiddleArm) {
                 histAction.push(['moveCircle', target, delta.x]);
                 target.set({ X: target.X + delta.x });
                 target.set({ left: target.X, dirty: true });
@@ -132,8 +136,14 @@ function canvasMouseUp(e) {
                     target.childNode.moveSubtreeBy(delta.x, 0);
                     histAction.push(['moveSubtree', target.childNode, delta.x, 0]);
                 }
+                canvasHist.undoPush(histAction);
             }
-            canvasHist.undoPush(histAction);
+            // If the move is not allowed
+            else {
+                target.set({ left: target.X });
+                target.setCoords();
+                // canvas.renderAll();
+            }
         }
 
         else if (target.type == 'arrowHandler' && Math.abs(delta.x) > 3) {

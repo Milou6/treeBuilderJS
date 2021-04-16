@@ -16,6 +16,7 @@ var globalArrowsToUpdate = new Set();
 
 
 var canvas = new fabric.Canvas('treeCanvas', {
+    preserveObjectStacking: true
     // fireRightClick: true,
     // line below not needed with jquery contextmenu
     // stopContextMenu: true

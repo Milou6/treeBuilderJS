@@ -80,7 +80,9 @@ fabric.TreeNode.prototype.toObject = (function (toObject) {
             moveNodeBy: this.moveNodeBy,
             moveSubtreeBy: this.moveSubtreeBy,
             getChildNodes: this.getChildNodes,
-            delete: this.delete
+            delete: this.delete,
+            deleteSubtree: this.deleteSubtree,
+            reAddSubtree: this.reAddSubtree
         });
     };
 })(fabric.TreeNode.prototype.toObject);
@@ -157,6 +159,8 @@ fabric.Polyline.prototype.toObject = (function (toObject) {
             moveSubtreeBy: this.moveSubtreeBy,
             getChildNodes: this.getChildNodes,
             delete: this.delete,
+            deleteSubtree: this.deleteSubtree,
+            reAddSubtree: this.reAddSubtree,
             // Arrow
             arrowStart: this.arrowStart,
             arrowEnd: this.arrowEnd,
@@ -317,7 +321,7 @@ fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SH
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy",
+fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy", "deleteSubtree", "reAddSubtree"
     // arrow obj atribs
     // "arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"
 
@@ -326,7 +330,7 @@ fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.statePropert
 fabric.Arrow.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
 fabric.Polyline.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat([
     // TreeNode attribs
-    "X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy",
+    "X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy", "deleteSubtree", "reAddSubtree",
     // Arrow
     "arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition",
 

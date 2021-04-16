@@ -177,6 +177,16 @@ class CanvasHistory {
             subAction[1].hoverParent.childNode = subAction[1];
         }
 
+        // 1: ternaryNode, 2: binaryNode
+        else if (subAction[0] == '3rdArmRemoved') {
+            subAction[1].hoverParent.childNode = subAction[1];
+        }
+
+        // 1: subtree
+        else if (subAction[0] == 'subtreeRemoved') {
+            subAction[1].reAddSubtree();
+        }
+
         else if (subAction[0] == 'arrowAdded') {
             let arrow = subAction[1];
             arrow.arrowStart.arrow = null;
@@ -276,6 +286,16 @@ class CanvasHistory {
 
         else if (subAction[0] == '3rdArmAdded') {
             subAction[1].hoverParent.childNode = subAction[2];
+        }
+
+        // 1: ternaryNode, 2: binaryNode
+        else if (subAction[0] == '3rdArmRemoved') {
+            subAction[1].hoverParent.childNode = subAction[2];
+        }
+
+        // 1: subtree
+        else if (subAction[0] == 'subtreeRemoved') {
+            subAction[1].deleteSubtree();
         }
 
         else if (subAction[0] == 'arrowAdded') {

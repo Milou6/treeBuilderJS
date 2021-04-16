@@ -139,7 +139,6 @@ fabric.Polyline.prototype.moveSubtreeBy = function (moveX, moveY) {
     for (child of this.getChildNodes()) {
         child.moveSubtreeBy(moveX, moveY);
     }
-
     canvas.renderAll();
 }
 
@@ -166,7 +165,42 @@ fabric.Polyline.prototype.delete = function () {
         this.canvas.remove(text);
     }
     this.canvas.remove(this);
+    canvas.renderAll();
 }
+
+fabric.Polyline.prototype.deleteSubtree = function () {
+    let children = [this];
+    while (children.length > 0) {
+        let current = children.pop();
+        for (let circle of current.hoverCircles) {
+            if (circle.childNode != null) { children.push(circle.childNode); }
+        }
+        current.delete();
+    }
+}
+
+fabric.Polyline.prototype.reAddSubtree = function () {
+    let children = [this];
+    while (children.length > 0) {
+        let current = children.pop();
+        for (let circle of current.hoverCircles) {
+            if (circle.childNode != null) { children.push(circle.childNode); }
+        }
+
+        for (let circle of current.hoverCircles) {
+            canvas.add(circle);
+        }
+        for (let text of current.textNodes) {
+            for (let pointer of text.pointerCircles) {
+                canvas.add(pointer);
+            }
+            canvas.add(text);
+        }
+        canvas.add(current);
+    }
+    canvas.renderAll();
+}
+
 
 
 

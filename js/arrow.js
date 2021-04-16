@@ -70,7 +70,7 @@ fabric.Polyline.prototype.arrowInitSequence = function () {
         this.set({ pathOffset: { x: +this.width / 2, y: -this.height / 2 } });
     }
 
-    // this.sendBackwards();
+    this.sendBackwards();
     // canvas.sendToBack(this); //Maybe this is adding arrow a 2nd time
 }
 
@@ -183,7 +183,7 @@ fabric.Polyline.prototype.updateArrowPosition = function () {
     this.tipEnd.setCoords();
 
     this.sendBackwards();
-    canvas.sendToBack(this);
+    // canvas.sendToBack(this);
 }
 
 
@@ -213,10 +213,12 @@ fabric.Arrow = fabric.util.createClass(fabric.Polyline, {
         this.initArrowHandlers();
         this.initArrowTips();
         this.sendBackwards();
+        // canvas.sendToBack(this);
     },
 
     _render: function (ctx) {
         this.callSuper('_render', ctx);
+        this.sendToBack();
         // send node to back, to make sure hoverCircles are clickable
         // canvas.sendToBack(this);
     }
@@ -369,10 +371,10 @@ function circleHandlerMoved() {
     this.arrow.set({ dirty: true });
     this.arrow.setCoords();
 
-    canvas.renderAll();
     canvas.sendToBack(this.arrow);
     this.bringToFront(); //Handler always in front
     this.setCoords();
+    canvas.renderAll();
 }
 
 fabric.CircleHandler.fromObject = function (object, callback) {

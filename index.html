@@ -116,7 +116,7 @@
 
 
 
-    <a id="mailBtn" href="mailto:emile.haas@etu.unige.com?subject=treeBuilderJS: Bug Report">🐞</a>
+    <a id="mailBtn" href="mailto:emile.haas@etu.unige.ch?subject=treeBuilderJS: Bug Report">🐞</a>
     <div class="container">
         <!-- The canvas running the tree-building javascript -->
         <canvas id="treeCanvas" width="3000" height="2000"></canvas>
@@ -236,53 +236,60 @@
             }
 
             else if (key == "add") {
-                // console.log('ADD');
-
                 let node = contextMenuObject;
-                console.log(node);
                 let parent = node.nodeParent;
                 let hoverIndex = parent.hoverCircles.indexOf(node.hoverParent);
-                // console.log(hoverIndex);
+                console.log(`hoverIndex: ${hoverIndex}`);
 
                 let histAction = [];
 
                 let subtreeMove = 0;
-                if (hoverIndex == 0) {
-                    subtreeMove = -50;
-                }
+                if (hoverIndex == 0) { subtreeMove = -50; }
                 else { subtreeMove = 50; }
 
                 // add new node on top of clicked one ...
                 var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 50, [[-50, 50], [50, 50]], parent, parent.hoverCircles[hoverIndex], []);
                 canvas.add(newNode);
+
+                // reset correct parentHover's childNode
                 parent.hoverCircles[hoverIndex].childNode = newNode;
 
-                newNode.hoverCircles[hoverIndex].hasChildNode = true;
-                newNode.hoverCircles[hoverIndex].childNode = node;
+                // setting newNode hover's child
+                if (hoverIndex == 2) { // If parent was ternary node, we gotta correct hoverIndex
+                    newNode.hoverCircles[1].hasChildNode = true;
+                    newNode.hoverCircles[1].childNode = node;
+                }
+                else {
+                    newNode.hoverCircles[hoverIndex].hasChildNode = true;
+                    newNode.hoverCircles[hoverIndex].childNode = node;
+                }
 
+                // clicked node has newNode as parent now
                 node.hoverParent = newNode.hoverCircles[hoverIndex];
+                // Line above breaks if parentNode is a ternary
+                // Must then fix hoverIndex to 2 if that's the case
+                if (hoverIndex == 2) { node.hoverParent = newNode.hoverCircles[1]; }
                 node.nodeParent = newNode;
                 // ... and push clicked node down
                 node.moveSubtreeBy(subtreeMove, 50 + 50 - 12);
 
                 // replace nodeText correctly
-                let hoverCircleText = parent.hoverCircles[hoverIndex].attachedNodeText.text;
-                newNode.textNodes[hoverIndex].text = hoverCircleText;
-                parent.hoverCircles[hoverIndex].attachedNodeText.text = 'XP';
+                try {
+                    let hoverCircleText = parent.hoverCircles[hoverIndex].attachedNodeText.text;
+                    newNode.textNodes[hoverIndex].text = hoverCircleText;
+                    parent.hoverCircles[hoverIndex].attachedNodeText.text = 'XP';
+                    histAction.push(['textEdited', parent.hoverCircles[hoverIndex].attachedNodeText, hoverCircleText, 'XP']);
+                }
+                catch {
+                    console.log(`Text from hoverIndex ${hoverIndex} cannot be copied.`);
+                }
 
-                histAction.push(['textEdited', parent.hoverCircles[hoverIndex].attachedNodeText, hoverCircleText, 'XP']);
                 histAction.push(['nodeAdded', newNode]);
                 histAction.push(['addedBetweenNode', node, parent, hoverIndex, newNode]);
                 histAction.push(['moveSubtree', node, subtreeMove, 50 + 50 - 12]);
 
                 // push to history
                 canvasHist.undoPush(histAction);
-
-
-
-
-                // var newNode = new fabric.TreeNode(target.X + 12 - 50, target.Y - 60 - 20, [[-50, 50], [50, 50]], null, null, []);
-                // canvas.add(newNode);
 
             }
 
@@ -291,10 +298,11 @@
                 let node = contextMenuObject;
                 let histAction = [];
 
-                if (node.textNodes.length == 2) {
+                if (node.armsArray.length <= 2) {
 
                     // create a new armsArray with 3 sets of coords instead of 2
-                    let newArmX = node.armsArray[0][0] + node.armsArray[1][0];
+                    let newArmX = node.armsArray[0][0] + (Math.abs(node.armsArray[0][0]) + Math.abs(node.armsArray[1][0])) / 2;
+                    console.log(newArmX);
                     let newArmY = node.armsArray[0][1];
                     let newArmsArray = [node.armsArray[0], [newArmX, newArmY], node.armsArray[1]];
 
@@ -306,29 +314,87 @@
                     let parentHover = node.hoverParent;
 
 
+
                     // new ternary node that replaces binary one
                     var newNode = new fabric.TreeNode(node.X, node.Y, newArmsArray, node.nodeParent, node.hoverParent, []);
                     // resetting stuff saved above
                     newNode.textNodes[0].text = text1;
                     newNode.textNodes[2].text = text2;
                     newNode.hoverCircles[0].childNode = child1;
-                    newNode.hoverCircles[0].hasChildNode = newNode.hoverCircles[0].childNode == null ? false : true;
+                    if (child1 != null) {
+                        newNode.hoverCircles[0].hasChildNode = true;
+                        child1.nodeParent = newNode;
+                        child1.hoverParent = newNode.hoverCircles[0];
+                    }
+                    // newNode.hoverCircles[0].hasChildNode = newNode.hoverCircles[0].childNode == null ? false : true;
+
                     newNode.hoverCircles[2].childNode = child2;
-                    newNode.hoverCircles[2].hasChildNode = newNode.hoverCircles[2].childNode == null ? false : true;
+                    if (child2 != null) {
+                        newNode.hoverCircles[2].hasChildNode = true;
+                        child2.nodeParent = newNode;
+                        child2.hoverParent = newNode.hoverCircles[2];
+                    }
+                    // newNode.hoverCircles[2].hasChildNode = newNode.hoverCircles[2].childNode == null ? false : true;
+
+                    // connect parent to new ternary node
                     parentHover.childNode = newNode;
 
                     canvas.add(newNode);
-                    node.delete();
+                    node.delete(); // delete the old, binary node
 
                     histAction.push(['nodeAdded', newNode]);
                     histAction.push(['nodeRemoved', node]);
                     histAction.push(['3rdArmAdded', node, newNode]);
                     canvasHist.undoPush(histAction);
-
-
                 }
 
+                // If node is ALREADY ternary, make it binary again
+                else {
+                    let ternaryNode = contextMenuObject;
 
+                    let newArmsArray = [ternaryNode.armsArray[0], ternaryNode.armsArray[2]];
+                    // new binary node that replaces ternary one
+                    var newNode = new fabric.TreeNode(node.X, node.Y, newArmsArray, node.nodeParent, node.hoverParent, []);
+
+                    // saving some stuff from old node
+                    // (for ternary -> binary, we only keep info from left & right arm. Middle arm IS DELETED)
+                    let text1 = ternaryNode.textNodes[0].text;
+                    let text2 = ternaryNode.textNodes[2].text;
+                    let child1 = ternaryNode.hoverCircles[0].childNode;
+                    let child2 = ternaryNode.hoverCircles[2].childNode;
+                    let parentHover = ternaryNode.hoverParent;
+
+                    newNode.hoverCircles[0].childNode = child1;
+                    if (child1 != null) {
+                        newNode.hoverCircles[0].hasChildNode = true;
+                        child1.nodeParent = newNode;
+                        child1.hoverParent = newNode.hoverCircles[0];
+                    }
+                    newNode.hoverCircles[1].childNode = child2;
+                    if (child2 != null) {
+                        newNode.hoverCircles[1].hasChildNode = true;
+                        child2.nodeParent = newNode;
+                        child2.hoverParent = newNode.hoverCircles[1];
+                    }
+
+                    // connect parent to new ternary node
+                    parentHover.childNode = newNode;
+
+                    // EXTRA : delete whole subtree of middleArm
+                    let middleSubtree = ternaryNode.hoverCircles[1].childNode;
+                    if (middleSubtree != null) {
+                        middleSubtree.deleteSubtree();
+                    }
+
+                    canvas.add(newNode);
+                    ternaryNode.delete(); // delete the old, binary node
+
+                    histAction.push(['nodeAdded', newNode]);
+                    histAction.push(['nodeRemoved', ternaryNode]);
+                    histAction.push(['3rdArmRemoved', ternaryNode, newNode]);
+                    histAction.push(['subtreeRemoved', middleSubtree]);
+                    canvasHist.undoPush(histAction);
+                }
             }
 
             else if (key == 'toggleTriangle' && !contextMenuObject.attachedHover.hasChildNode) {
