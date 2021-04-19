@@ -25,14 +25,14 @@ var globalColorCircles = []; // global var for textNode Color Menu
 fabric.IText.prototype.showColorMenu = function () {
     let colorLeft = { x: this.aCoords.tl.x - 20, y: this.aCoords.tl.y };
     let colorRight = { x: this.aCoords.tr.x + 20, y: this.aCoords.tr.y };
-    let colorArray = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+    let colorArray = ['red', 'orange', 'yellow', 'white', 'green', 'blue', 'purple', 'black'];
     let colorIndex = 0;
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 8; i++) {
         let colorCircle = new fabric.Circle({
-            left: colorIndex < 3 ? colorLeft.x : colorRight.x,
+            left: colorIndex < 4 ? colorLeft.x : colorRight.x,
             // making right-side circles have correct y
-            top: i < 3 ? colorLeft.y + 30 * i : colorLeft.y + 30 * (i - 3),
+            top: i < 4 ? colorLeft.y + 30 * i : colorLeft.y + 30 * (i - 4),
             originX: 'center',
             originY: 'center',
             fill: colorArray[colorIndex],
@@ -46,6 +46,37 @@ fabric.IText.prototype.showColorMenu = function () {
         canvas.add(colorCircle);
         globalColorCircles.push(colorCircle);
         colorIndex += 1;
+
+        if (i == 3) {
+            colorCircle.off('mouseover');
+            colorCircle.off('mousedown');  // remove events from circle, we'll re-add them to whole group
+            colorCircle.off('mouseout');
+
+
+            colorCircle.set({ stroke: 'black', strokeWidth: 0.3 });
+            let strikeThroughLine = new fabric.Line([   // add a horizontal line to the strikethrough circle
+                colorCircle.left - 5, colorCircle.top,
+                colorCircle.left + 5, colorCircle.top],
+                {
+                    stroke: 'black',
+                    selectable: false
+                });
+
+            globalColorCircles.pop();
+            var group = new fabric.Group([colorCircle, strikeThroughLine], {
+                originX: 'center',
+                originY: 'center',
+                selectable: false
+            });
+            canvas.add(group);
+            globalColorCircles.push(group);
+
+            group.on('mouseover', getSelectionIndexes);
+            group.on('mousedown', setSelectionColor);  // events to color selection (or whole text)
+            group.on('mouseout', resizeColorCircle);
+
+        }
+
     }
     canvas.renderAll();
 }
@@ -53,28 +84,82 @@ fabric.IText.prototype.showColorMenu = function () {
 var selectionStart = null; // Global vars to keep selection indexes from one event to another
 var selectionEnd = null;
 function getSelectionIndexes() {
-    selectionStart = this.textNode.selectionStart;
-    selectionEnd = this.textNode.selectionEnd;
-    this.set({ radius: 12 });
-}
-function setSelectionColor() {
-    if (selectionStart == selectionEnd) { // If no selection exists, select whole text
-        selectionStart = 0;
-        selectionEnd = this.textNode._text.length;
+    let circle = null;
+    try { // If event caller is a group, gotta get the circle inside group
+        circle = this.item(0);
+        console.log(this);
     }
-    this.textNode.setSelectionStart(selectionStart);
-    this.textNode.setSelectionEnd(selectionEnd);
-    let style = { fill: this.fill } // Add circle color to style object
-    this.textNode.setSelectionStyles(style);
-    // this.textNode.enterEditing();
+    catch { // If caller is the circle itself, no prob
+        circle = this;
+    }
+    selectionStart = circle.textNode.selectionStart;
+    selectionEnd = circle.textNode.selectionEnd;
+    console.log(selectionStart);
+    console.log(selectionEnd);
+    circle.set({ radius: 12 });
 }
-function resizeColorCircle() { this.set({ radius: 10 }); }
+
+function setSelectionColor() {
+    let circle = null;
+    try { // If event caller is a group, gotta get the circle inside group
+        circle = this.item(0);
+    }
+    catch { // If caller is the circle itself, no prob
+        circle = this;
+    }
+
+    if (circle.fill != 'white') {
+        if (selectionStart == selectionEnd) { // If no selection exists, select whole text
+            selectionStart = 0;
+            selectionEnd = circle.textNode._text.length;
+        }
+        circle.textNode.setSelectionStart(selectionStart);
+        circle.textNode.setSelectionEnd(selectionEnd);
+
+        let style = { fill: circle.fill } // Add circle color to style object
+        circle.textNode.setSelectionStyles(style);
+        // circle.textNode.enterEditing();
+    }
+
+
+    else { // if white circle was selected, we want to set linethrough
+        console.log(selectionStart);
+        let lineStart = circle.textNode.findLineBoundaryLeft(selectionStart);
+        let lineEnd = circle.textNode.findLineBoundaryRight(selectionStart);
+        // let middleIndex = (lineStart + lineEnd) / 2;
+        // console.log(circle.textNode.styleHas('linethrough'));
+        // console.log(circle.textNode.styles);
+
+
+        currentStyle = circle.textNode.getSelectionStyles(0, circle.textNode._text.length).slice(lineStart, lineEnd);
+        // if (circle.textNode.styleHas('linethrough')) {
+        if (currentStyle[0].linethrough == true) { // If line is already strikethrough, remove it
+            let style = { linethrough: false };
+            circle.textNode.setSelectionStyles(style, lineStart, lineEnd);
+        }
+        else { // If line is not strikethrough, add it
+            let style = { linethrough: true };
+            circle.textNode.setSelectionStyles(style, lineStart, lineEnd);
+        }
+    }
+}
+
+function resizeColorCircle() {
+    let circle = null;
+    try { // If event caller is a group, gotta get the circle inside group
+        circle = this.item(0);
+    }
+    catch { // If caller is the circle itself, no prob
+        circle = this;
+    }
+    circle.set({ radius: 10 });
+}
 
 // Push color circle as textNode gets wider/shorter
 fabric.IText.prototype.updateColorMenu = function () {
     let index = 0;
     for (let colorCircle of globalColorCircles) {
-        if (index < 3) { colorCircle.set({ left: this.aCoords.tl.x - 20 }); }
+        if (index < 4) { colorCircle.set({ left: this.aCoords.tl.x - 20 }); }
         else { colorCircle.set({ left: this.aCoords.tr.x + 20 }); }
         colorCircle.setCoords();
         index += 1;
@@ -262,6 +347,12 @@ function nodeTextChanged(e) {
     this.updatePointerCircles();
     this.updateColorMenu();
     this.setCoords(); // Prevents clashes when textNodes overlapping...
+
+    if (this._text[this.selectionStart - 1] == '\n') { // If current line is striketrough & we insert new line
+        let style = { linethrough: false };            // remove the style from new line
+        this.setSelectionStyles(style, this.selectionStart - 1, this.selectionStart + 1);
+    }
+
     // if #lines changed, allow pointers to be recreated
     // this.alreadyHasPointers = false;
     // this.deletePointers();
@@ -272,7 +363,12 @@ function nodeTextEditingExited(e) {
     console.log('exited');
     // remove the Color circles of nodeText
     for (color of globalColorCircles) {
-        canvas.remove(color);
+        if (color.type == 'group') {
+            // console.log('GROUP');
+            for (let obj of color.getObjects()) { canvas.remove(obj); }
+            canvas.remove(color);
+        }
+        else { canvas.remove(color); }
     }
     globalColorCircles.length = 0;
     canvas.renderAll();

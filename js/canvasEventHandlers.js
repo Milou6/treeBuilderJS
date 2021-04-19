@@ -18,7 +18,8 @@ function canvasMouseMove(e) {
             if (Math.abs(textCenter.x - e.absolutePointer.x) < 90 && Math.abs(textCenter.y - e.absolutePointer.y) < 90) {
 
                 // for (let pointer of text.pointerCircles) {
-                for (let i = 0; i < text.numberLines * 2; i++) {
+                let limit = Math.min(text.numberLines * 2, 12); // FTM, ONLY CHECKING TILL 12 (= 6 lines of text)
+                for (let i = 0; i < limit; i++) {
                     let point = text.pointerCircles[i];
                     // let point2 = text.pointerCircles[i * 2];
                     // ... check distance of possible point to mouse ...
