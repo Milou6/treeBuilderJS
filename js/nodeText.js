@@ -87,15 +87,13 @@ function getSelectionIndexes() {
     let circle = null;
     try { // If event caller is a group, gotta get the circle inside group
         circle = this.item(0);
-        console.log(this);
+        // console.log(this);
     }
     catch { // If caller is the circle itself, no prob
         circle = this;
     }
     selectionStart = circle.textNode.selectionStart;
     selectionEnd = circle.textNode.selectionEnd;
-    console.log(selectionStart);
-    console.log(selectionEnd);
     circle.set({ radius: 12 });
 }
 
@@ -123,7 +121,7 @@ function setSelectionColor() {
 
 
     else { // if white circle was selected, we want to set linethrough
-        console.log(selectionStart);
+        // console.log(selectionStart);
         let lineStart = circle.textNode.findLineBoundaryLeft(selectionStart);
         let lineEnd = circle.textNode.findLineBoundaryRight(selectionStart);
         // let middleIndex = (lineStart + lineEnd) / 2;

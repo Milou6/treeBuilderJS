@@ -90,18 +90,18 @@ function canvasMouseUp(e) {
 
 
         // if the hoverCircle was dragged more than 20px left or right, activate its movement
-        if (target.hoverType == 'bottom' && Math.abs(delta.x) > 20) {
+        if (target.hoverType == 'bottom' && Math.abs(delta.x) > 5) {
 
             // second check : make sure user cannot drag an arm past the middle of its node
             // the 'isMiddleArm' boolean used to allow middle arm of ternary nodes to move both ways
             let isMiddleArm = target.parentNode.armsArray.length > 2 && target.parentNode.hoverCircles.indexOf(target) == 1;
-            console.log(isMiddleArm);
+            // console.log(isMiddleArm);
             console.log(wantsToCrossMiddle(target, delta));
-            if (!wantsToCrossMiddle(target, delta) || isMiddleArm) {
-                histAction.push(['moveCircle', target, delta.x]);
-                target.set({ X: target.X + delta.x });
-                target.set({ left: target.X, dirty: true });
-                target.setCoords();
+            if ((!wantsToCrossMiddle(target, delta) || isMiddleArm) && target.parentNode.armsArray.length > 1) {
+                // histAction.push(['moveCircle', target, delta.x]); // NOT NEEDED ANYMORE W/ updateArms()
+                // target.set({ X: target.X + delta.x });
+                // target.set({ left: target.X, dirty: true });
+                // target.setCoords();
 
                 // We have to find the corresponding arm to update
                 let parent = target.parentNode;
@@ -145,6 +145,19 @@ function canvasMouseUp(e) {
                 target.setCoords();
                 // canvas.renderAll();
             }
+        }
+
+        // Draggin a top hoverCircle adjusts its X position relative to its parentNode
+        else if (target.hoverType == 'top' && Math.abs(delta.x) > 3) {
+            // histAction.push(['moveCircle', target, delta.x]);
+            target.set({ X: target.X });
+            // target.set({ X: target.X + delta.x });
+            target.set({ left: target.X, dirty: true });
+            target.setCoords();
+
+            target.parentNode.moveSubtreeBy(delta.x, 0);
+            histAction.push(['moveSubtree', target.parentNode, delta.x, 0]);
+            canvasHist.undoPush(histAction);
         }
 
         else if (target.type == 'arrowHandler' && Math.abs(delta.x) > 3) {

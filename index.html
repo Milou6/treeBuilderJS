@@ -162,14 +162,25 @@
             var pointer = canvas.getPointer(event.originalEvent);
             let found = false;
             // let objectClicked = null;
+            console.log(pointer);
+
+            let intersectCircle = new fabric.Circle({ // For a more lenient intersection w/ unary Nodes
+                top: pointer.y,
+                left: pointer.x,
+                radius: 8,
+                originX: 'center',
+                originY: 'center'
+            });
 
             for (let obj of canvas.getObjects()) {
+                // if ((obj.type == 'treeNode' || obj.type == 'nodeText') && obj.containsPoint(pointer, null, true)) {
                 // figuring out if a treeNode was right-clicked
-                if ((obj.type == 'treeNode' || obj.type == 'nodeText') && obj.containsPoint(pointer, null, true)) {
+                if ((obj.type == 'treeNode' || obj.type == 'nodeText') && obj.intersectsWithObject(intersectCircle, true)) {
                     contextMenuObject = obj;
                     found = true;
                 }
             }
+            intersectCircle = null;
             if (found == false) contextMenuObject = null;
             else {
                 // only show menu if SOMETHING was clicked!
@@ -340,7 +351,8 @@
                     // newNode.hoverCircles[2].hasChildNode = newNode.hoverCircles[2].childNode == null ? false : true;
 
                     // connect parent to new ternary node
-                    parentHover.childNode = newNode;
+                    try { parentHover.childNode = newNode; }
+                    catch { }
 
                     canvas.add(newNode);
                     node.delete(); // delete the old, binary node
@@ -381,7 +393,8 @@
                     }
 
                     // connect parent to new ternary node
-                    parentHover.childNode = newNode;
+                    try { parentHover.childNode = newNode; }
+                    catch { }
 
                     // EXTRA : delete whole subtree of middleArm
                     let middleSubtree = ternaryNode.hoverCircles[1].childNode;

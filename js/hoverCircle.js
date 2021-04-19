@@ -36,9 +36,9 @@ fabric.HoverCircle = fabric.util.createClass(fabric.Circle, {
         // this.set({ left: this.X, top: this.Y, radius: 10, fill: 'rgba(0,255,0,0)', selectable: true, lockMovementY: true });
         // this.set({ pathOffset: { x: 0, y: 25 } }); //Maybe not for circle
 
-        if (this.hoverType == 'top') {
-            this.set({ lockMovementX: true });
-        }
+        // if (this.hoverType == 'top') {
+        //     this.set({ lockMovementX: true });
+        // }
 
         this.on('mouseover', hoverCircleMouseOver);
         this.on('mouseout', hoverCircleMouseOut);

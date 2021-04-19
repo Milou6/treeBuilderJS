@@ -242,7 +242,7 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
         let nodeWidth = getNodeWidth(this.armsArray);
 
         this.set({ width: nodeWidth, height: this.vertOffset * 2, originX: 'center', originY: 'top' });
-        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false });
+        this.set({ left: this.X, top: this.Y, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false, padding: 10 });
         this.setCoords();
 
         // Dymanically setting the offset

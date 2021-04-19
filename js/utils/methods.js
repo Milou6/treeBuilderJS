@@ -340,6 +340,14 @@ function getNodeWidth(array) {
  * @param {string} button - toolbar button to set as selected
  */
 function setSelectedButton(button) {
+
+    // if button was Arrow before click, make sure all pointerCircles are invisible
+    if (selectedButton == 'arrow') {
+        for (let text of canvas.getObjects('nodeText')) {
+            for (let point of text.pointerCircles) { point.set({ opacity: 0 }); }
+        }
+    }
+
     selectedButton = button.id;
     // console.log(selectedButton);
     let buttons = document.getElementsByClassName('btn');

@@ -129,6 +129,7 @@ class CanvasHistory {
             ancestor.updateArmCoords(update);
         }
 
+        // 1: root moved, 2: delta.x of movement , 3: delta.y of movement
         else if (subAction[0] == 'moveSubtree') {
             let root = subAction[1];
             subAction[2] = (-1) * subAction[2];
@@ -136,9 +137,11 @@ class CanvasHistory {
             root.moveSubtreeBy(subAction[2], subAction[3]);
         }
 
+        // 1: circle moved, 2: delta.x of movement // NOT USED ANYMORE, MIGHT BE ABLE TO DELETE?
         else if (subAction[0] == 'moveCircle') {
             let circle = subAction[1];
             subAction[2] = (-1) * subAction[2];
+            console.log(subAction[2]);
             circle.set({ X: circle.X + subAction[2], dirty: true });
             circle.setCoords();
         }
@@ -174,7 +177,9 @@ class CanvasHistory {
         }
 
         else if (subAction[0] == '3rdArmAdded') {
-            subAction[1].hoverParent.childNode = subAction[1];
+            // subAction[1].hoverParent.childNode = subAction[1];
+            try { subAction[1].hoverParent.childNode = subAction[1]; }
+            catch { }
         }
 
         // 1: ternaryNode, 2: binaryNode
@@ -285,7 +290,9 @@ class CanvasHistory {
         }
 
         else if (subAction[0] == '3rdArmAdded') {
-            subAction[1].hoverParent.childNode = subAction[2];
+            // subAction[1].hoverParent.childNode = subAction[2];
+            try { subAction[1].hoverParent.childNode = subAction[2]; }
+            catch { }
         }
 
         // 1: ternaryNode, 2: binaryNode
