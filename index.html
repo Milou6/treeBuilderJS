@@ -323,7 +323,7 @@
                 else { subtreeMove = 50; }
 
                 // add new node on top of clicked one ...
-                var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 50, [[-50, 30], [50, 30]], parent, parent.hoverCircles[hoverIndex], []);
+                var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 60, [[-50, 30], [50, 30]], parent, parent.hoverCircles[hoverIndex], []);
                 canvas.add(newNode);
 
                 // reset correct parentHover's childNode
@@ -346,7 +346,7 @@
                 if (hoverIndex == 2) { node.hoverParent = newNode.hoverCircles[1]; }
                 node.nodeParent = newNode;
                 // ... and push clicked node down
-                node.moveSubtreeBy(subtreeMove, 30 + 30 - 12);
+                node.moveSubtreeBy(subtreeMove, 30 + 60 - 12);
 
                 // replace nodeText correctly
                 try {
@@ -361,7 +361,7 @@
 
                 histAction.push(['nodeAdded', newNode]);
                 histAction.push(['addedBetweenNode', node, parent, hoverIndex, newNode]);
-                histAction.push(['moveSubtree', node, subtreeMove, 30 + 30 - 12]);
+                histAction.push(['moveSubtree', node, subtreeMove, 30 + 60 - 12]);
 
                 // push to history
                 canvasHist.undoPush(histAction);
