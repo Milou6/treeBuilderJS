@@ -19,7 +19,7 @@ fabric.TreeTriangle = fabric.util.createClass(fabric.Polygon, {
         this.historyID = setHistoryID();
 
         this.set({ width: 60, height: 30, originX: 'center', originY: 'top' });
-        this.set({ left: this.attachedText.X + relativeX, top: this.attachedText.Y + relativeY, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: true });
+        this.set({ left: this.attachedText.X + relativeX, top: this.attachedText.Y + relativeY, fill: 'rgba(255, 255, 255, 1)', stroke: 'black', selectable: false });
         this.setCoords();
 
         this.set({ pathOffset: { x: 0, y: 15 } });

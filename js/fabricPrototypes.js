@@ -257,7 +257,8 @@ fabric.PointerCircle.prototype.toObject = (function (toObject) {
             arrow: this.arrow,
             historyID: this.historyID,
             textSide: this.textSide,
-            textNode: this.textNode
+            textNode: this.textNode,
+            selectable: this.selectable
         });
     };
 })(fabric.PointerCircle.prototype.toObject);
@@ -286,6 +287,7 @@ fabric.Circle.prototype.toObject = (function (toObject) {
             relativeY: this.relativeY,
             // PointerCircle attribs
             arrow: this.arrow,
+            selectable: this.selectable,
             // historyID: this.historyID,
             // hasControls: this.hasControls,
             // hasBorders: this.hasBorders

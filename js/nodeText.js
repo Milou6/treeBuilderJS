@@ -374,14 +374,18 @@ function nodeTextEditingExited(e) {
     if (this.text == "") {
         this.text = "...";
     }
+
     let histAction = [];
-    histAction.push(['textEdited', this, this.oldText, this.text]);
+    if (this._textBeforeEdit != this.text) {
+        histAction.push(['textEdited', this, this.oldText, this.text]);
+    }
 
     if (this.attachedHover.childNode != null) {
         // Check if childNode intersects w/ smth after updateVerticalSpace()
         resolveIntersections(this.attachedHover.childNode, histAction);
     }
-    canvasHist.undoPush(histAction);
+    if (histAction.length > 0) { canvasHist.undoPush(histAction); }
+
     // update pointerCircles, for ex. if text got wider or shorter
     // this.updatePointerCircles();
 }

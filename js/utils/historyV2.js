@@ -162,6 +162,7 @@ class CanvasHistory {
             subAction[2].hoverCircles[subAction[3]].childNode = subAction[1];
         }
 
+        // 1: node deleted, 2: parent, 3: hoverParent, 4: childNode
         else if (subAction[0] == 'nodeRemoved') {
             let node = subAction[1];
             for (let circle of node.hoverCircles) {
@@ -174,6 +175,19 @@ class CanvasHistory {
                 this.canvas.add(text);
             }
             this.canvas.add(node);
+
+            // re-attach parent to node and childNode to node
+            try {
+                subAction[3].childNode = subAction[1];
+            }
+            catch { }
+            try {
+                subAction[4].nodeParent = subAction[1];
+                subAction[4].hoverParent = subAction[1];
+            }
+            catch { }
+
+
         }
 
         else if (subAction[0] == '3rdArmAdded') {
@@ -275,6 +289,7 @@ class CanvasHistory {
             subAction[2].hoverCircles[subAction[3]].childNode = subAction[4];
         }
 
+        // 1: node deleted, 2: parent, 3: hoverParent, 4: childNode
         else if (subAction[0] == 'nodeRemoved') {
             let node = subAction[1];
             for (let circle of node.hoverCircles) {
@@ -287,6 +302,17 @@ class CanvasHistory {
                 this.canvas.remove(text);
             }
             this.canvas.remove(node);
+
+            // re-attach parent to ((node)) childNode 
+            try {
+                subAction[3].childNode = subAction[4];
+            }
+            catch { }
+            try {
+                subAction[4].nodeParent = subAction[2];
+                subAction[4].hoverParent = subAction[3];
+            }
+            catch { }
         }
 
         else if (subAction[0] == '3rdArmAdded') {

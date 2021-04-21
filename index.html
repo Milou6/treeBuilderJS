@@ -195,6 +195,19 @@
             return false;
         }
 
+
+
+        function nodeHasManyChildren() {
+            let count = 0;
+            for (let circle of contextMenuObject.hoverCircles) {
+                if (circle.childNode != null) { count += 1; }
+            }
+
+            if (count > 1) { return true; }
+            else { return false; }
+        }
+
+
         var contextMenuItems;
         //Right-click menu item click
         function showContextMenu(event) {
@@ -210,7 +223,9 @@
             else if (contextMenuObject.type == 'treeNode' && contextMenuObject.nodeParent != null) {
                 contextMenuItems = {
                     // "delete": { name: "delete", icon: "delete", data: object },
-                    "delete": { name: "Delete node", icon: "delete" },
+                    "delete": {
+                        name: "Delete node", icon: "delete", disabled: nodeHasManyChildren()
+                    },
                     "add": { name: "Add node here", icon: "add" },
                     "sep1": "---------",
                     "edit": { name: "Toggle 3rd arm", icon: "edit" }
@@ -218,7 +233,9 @@
             }
             else if (contextMenuObject.type == 'treeNode') {       //NOT IDEAL STRUCT, HAVE TO REFACTOR
                 contextMenuItems = {
-                    "delete": { name: "Delete node", icon: "delete" },
+                    "delete": {
+                        name: "Delete node", icon: "delete", disabled: nodeHasManyChildren()
+                    },
                     // "add": { name: "Add node here", icon: "add" },
                     "sep1": "---------",
                     "edit": { name: "Toggle 3rd arm", icon: "edit" }
@@ -241,13 +258,53 @@
         //Right-click menu : item click
         function contextMenuClick(key, options) {
             // console.log(options);
-            if (key == "delete") {
-                console.log('DELETE');
-                // let node = contextMenuObject;
-                // let histAction = [];
 
-                // histAction.push(['nodeRemoved', node]);
-                // canvasHist.undoPush(histAction);
+            let histAction = [];
+
+            // Only works if node below has only one child
+            // (otherwise, how to choose which child to attach to parent?)
+            if (key == "delete") {
+                let node = contextMenuObject;
+                let parent = node.nodeParent;
+                let hoverParent = node.hoverParent; // Get parent node and hover
+
+
+                let childNode = null; // Get the child node
+                for (let circle of node.hoverCircles) {
+                    if (circle.childNode != null) { childNode = circle.childNode; }
+                }
+
+                try {
+                    childNode.nodeParent = parent; // link child to parent
+                    childNode.hoverParent = hoverParent; // link child to parent
+                }
+                catch { // If node deleted had no parent..
+                    childNode.nodeParent = null;
+                    childNode.hoverParent = null;
+                }
+
+                try {
+                    hoverParent.childNode = childNode;
+                }
+                catch { // If node deleted had no children..
+                    hoverParent.childNode = null;
+                    hoverParent.hasChildNode = false;
+                }
+
+
+                // if there is child node, move it to position of deleted node
+                try {
+                    let moveX = node.left - childNode.left;
+                    let moveY = node.top - childNode.top;
+
+                    childNode.moveSubtreeBy(moveX, moveY);
+                    histAction.push(['moveSubtree', childNode, moveX, moveY]);
+                }
+                catch { }
+
+                node.delete();
+                histAction.push(['nodeRemoved', node, parent, hoverParent, childNode]);
+                canvasHist.undoPush(histAction);
 
             }
 
@@ -257,7 +314,7 @@
                 let hoverIndex = parent.hoverCircles.indexOf(node.hoverParent);
                 console.log(`hoverIndex: ${hoverIndex}`);
 
-                let histAction = [];
+
 
                 let subtreeMove = 0;
                 if (hoverIndex == 0) { subtreeMove = -50; }
@@ -312,7 +369,7 @@
             else if (key == "edit") {
                 // console.log('EDIT');
                 let node = contextMenuObject;
-                let histAction = [];
+
 
                 if (node.armsArray.length <= 2) {
 
@@ -417,7 +474,7 @@
 
             else if (key == 'toggleTriangle' && !contextMenuObject.attachedHover.hasChildNode) {
                 let textNode = contextMenuObject;
-                let histAction = [];
+
 
                 let line1 = textNode.textLines[0];
                 let line2 = textNode.textLines[1];
