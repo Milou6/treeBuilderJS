@@ -217,7 +217,7 @@ function canvasMouseUp(e) {
                     target.attachedNodeText.setInitVerticalSpace();
                     histAction.push(['addedChild', target, target.childNode]);
                     histAction.push(['nodeAdded', newNode]);
-                    console.log(histAction);
+                    // console.log(histAction);
                     canvasHist.undoPush(histAction);
 
                     // myHistory.undoPush();
@@ -274,8 +274,25 @@ function canvasMouseUp(e) {
                     canvasHist.undoPush(histAction);
                 }
 
+                else if (target.hoverType == 'bottom' && !target.hasChildNode && target.attachedNodeText.attachedTriangle == null && selectedButton == 'ternaryNode') {
+                    var newNode = new fabric.TreeNode(target.left + 12, target.top + 30, [[-60, 30], [0, 30], [60, 30]], target.parentNode, target, []);
+
+                    canvas.add(newNode);
+                    target.hasChildNode = true;
+                    target.childNode = newNode;
+
+                    resolveIntersections(newNode, histAction);
+                    // if the hoverCircle's textNode is multiple lines long, make sure to push new node a bit down
+                    target.attachedNodeText.setInitVerticalSpace();
+                    histAction.push(['addedChild', target, target.childNode]);
+                    histAction.push(['nodeAdded', newNode]);
+                    // console.log(histAction);
+                    canvasHist.undoPush(histAction);
+                }
 
             } // if (target.type == 'hoverCircle')
+
+
 
             else if (target.type == 'nodeText') {
                 target.enterEditing();
