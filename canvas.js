@@ -51,8 +51,8 @@ function zoomOutCanvas() {
 
 
 // Print coords of mouse on the screen for development
-var Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
-canvas.add(Coordstext);
+// var Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
+// canvas.add(Coordstext);
 
 // ** Attaching all events handlers to canvas
 canvas.on('mouse:move', canvasMouseMove);
@@ -279,8 +279,8 @@ fileSelector.addEventListener('change', (event) => {
         canvasHist.redoStack.length = 0;
         $('#redoBtn').prop('disabled', true);
 
-        Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
-        canvas.add(Coordstext);
+        // Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
+        // canvas.add(Coordstext);
 
         // remove events for debug
         // canvas.off('mouse:move', canvasMouseMove);
@@ -320,10 +320,10 @@ function saveCanvasToJSON() {
     let canvasRegularObjects = canvas.getObjects();
     let canvasFlattenedObjects = flattenObjects(_.cloneDeep(canvasRegularObjects));
 
-    console.log('FLAT');
-    console.log(canvasFlattenedObjects);
-    console.log('REG');
-    console.log(canvasRegularObjects);
+    // console.log('FLAT');
+    // console.log(canvasFlattenedObjects);
+    // console.log('REG');
+    // console.log(canvasRegularObjects);
 
     histCanvas.clear();
     histCanvas.add(...canvasFlattenedObjects);
@@ -337,10 +337,9 @@ function saveCanvasToJSON() {
 
 
     let jsonObjects = JSON.stringify(histCanvas);
-    // console.log(jsonObjects);
     let blob = new Blob([jsonObjects], { type: 'application/json' });
     let downloadLink = window.URL.createObjectURL(blob);
-    console.log(downloadLink);
+    // console.log(downloadLink);
 
     let anchor = document.getElementById('canvasJSONDownload');
     anchor.href = downloadLink;

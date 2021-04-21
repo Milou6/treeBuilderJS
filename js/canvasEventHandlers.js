@@ -1,6 +1,6 @@
 function canvasMouseMove(e) {
     // we have to use absolutePointer, otherwise zoom messes up the text Coords!!
-    Coordstext.set({ text: `X : ${e.absolutePointer.x.toFixed(0)},  Y : ${e.absolutePointer.y.toFixed(0)}` });
+    // Coordstext.set({ text: `X : ${e.absolutePointer.x.toFixed(0)},  Y : ${e.absolutePointer.y.toFixed(0)}` });
 
     // This is for dragging the canvas w/ the mouse 
     if (this.panning && e && e.e) {
@@ -202,7 +202,7 @@ function canvasMouseUp(e) {
                         newNode.isOnTreeSpine = spineLabel;
                     }
                     else {
-                        var newNode = new fabric.TreeNode(target.left + 12, target.top + 30, [[-50, 30], [50, 30]], target.parentNode, target, []);
+                        var newNode = new fabric.TreeNode(target.left + 12, target.top + 30, [[-40, 30], [40, 30]], target.parentNode, target, []);
                         // var newNode = new fabric.TreeNode(target.left + 12, target.top + 40, [[-60, 50], [60, 50]], target.parentNode, target, []);
                     }
                     // var newNode = new fabric.TreeNode(target.left + 12, target.top + 50, [[-50, 50], [50, 50]], target.parentNode, target, []);
@@ -225,7 +225,7 @@ function canvasMouseUp(e) {
                 }
 
                 else if (target.hoverType == 'bottom' && !target.hasChildNode && target.attachedNodeText.attachedTriangle == null && selectedButton == 'singleNode') {
-                    var newNode = new fabric.TreeNode(target.left + 12, target.top + 50, [[0, 60]], target.parentNode, target, []);
+                    var newNode = new fabric.TreeNode(target.left + 12, target.top + 35, [[0, 30]], target.parentNode, target, []);
                     canvas.add(newNode);
                     // set boolean on hoverCircle to disable adding new children to it
                     target.hasChildNode = true;

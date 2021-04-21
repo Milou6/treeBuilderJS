@@ -37,15 +37,16 @@
 
     <div id="top-menu">
         <!-- <a id="loadFileBtn" onclick="clickFileLoader()">Load from file</a> -->
-        <!-- <label for="filename">Load from file</label> -->
+        <span>Import a Tree: ⬆️</span>
         <input type="file" id="fileLoader" name="filename" accept=".json">
+        <!-- <label for="fileLoader">Load from file</label> -->
         <a href="" download="canvasObjects.json" id="canvasJSONDownload"></a>
 
         <!-- <a href="" onclick="saveCanvasToJSON()">Save to JSON</a> -->
-        <button id="save" onclick="saveCanvasToJSON()">Save to JSON</button>
+        <button id="save" onclick="saveCanvasToJSON()">Save Tree to File 📂</button>
 
         <a download="canvas.svg" id="downloadlink" onclick="SVGDownload(event)">
-            <button type="button">Download as Image</button>
+            <button type="button">Save Tree as Image 🖼️</button>
         </a>
         <!-- this 2nd anchor is the one who actually downloads the SVG -->
         <a href="" download="canvas.svg" id="CanvasDownload"></a>
@@ -53,34 +54,35 @@
 
     <!-- Toolbar for different kinds of nodes -->
     <div id="main-toolbar">
-        <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)">
+        <button id="binaryNode" class="btn active" onclick="setSelectedButton(this)" title="Binary branch">
             <img src="assets/branch_actV2.png" alt="binaryBranch">
         </button>
 
-        <button id="singleNode" class="btn" onclick="setSelectedButton(this)">
+        <button id="singleNode" class="btn" onclick="setSelectedButton(this)" title="Single branch">
             <img src="assets/node_actV2.png" alt="singleBranch">
         </button>
 
-        <button id="ternaryNode" class="btn" onclick="setSelectedButton(this)">
+        <button id="ternaryNode" class="btn" onclick="setSelectedButton(this)" title="Ternary branch">
             <img src="assets/ternaryV2.png" alt="ternaryBranch">
         </button>
-        <button id="arrow" class="btn" onclick="setSelectedButton(this)">
+        <button id="arrow" class="btn" onclick="setSelectedButton(this)" title="Arrow">
             <img src="assets/arrowV2.png" alt="arrow">
         </button>
 
-        <button id="undoBtn" class="undoRedo" onclick="undo()" disabled>↩️</button>
-        <button id="redoBtn" class="undoRedo" onclick="redo()" disabled>↪️</button>
+        <button id="undoBtn" class="undoRedo" onclick="undo()" disabled title="Undo">↩️</button>
+        <button id="redoBtn" class="undoRedo" onclick="redo()" disabled title="Redo">↪️</button>
 
-        <button id="zoomIn" class="btn zoom push" onclick="zoomInCanvas()">
+        <button id="zoomIn" class="btn zoom push" onclick="zoomInCanvas()" title="Zoom in">
             <!-- <img src="images/zoomIn.png" alt="zoomIn"> -->
             🔎+
         </button>
-        <button id="zoomOut" class="btn zoom" onclick="zoomOutCanvas()">
+        <button id="zoomOut" class="btn zoom" onclick="zoomOutCanvas()" title="Zoom out">
             <!-- <img src="images/zoomOut.png" alt="zoomOut"> -->
             🔍-
         </button>
 
-        <button id="render" onclick="renderBoundingRect()">BoundingRect()</button>
+        <!-- <button id="render" onclick="renderBoundingRect()">BoundingRect()</button> -->
+        <a id="tutorialBtn" href="tutorial.html" target="_blank">Help!</a>
 
 
     </div>
@@ -119,7 +121,7 @@
 
 
 
-    <a id="mailBtn" href="mailto:emile.haas@etu.unige.ch?subject=treeBuilderJS: Bug Report">🐞</a>
+    <a id="mailBtn" href="mailto:emile.haas@etu.unige.ch?subject=treeBuilderJS: Bug Report" title="Bug Report">🐞</a>
     <div class="container">
         <!-- The canvas running the tree-building javascript -->
         <canvas id="treeCanvas" width="3000" height="2000"></canvas>
@@ -262,7 +264,7 @@
                 else { subtreeMove = 50; }
 
                 // add new node on top of clicked one ...
-                var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 50, [[-50, 50], [50, 50]], parent, parent.hoverCircles[hoverIndex], []);
+                var newNode = new fabric.TreeNode(node.hoverParent.left + 12, node.hoverParent.top + 50, [[-50, 30], [50, 30]], parent, parent.hoverCircles[hoverIndex], []);
                 canvas.add(newNode);
 
                 // reset correct parentHover's childNode
@@ -285,7 +287,7 @@
                 if (hoverIndex == 2) { node.hoverParent = newNode.hoverCircles[1]; }
                 node.nodeParent = newNode;
                 // ... and push clicked node down
-                node.moveSubtreeBy(subtreeMove, 50 + 50 - 12);
+                node.moveSubtreeBy(subtreeMove, 30 + 30 - 12);
 
                 // replace nodeText correctly
                 try {
@@ -300,7 +302,7 @@
 
                 histAction.push(['nodeAdded', newNode]);
                 histAction.push(['addedBetweenNode', node, parent, hoverIndex, newNode]);
-                histAction.push(['moveSubtree', node, subtreeMove, 50 + 50 - 12]);
+                histAction.push(['moveSubtree', node, subtreeMove, 30 + 30 - 12]);
 
                 // push to history
                 canvasHist.undoPush(histAction);

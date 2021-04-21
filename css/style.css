@@ -28,13 +28,27 @@ canvas {
 
 
 
+/* .container::-webkit-scrollbar {
+    width: 0; 
+    background: transparent; 
+} */
 
+.container::-webkit-scrollbar {
+    display: none;
+}
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+.container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
 
 .container {
-    width: 1200px;
+    width: 97vw;
+    /* width: 1200px; */
     height: 500px;
     /* max-height: 300px; */
-    overflow-y: scroll;
+    overflow-y:scroll;
     /* position: fixed; */
 
 }
@@ -64,11 +78,11 @@ button img {
     align-self: flex-end;
 }
 
-#mailBtn {
+#mailBtn, #tutorialBtn {
     text-decoration: none;
     position: absolute;
-    left: 1100px;
-    top: 160px;
+    left: 90vw;
+    top: 5vh;
     height: 60px;
     width: 60px;
     z-index: 10;
@@ -85,10 +99,20 @@ button img {
     background-color: rgb(139, 0, 253);
     border-radius: 50%;
 }
-#mailBtn:hover {
+#mailBtn:hover, #tutorialBtn:hover {
     font-size: 30px;
     opacity: 0.9;
     /* background-color: rgba(139, 0, 253, 0.9); */
+}
+
+#tutorialBtn {
+    left: 85vw;
+    top: 5vh;
+    font-size:20px;
+    background-color: rgb(46, 20, 196);
+}
+#tutorialBtn:hover {
+    font-size: 25px;
 }
 
 input[type='file'] {
@@ -108,3 +132,17 @@ input[type='file'] {
     cursor: pointer;
   }
 
+img.tutoImg {
+    border: 1px solid rgb(0,0,0);
+    width: 20%;
+    height: 20%;
+}
+
+img.s30 {
+    width: 30%;
+    height: 30%;
+}
+img.s40 {
+    width: 40%;
+    height: 40%;
+}
