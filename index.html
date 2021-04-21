@@ -287,8 +287,10 @@
                     hoverParent.childNode = childNode;
                 }
                 catch { // If node deleted had no children..
-                    hoverParent.childNode = null;
-                    hoverParent.hasChildNode = false;
+                    if (hoverParent != null) {
+                        hoverParent.childNode = null;
+                        hoverParent.hasChildNode = false;
+                    }
                 }
 
 
