@@ -18,6 +18,7 @@ fabric.NodeText.prototype.toObject = (function (toObject) {
             historyID: this.historyID,
             oldText: this.oldText,
             pointerCircles: this.pointerCircles,
+            mainTextNode: this.mainTextNode,
 
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
@@ -44,6 +45,7 @@ fabric.IText.prototype.toObject = (function (toObject) {
             historyID: this.historyID,
             oldText: this.oldText,
             pointerCircles: this.pointerCircles,
+            mainTextNode: this.mainTextNode,
 
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
@@ -303,6 +305,9 @@ fabric.TreeTriangle.prototype.toObject = (function (toObject) {
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
             pointer: this.pointer,
+            attachedText: this.attachedText,
+            relativeX: this.relativeX,
+            relativeY: this.relativeY,
             historyID: this.historyID
         });
     };
@@ -311,6 +316,9 @@ fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SH
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
             pointer: this.pointer,
+            attachedText: this.attachedText,
+            relativeX: this.relativeX,
+            relativeY: this.relativeY,
             historyID: this.historyID
         });
     };
@@ -321,6 +329,10 @@ fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SH
 // stateProperties //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+fabric.NodeText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
+
+fabric.IText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
+
 
 
 fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy", "deleteSubtree", "reAddSubtree"
@@ -352,5 +364,5 @@ fabric.Circle.prototype.stateProperties = fabric.Object.prototype.statePropertie
 
 
 
-fabric.TreeTriangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "historyID"]);
-fabric.Triangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "historyID"]);
+fabric.TreeTriangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID"]);
+fabric.Triangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID"]);

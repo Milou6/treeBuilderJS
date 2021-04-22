@@ -474,16 +474,18 @@
                 }
             }
 
-            else if (key == 'toggleTriangle' && !contextMenuObject.attachedHover.hasChildNode) {
+            else if (key == 'toggleTriangle' && !contextMenuObject.attachedHover.hasChildNode /*&& !contextMenuObject.isSecondaryText*/) {
+
+                // If toggle came from secondaryText, switch to mainText
+                if (contextMenuObject.mainTextNode != null) {
+                    contextMenuObject = contextMenuObject.mainTextNode;
+                }
+
                 let textNode = contextMenuObject;
-
-
                 let line1 = textNode.textLines[0];
                 let line2 = textNode.textLines[1];
                 // console.log(line2);
 
-                // if (line2 != null) {
-                // console.log('works');
                 if (textNode.attachedTriangle == null) {
                     if (line2 == null) {
                         // var newTriangle = new fabric.TreeTriangle(textNode.X, textNode.Y, textNode, []);
@@ -493,9 +495,6 @@
 
                         // push text down to accomodate triangle
                         textNode.attachedTriangle = newTriangle;
-                        // textNode.set({ Y: textNode.Y + 35 });
-                        // textNode.set({ top: textNode.Y, dirty: true });
-                        // textNode.setCoords();
                         canvas.renderAll();
                     }
 
@@ -503,21 +502,28 @@
                     else {
                         var newTriangle = new fabric.TreeTriangle(0, 25, textNode, []);
                         textNode.attachedTriangle = newTriangle;
-                        // canvas.renderAll();
 
-                        let secondaryText = new fabric.NodeText(textNode.X, textNode.Y + 60, textNode.parentNode, textNode.attachedHover, line2);
+                        let line1Length = textNode.textLines[0].length + 1;
+                        textNode.setSelectionStart(textNode.findLineBoundaryLeft(line1Length));
+                        textNode.setSelectionEnd(textNode._text.length);
+                        // var below stores content of line 2 and beyond
+                        let secondaryTextContent = textNode.getSelectedText();
+                        let secondaryTextStyle = textNode.getSelectionStyles(line1Length, textNode._text.length, true);
+                        console.log(secondaryTextStyle);
+
+                        let secondaryText = new fabric.NodeText(textNode.X, textNode.Y + 60, textNode.parentNode, textNode.attachedHover, secondaryTextContent);
+                        // secondaryText.isSecondaryText = true;
+                        secondaryText.mainTextNode = textNode;
                         // link new text to primary text
                         textNode.secondaryText = secondaryText;
                         // textNode.parentNode.textNodes.push(secondaryText);
                         canvas.add(newTriangle, secondaryText);
 
-                        // remove 2nd line from primary text
+                        // re-copy text styles of lines 2+ into secondary text
+                        secondaryText.setSelectionStyles(secondaryTextStyle, 0, secondaryText._text.length);
+                        // secondaryText.styles = secondaryTextStyle;
+                        // remove all but 1st line from textNode
                         textNode.text = line1;
-
-                        // push text down to accomodate triangle
-                        // textNode.set({ Y: textNode.Y + 35 });
-                        // textNode.set({ top: textNode.Y, dirty: true });
-                        // textNode.setCoords();
                         canvas.renderAll();
                     }
                 }

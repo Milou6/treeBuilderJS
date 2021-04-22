@@ -390,6 +390,9 @@ function flattenObjects(array, hist, realArray) {
             // console.log(object.attachedHover);
             object.attachedHover = object.attachedHover.historyID;
             // console.log(object.attachedHover);
+            object.mainTextNode = (object.mainTextNode == null ? null : object.mainTextNode.historyID);
+            object.secondaryText = (object.secondaryText == null ? null : object.secondaryText.historyID);
+            object.attachedTriangle = (object.attachedTriangle == null ? null : object.attachedTriangle.historyID);
 
             object.pointerCircles.forEach(function (item, innerIndex) {
                 object.pointerCircles[innerIndex] = object.pointerCircles[innerIndex].historyID;
@@ -410,6 +413,9 @@ function flattenObjects(array, hist, realArray) {
         else if (object.type == 'pointerCircle') {
             object.arrow = (object.arrow == null ? null : object.arrow.historyID);
             object.textNode = (object.textNode == null ? null : object.textNode.historyID);
+        }
+        else if (object.type == 'treeTriangle') {
+            object.attachedText = (object.attachedText == null ? null : object.attachedText.historyID);
         }
         else if (object.type == 'triangle') {
             object.pointer = (object.pointer == null ? null : object.pointer.historyID);
@@ -469,6 +475,9 @@ function reviveCanvasObject(o, object) {
     else if (object.type == 'triangle') {
         reviveTriangle(object);
     }
+    else if (object.type == 'treeTriangle') {
+        reviveTreeTriangle(object);
+    }
     else if (object.type == 'text') {
         canvas.remove(object);
     }
@@ -495,6 +504,9 @@ function reviveNodeText(object) {
 
     object.parentNode = findObjByID(object.parentNode, 'treeNode');
     object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
+    object.mainTextNode = findObjByID(object.mainTextNode, 'nodeText');
+    object.secondaryText = findObjByID(object.secondaryText, 'nodeText');
+    object.attachedTriangle = findObjByID(object.attachedTriangle, 'treeTriangle');
 
     object.pointerCircles.forEach(function (item, innerIndex) {
         object.pointerCircles[innerIndex] = findObjByID(object.pointerCircles[innerIndex], 'pointerCircle');
@@ -542,6 +554,11 @@ function revivePointerCircle(object) {
 
 function reviveTriangle(object) {
     object.pointer = findObjByID(object.pointer, 'pointerCircle');
+
+}
+
+function reviveTreeTriangle(object) {
+    object.attachedText = findObjByID(object.attachedText, 'nodeText');
 
 }
 

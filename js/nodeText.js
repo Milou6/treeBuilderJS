@@ -384,6 +384,7 @@ function nodeTextEditingExited(e) {
         // Check if childNode intersects w/ smth after updateVerticalSpace()
         resolveIntersections(this.attachedHover.childNode, histAction);
     }
+    // Don't need to push Action if it's empty, do we?
     if (histAction.length > 0) { canvasHist.undoPush(histAction); }
 
     // update pointerCircles, for ex. if text got wider or shorter

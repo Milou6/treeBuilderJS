@@ -34,3 +34,7 @@ fabric.TreeTriangle = fabric.util.createClass(fabric.Polygon, {
         // canvas.sendToBack(this);
     },
 });
+
+fabric.TreeTriangle.fromObject = function (object, callback) {
+    return fabric.Object._fromObject('Polygon', object, callback, 'points'); // TY @asturur
+};
