@@ -308,6 +308,29 @@ fabric.NodeText = fabric.util.createClass(fabric.IText, {
         this.callSuper('_render', ctx);
     },
 
+    // onInput: function (e) {
+    // Call parent class method
+    // this.callSuper('onInput', e);
+
+    // // if text has secondaryText, don't allow to enter \n
+    // if (this.secondaryText) {
+    //     textOriginal = this.text;
+    //     // Remove all 3 types (PC, UNIX, iOS) of line breaks
+    //     var textRevised = textOriginal.replace(/(\r\n|\n|\r)/gm, "");
+    //     // console.log(textOriginal);
+    //     // console.log(textRevised);
+    //     this.set({ text: textRevised });
+
+    //     if (this.text != textOriginal) { // set cursor back if text changed
+    //         // console.log('textRevised != textOriginal');
+    //         this.moveCursorLeft(e);
+    //     }
+    //     this.exitEditing();
+    //     this.enterEditing()
+    //     // this.updateColorMenu();
+    // }
+    // }
+
     // ** CHANGE: export the custom method when serializing
     // toObject: function () {
     //     return fabric.util.object.extend(this.callSuper('toObject'), {
@@ -346,10 +369,43 @@ function nodeTextChanged(e) {
     this.updateColorMenu();
     this.setCoords(); // Prevents clashes when textNodes overlapping...
 
+    // console.log(this._text[this.selectionStart - 1]);
     if (this._text[this.selectionStart - 1] == '\n') { // If current line is striketrough & we insert new line
-        let style = { linethrough: false };            // remove the style from new line
-        this.setSelectionStyles(style, this.selectionStart - 1, this.selectionStart + 1);
+        // console.log('true');
+        if (this.secondaryText) {
+
+            // this.removeChars(this.selectionStart - 1);
+            // this.exitEditing();
+            // this.secondaryText.enterEditing();
+
+
+            // let length = this._text.length;
+            // this.selectionStart = this.selectionStart - 1;
+            // this.selectionEnd = this._text.length;
+            // let textToMoveDown = this.getSelectedText();
+            // console.log(textToMoveDown);
+            // this.removeChars(this.selectionStart, this.selectionEnd);
+            // this.exitEditing(this.secondaryText.enterEditing());
+
+            // // this.secondaryText.enterEditing();
+            // // this.secondaryText.showColorMenu();
+            // this.secondaryText.selectionStart = 0;
+            // this.secondaryText.insertChars(textToMoveDown, null, 0);
+            // // this.secondaryText.exitEditing();
+
+        }
+        else {
+            let style = { linethrough: false };            // remove the style from new line
+            this.setSelectionStyles(style, this.selectionStart - 1, this.selectionStart + 1);
+        }
     }
+
+    // let length = this._text.length;
+    // if (this._text[length - 1] == '\n' && this.secondaryText) {
+    //     this.removeChars(length - 1, length);
+    //     this.exitEditing();
+    //     this.secondaryText.enterEditing();
+    // }
 
     // if #lines changed, allow pointers to be recreated
     // this.alreadyHasPointers = false;
@@ -403,3 +459,122 @@ function nodeTextEditingEntered(e) {
     this.showColorMenu();
 }
 
+
+
+// Huge HAX to make onInput still work after reload fromJSON...
+fabric.NodeText.prototype.onInput = fabric.IText.prototype.onInput = function (e) {
+    // this.callSuper('onInput', e);
+
+    originalOnInput(this, e);
+    // this.undoLineBreaks();
+    // fabric.IText.prototype.onInput(e);
+
+    // if text has secondaryText, don't allow to enter \n
+    if (this.secondaryText) {
+        let textOriginal = this.text;
+        // let textStyles = this.getSelectionStyles(0, this.text.length);
+        // Remove all 3 types (PC, UNIX, iOS) of line breaks
+        let textRevised = textOriginal.replace(/(\r\n|\n|\r)/gm, "");
+        // console.log(textOriginal);
+        // console.log(textRevised);
+        this.set({ text: textRevised });
+
+        if (this.text != textOriginal) { // set cursor back if text changed
+            // console.log('textRevised != textOriginal');
+            // this.setSelectionStyles(textStyles, 0, this.text.length); // Breaking the canvas...
+            this.moveCursorLeft(e);
+        }
+        this.exitEditing();
+        this.enterEditing()
+        // this.updateColorMenu();
+    }
+}
+
+
+// Original IText onInput() function from fabricJS
+function originalOnInput(textNode, e) {
+    var fromPaste = textNode.fromPaste;
+    textNode.fromPaste = false;
+    e && e.stopPropagation();
+    if (!textNode.isEditing) {
+        return;
+    }
+    // decisions about style changes.
+    var nextText = textNode._splitTextIntoLines(textNode.hiddenTextarea.value).graphemeText,
+        charCount = textNode._text.length,
+        nextCharCount = nextText.length,
+        removedText, insertedText,
+        charDiff = nextCharCount - charCount,
+        selectionStart = textNode.selectionStart, selectionEnd = textNode.selectionEnd,
+        selection = selectionStart !== selectionEnd,
+        copiedStyle, removeFrom, removeTo;
+    if (textNode.hiddenTextarea.value === '') {
+        textNode.styles = {};
+        textNode.updateFromTextArea();
+        textNode.fire('changed');
+        if (textNode.canvas) {
+            textNode.canvas.fire('text:changed', { target: textNode });
+            textNode.canvas.requestRenderAll();
+        }
+        return;
+    }
+    var textareaSelection = textNode.fromStringToGraphemeSelection(
+        textNode.hiddenTextarea.selectionStart,
+        textNode.hiddenTextarea.selectionEnd,
+        textNode.hiddenTextarea.value
+    );
+    var backDelete = selectionStart > textareaSelection.selectionStart;
+    if (selection) {
+        removedText = textNode._text.slice(selectionStart, selectionEnd);
+        charDiff += selectionEnd - selectionStart;
+    }
+    else if (nextCharCount < charCount) {
+        if (backDelete) {
+            removedText = textNode._text.slice(selectionEnd + charDiff, selectionEnd);
+        }
+        else {
+            removedText = textNode._text.slice(selectionStart, selectionStart - charDiff);
+        }
+    }
+    insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd);
+    if (removedText && removedText.length) {
+        if (insertedText.length) {
+            // let's copy some style before deleting.
+            // we want to copy the style before the cursor OR the style at the cursor if selection
+            // is bigger than 0.
+            copiedStyle = textNode.getSelectionStyles(selectionStart, selectionStart + 1, false);
+            // now duplicate the style one for each inserted text.
+            copiedStyle = insertedText.map(function () {
+                // this return an array of references, but that is fine since we are
+                // copying the style later.
+                return copiedStyle[0];
+            });
+        }
+        if (selection) {
+            removeFrom = selectionStart;
+            removeTo = selectionEnd;
+        }
+        else if (backDelete) {
+            // detect differences between forwardDelete and backDelete
+            removeFrom = selectionEnd - removedText.length;
+            removeTo = selectionEnd;
+        }
+        else {
+            removeFrom = selectionEnd;
+            removeTo = selectionEnd + removedText.length;
+        }
+        textNode.removeStyleFromTo(removeFrom, removeTo);
+    }
+    if (insertedText.length) {
+        if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
+            copiedStyle = fabric.copiedTextStyle;
+        }
+        textNode.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+    }
+    textNode.updateFromTextArea();
+    textNode.fire('changed');
+    if (textNode.canvas) {
+        textNode.canvas.fire('text:changed', { target: textNode });
+        textNode.canvas.requestRenderAll();
+    }
+}

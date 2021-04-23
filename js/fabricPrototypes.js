@@ -20,6 +20,7 @@ fabric.NodeText.prototype.toObject = (function (toObject) {
             pointerCircles: this.pointerCircles,
             mainTextNode: this.mainTextNode,
 
+            onInput: this.onInput,
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
             showColorMenu: this.showColorMenu,
@@ -47,6 +48,7 @@ fabric.IText.prototype.toObject = (function (toObject) {
             pointerCircles: this.pointerCircles,
             mainTextNode: this.mainTextNode,
 
+            onInput: this.onInput,
             updateVerticalSpace: this.updateVerticalSpace,
             moveSecondaryText: this.moveSecondaryText,
             showColorMenu: this.showColorMenu,
@@ -329,9 +331,9 @@ fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SH
 // stateProperties //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-fabric.NodeText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
+fabric.NodeText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "onInput", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
 
-fabric.IText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
+fabric.IText.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "numberLines", "parentNode", "attachedHover", "attachedTriangle", "secondaryText", "lockMovementX", "lockMovementY", "customType", "historyID", "oldText", "pointerCircles", "mainTextNode", "onInput", "updateVerticalSpace", "moveSecondaryText", "showColorMenu", "updateColorMenu", "initPointers", "updatePointerCircles"]);
 
 
 

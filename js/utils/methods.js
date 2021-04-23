@@ -502,6 +502,8 @@ function reviveNodeText(object) {
     object.on('editing:exited', nodeTextEditingExited);
     object.on('editing:entered', nodeTextEditingEntered);
 
+    // object.onInput = fabric.NodeText.prototype.onInput;
+
     object.parentNode = findObjByID(object.parentNode, 'treeNode');
     object.attachedHover = findObjByID(object.attachedHover, 'hoverCircle');
     object.mainTextNode = findObjByID(object.mainTextNode, 'nodeText');
