@@ -525,23 +525,33 @@
                         // remove all but 1st line from textNode
                         textNode.text = line1;
                         canvas.renderAll();
+
+                        histAction.push(['addedSecText', textNode, secondaryText, textNode.text]);
                     }
+
+                    histAction.push(['addedTriangle', newTriangle]);
+                    canvasHist.undoPush(histAction);
                 }
 
                 // IF TRIANGLES IS ALREADY THERE, REMOVE IT
                 else {
                     if (textNode.secondaryText != null) {
                         let secondaryText = textNode.secondaryText;
+                        histAction.push(['removedSecText', textNode, secondaryText, textNode.text]);
 
                         // re-add secondary text to primary text
                         textNode.text = textNode.text.concat('\n', secondaryText.text);
                         // remove secondary text and triangle
                         canvas.remove(textNode.secondaryText);
                     }
+                    // gotta put this hisAction below BEFORE removing triangle
+                    histAction.push(['removedTriangle', textNode.attachedTriangle]);
                     canvas.remove(textNode.attachedTriangle);
                     textNode.attachedTriangle = null;
                     textNode.secondaryText = null;
                     canvas.renderAll();
+
+                    canvasHist.undoPush(histAction);
                 }
 
 

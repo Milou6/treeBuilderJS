@@ -214,10 +214,35 @@ class CanvasHistory {
             canvas.renderAll();
         }
 
+        else if (subAction[0] == 'addedTriangle') {
+            let tri = subAction[1];
+            tri.attachedText.attachedTriangle = null;
+            this.canvas.remove(tri);
+            canvas.renderAll();
+        }
 
+        // 1: textNode, 2: secondaryText
+        else if (subAction[0] == 'addedSecText') {
+            subAction[1].secondaryText = null;
+            subAction[1].text = subAction[1].text.concat('\n', subAction[2].text);
+            this.canvas.remove(subAction[2]);
+            canvas.renderAll();
+        }
 
+        else if (subAction[0] == 'removedTriangle') {
+            let tri = subAction[1];
+            tri.attachedText.attachedTriangle = tri;
+            this.canvas.add(tri);
+            canvas.renderAll();
+        }
 
-
+        // 1: textNode, 2: secondaryText, 3: textNode original text
+        else if (subAction[0] == 'removedSecText') {
+            subAction[1].secondaryText = subAction[2];
+            this.canvas.add(subAction[2]);
+            subAction[1].text = subAction[3];
+            canvas.renderAll();
+        }
 
     }
 
@@ -336,6 +361,36 @@ class CanvasHistory {
             arrow.arrowStart.arrow = arrow;
             arrow.arrowEnd.arrow = arrow;
             canvas.add(arrow.tipStart, arrow.tipEnd, arrow.circleHandler, arrow);
+            canvas.renderAll();
+        }
+
+        else if (subAction[0] == 'addedTriangle') {
+            let tri = subAction[1];
+            tri.attachedText.attachedTriangle = tri;
+            this.canvas.add(tri);
+            canvas.renderAll();
+        }
+
+        // 1: textNode, 2: secondaryText, 3: textNode original text
+        else if (subAction[0] == 'addedSecText') {
+            subAction[1].secondaryText = subAction[2];
+            this.canvas.add(subAction[2]);
+            subAction[1].text = subAction[3];
+            canvas.renderAll();
+        }
+
+        else if (subAction[0] == 'removedTriangle') {
+            let tri = subAction[1];
+            tri.attachedText.attachedTriangle = null;
+            this.canvas.remove(tri);
+            canvas.renderAll();
+        }
+
+        // 1: textNode, 2: secondaryText, 3: textNode original text
+        else if (subAction[0] == 'removedSecText') {
+            subAction[1].secondaryText = null;
+            subAction[1].text = subAction[1].text.concat('\n', subAction[2].text);
+            this.canvas.remove(subAction[2]);
             canvas.renderAll();
         }
     }

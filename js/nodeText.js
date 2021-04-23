@@ -469,8 +469,8 @@ fabric.NodeText.prototype.onInput = fabric.IText.prototype.onInput = function (e
     // this.undoLineBreaks();
     // fabric.IText.prototype.onInput(e);
 
-    // if text has secondaryText, don't allow to enter \n
-    if (this.secondaryText) {
+    // if text has attachedTriangle, don't allow to enter \n
+    if (this.attachedTriangle) {
         let textOriginal = this.text;
         // let textStyles = this.getSelectionStyles(0, this.text.length);
         // Remove all 3 types (PC, UNIX, iOS) of line breaks
