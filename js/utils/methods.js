@@ -628,7 +628,8 @@ function correctViewBox(SVG) {
     let newViewbox = `viewBox="${Math.floor(tlX)} ${Math.floor(tlY)} ${width} ${height}"`;
     // console.log(newViewbox);
 
-    SVG = SVG.replaceAll(/viewBox="0 0 3000 2000"/g, newViewbox);
+    // SVG = SVG.replace(/viewBox="0 0 3000 2000"/g, newViewbox);
+    SVG = SVG.replace(/viewBox="\d{0,5}\s\d{0,5}\s\d{0,5}\s\d{0,5}"/, newViewbox);
     SVG = SVG.replaceAll(/width="3000"/g, `width="${width}"`);
     SVG = SVG.replaceAll(/height="2000"/g, `height="${height}"`);
     // RegeEx-of-doom to remove all the circles in SVG file
