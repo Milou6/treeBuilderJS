@@ -96,6 +96,9 @@ class CanvasHistory {
                 this.canvas.remove(circle);
             }
             for (let text of subAction[2].textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.remove(pointer);
+                }
                 this.canvas.remove(text);
             }
             this.canvas.remove(subAction[2]);
@@ -111,11 +114,17 @@ class CanvasHistory {
             for (let text of node.textNodes) {
                 for (let pointer of text.pointerCircles) {
                     this.canvas.remove(pointer);
-                    console.log('pointer');
                 }
                 this.canvas.remove(text);
             }
             this.canvas.remove(node);
+        }
+
+        // 1: node, 2: topText
+        else if (subAction[0] == 'topTextRemoved') {
+            subAction[1].textNodes.push(subAction[2]);
+            canvas.add(subAction[2]);
+
         }
 
         else if (subAction[0] == 'updateArms') {
@@ -260,9 +269,13 @@ class CanvasHistory {
                 this.canvas.add(circle);
             }
             for (let text of subAction[2].textNodes) {
+                for (let pointer of text.pointerCircles) {
+                    this.canvas.add(pointer);
+                }
                 this.canvas.add(text);
             }
             this.canvas.add(subAction[2]);
+            subAction[2].sendToBack();
         }
 
         else if (subAction[0] == 'nodeAdded') {
@@ -278,6 +291,14 @@ class CanvasHistory {
                 this.canvas.add(text);
             }
             this.canvas.add(node);
+            node.sendToBack();
+        }
+
+        // 1: node, 2: topText
+        else if (subAction[0] == 'topTextRemoved') {
+            subAction[1].textNodes.pop();
+            canvas.remove(subAction[2]);
+
         }
 
         else if (subAction[0] == 'updateArms') {

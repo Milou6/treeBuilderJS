@@ -81,6 +81,7 @@ fabric.Polyline.prototype.updateArmCoords = function (coordUpdates) {
     this.hoverCircles[this.hoverCircles.length - 1].set({ X: this.X - 12, Y: this.Y - 12 });
     this.hoverCircles[this.hoverCircles.length - 1].set({ left: this.hoverCircles[this.hoverCircles.length - 1].X, top: this.hoverCircles[this.hoverCircles.length - 1].Y });
     this.hoverCircles[this.hoverCircles.length - 1].setCoords();
+    this.sendToBack();
     canvas.renderAll();
 }
 
@@ -129,6 +130,7 @@ fabric.Polyline.prototype.moveNodeBy = function (moveX, moveY) {
     //         arrow.updateArrowPosition();
     //     }
     //     globalArrowsToUpdate.clear();
+    this.sendToBack();
 }
 
 fabric.Polyline.prototype.moveSubtreeBy = function (moveX, moveY) {
@@ -139,6 +141,7 @@ fabric.Polyline.prototype.moveSubtreeBy = function (moveX, moveY) {
     for (child of this.getChildNodes()) {
         child.moveSubtreeBy(moveX, moveY);
     }
+    this.sendToBack();
     canvas.renderAll();
 }
 
@@ -280,10 +283,12 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
         this.moveNodeBy(this.horizOffset, 0);
 
 
-        // this.on('drag:enter', function (e) {
-        //     // console.log(e);
-        //     console.log("dragenter");
-        // });
+        // Adding top textNode if node doesn't have a parent
+        if (this.nodeParent == null) {
+            let nodeTopText = new fabric.NodeText(this.X  /*- this.horizOffset*/, this.Y /*+ this.vertOffset*/ - 12 - 20, this, this.hoverCircles[this.hoverCircles.length - 1], 'XP');
+            this.textNodes.push(nodeTopText);
+            canvas.add(nodeTopText);
+        }
     },
 
     _render: function (ctx) {

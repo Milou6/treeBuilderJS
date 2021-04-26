@@ -70,6 +70,9 @@ var root = new fabric.TreeNode(1500, 1200, _.cloneDeep(nodeShape), null, null, [
 // var node2 = new fabric.TreeNode(1700, 1200, [[-80, 50], [30, 50]], null, null, [],);
 // var node3 = new fabric.TreeNode(1900, 1200, [[-30, 50], [80, 50]], null, null, [],);
 
+// let rootTopText = new fabric.NodeText(root.X  /*- this.horizOffset*/, root.Y /*+ this.vertOffset*/ - 12 - 20, root, root.hoverCircles[2], 'XP');
+// root.textNodes.push(rootTopText);
+
 canvas.add(root);
 // canvas.add(root, node2, node3);
 

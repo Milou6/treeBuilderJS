@@ -310,7 +310,8 @@ fabric.TreeTriangle.prototype.toObject = (function (toObject) {
             attachedText: this.attachedText,
             relativeX: this.relativeX,
             relativeY: this.relativeY,
-            historyID: this.historyID
+            historyID: this.historyID,
+            selectable: this.selectable
         });
     };
 })(fabric.TreeTriangle.prototype.toObject);
@@ -321,7 +322,8 @@ fabric.Triangle.prototype.toObject = (function (toObject) { // The .prototype SH
             attachedText: this.attachedText,
             relativeX: this.relativeX,
             relativeY: this.relativeY,
-            historyID: this.historyID
+            historyID: this.historyID,
+            selectable: this.selectable
         });
     };
 })(fabric.Triangle.prototype.toObject);
@@ -366,5 +368,5 @@ fabric.Circle.prototype.stateProperties = fabric.Object.prototype.statePropertie
 
 
 
-fabric.TreeTriangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID"]);
-fabric.Triangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID"]);
+fabric.TreeTriangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID", "selectable"]);
+fabric.Triangle.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["pointer", "attachedText", "relativeX", "relativeY", "historyID", "selectable"]);

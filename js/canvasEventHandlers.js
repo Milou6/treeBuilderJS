@@ -253,6 +253,13 @@ function canvasMouseUp(e) {
                     clickedNode.hoverParent.childNode = clickedNode;
                     clickedNode.hoverParent.hasChildNode = true;
 
+                    // If node clicked has a top TextNode, we need to replace it
+                    if (clickedNode.hoverCircles.length == clickedNode.textNodes.length) {
+                        let textToPop = clickedNode.textNodes.pop();
+                        canvas.remove(textToPop);
+                        histAction.push(['topTextRemoved', clickedNode, textToPop]);
+                    }
+
                     histAction.push(['upperNodeAdded', clickedNode, newNode, newNode.hoverCircles[1]]);
                     canvasHist.undoPush(histAction);
                 }
@@ -269,6 +276,13 @@ function canvasMouseUp(e) {
                     clickedNode.hoverParent = newNode.hoverCircles[0];
                     clickedNode.hoverParent.childNode = clickedNode;
                     clickedNode.hoverParent.hasChildNode = true;
+
+                    // If node clicked has a top TextNode, we need to replace it
+                    if (clickedNode.hoverCircles.length == clickedNode.textNodes.length) {
+                        let textToPop = clickedNode.textNodes.pop();
+                        canvas.remove(textToPop);
+                        histAction.push(['topTextRemoved', clickedNode, textToPop]);
+                    }
 
                     histAction.push(['upperNodeAdded', clickedNode, newNode, newNode.hoverCircles[1]]);
                     canvasHist.undoPush(histAction);

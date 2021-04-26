@@ -150,3 +150,8 @@ img.s50 {
     width: 50%;
     height: 50%;
 }
+
+h2 {
+    margin-top: 50px;
+    color: rgb(71, 55, 214);
+}
