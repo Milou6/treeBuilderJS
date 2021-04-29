@@ -635,6 +635,7 @@ function correctViewBox(SVG) {
     // RegeEx-of-doom to remove all the circles in SVG file
     SVG = SVG.replaceAll(/<g transform="matrix(.+?)\n<circle.+?\/>\n<\/g>/g, '');
     SVG = SVG.replaceAll('treeNode', 'polyline');
+    SVG = SVG.replaceAll('treeTriangle', 'polygon');
     SVG = SVG.replaceAll('arrow', 'polyline');
     return SVG;
 }
