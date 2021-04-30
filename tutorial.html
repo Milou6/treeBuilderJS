@@ -27,14 +27,14 @@
 
     <h2>Guide Contents</h2>
     <ul>
-        <li><a href="#sect1">Basic Branching</a></li>
-        <li><a href="#sect2">Adjusting Branch Properties</a></li>
-        <li><a href="#sect3">Single/Three -armed Branches</a></li>
-        <li><a href="#sect4">Arrows</a></li>
-        <li><a href="#sect5">Exporting & Importing Trees</a></li>
-        <li><a href="#sect6">Text Box Editing</a></li>
-        <li><a href="#sect7">Adding/Removing Branches from Tree</a></li>
-        <li><a href="#sect8">Moving Around the Canvas</a></li>
+        <li><a href="#sectBasic">Basic Branching</a></li>
+        <li><a href="#sectMoving">Moving Around the Canvas</a></li>
+        <li><a href="#sectAdjust">Adjusting Branch Properties</a></li>
+        <li><a href="#sectTernary">Single/Three -armed Branches</a></li>
+        <li><a href="#sectArrow">Arrows</a></li>
+        <li><a href="#sectExport">Exporting & Importing Trees</a></li>
+        <li><a href="#sectText">Text Box Editing</a></li>
+        <li><a href="#sectAdd">Adding/Removing Branches from Tree</a></li>
     </ul>
 
 
@@ -42,7 +42,7 @@
 
     <h1>Quickstart Guide</h1>
 
-    <h2 id="sect1">Basic Branching</h2>
+    <h2 id="sectBasic">Basic Branching</h2>
 
     <p>The canvas is the main area of the interface. You can see that it always starts with a single binary
         branch already drawn.</p>
@@ -50,45 +50,59 @@
     <p>The edges of a branch can be clicked to create new branches. By clicking on the bottom-right edge of the root
         branch, we can create a new branch :</p>
 
-    <img class="tutoImg" src="assets/tuto1.png" alt="">
+    <img class="tutoImg s30" src="assets/tutoGif1.gif" alt="">
+
+    <!-- <img class="tutoImg" src="assets/tuto1.png" alt=""> -->
 
     <p>Of course, branching can be done upwards as well. By clicking on the top edge of our root branch, we create a
         left-branching node on top of it :</p>
 
-    <img class="tutoImg" src="assets/tuto2.png" alt="">
+    <!-- <img class="tutoImg" src="assets/tuto2.png" alt=""> -->
 
     <p>In order to branch upwards towards the right, we simply click <b>while holding down the Shift key</b> :</p>
 
-    <img class="tutoImg" src="assets/tuto3.png" alt="">
+    <img class="tutoImg s30" src="assets/tutoGif2.gif" alt="">
+
+    <!-- <img class="tutoImg" src="assets/tuto3.png" alt=""> -->
+
+    <h2 id="sectMoving">Moving Around the Canvas</h2>
+
+    <p>We can vertically navigate the canvas by scrolling up/down, and horizontally navigate by scrolling while holding
+        the Shift key.</p>
+
+    <p>We can also reposition the canvas by simply clicking on an empty part of it and dragging the cursor.</p>
+
+    <img class="tutoImg s40" src="assets/tutoGif10.gif" alt="">
 
 
-    <h2 id="sect2">Adjusting Branch Properties</h2>
+    <h2 id="sectAdjust">Adjusting Branch Properties</h2>
 
     <p>When adding multiple branches to a tree, TreeBuilder tries to space them out appropriately. If the
         default placement is incorrect or not optimal, we have full liberty to adjust the tree to our needs.</p>
 
-    <p>The bottom edges of a branch can be dragged to reposition that particular 'arm' (and its subtree if present) :
+    <p>The bottom edges of a branch can be dragged to reposition that particular 'arm' (and its subtree if present).
     </p>
-    <span>
+    <p>The top edge of a branch can be dragged to adjust its position relative to its parent-branch :</p>
+    <img class="tutoImg s40" src="assets/tutoGif3.gif" alt="">
+    <!-- <span>
         <img class="tutoImg" src="assets/tuto4.png" alt="">
         <img class="tutoImg" src="assets/tuto5.png" alt="">
-    </span>
+    </span> -->
 
-    <p>The top edge of a branch can be dragged to adjust its position relative to its parent-branch :</p>
-    <span>
+    <!-- <span>
         <img class="tutoImg" src="assets/tuto6.png" alt="">
         <img class="tutoImg" src="assets/tuto7.png" alt="">
-    </span>
+    </span> -->
 
 
-    <h2 id="sect3">Single/Three -armed Branches</h2>
+    <h2 id="sectTernary">Single/Three -armed Branches</h2>
 
     <img class="tutoImg s40" src="assets/tuto8.png" alt="">
     <p>The button panel allows us to create branches with one/three arms too :</p>
-    <img class="tutoImg" src="assets/tuto9.png" alt="">
+    <img class="tutoImg s30" src="assets/tuto9.png" alt="">
 
 
-    <h2 id="sect4">Arrows</h2>
+    <h2 id="sectArrow">Arrows</h2>
 
     <p>Connecting features of your syntax tree with arrows is a 3-step process :</p>
 
@@ -97,21 +111,22 @@
         <li>Choose start of the arrow by clicking on a purple indicator next to the text box</li>
         <li>Choose end of the arrow in the same way</li>
     </ul>
-    <img class="tutoImg s30" src="assets/tuto10.png" alt="">
-    <img class="tutoImg s30" src="assets/tuto11.png" alt="">
+    <!-- <img class="tutoImg s30" src="assets/tuto10.png" alt="">
+    <img class="tutoImg s30" src="assets/tuto11.png" alt=""> -->
 
     <p>Arrows have a minimum size, but can be expanded away from the tree as much as needed. To do so,
         we drag the blue circle in the corner of the arrow : </p>
-    <img class="tutoImg s30" src="assets/tuto12.png" alt="">
-
+    <img class="tutoImg s40" src="assets/tutoGif4.gif" alt="">
+    <!-- <img class="tutoImg s30" src="assets/tuto12.png" alt=""> -->
 
     <p>We can re-attach the start/end of an arrow to a different text box by dragging the arrow-tip to another purple
         indicator :</p>
-    <img class="tutoImg s30" src="assets/tuto13.png" alt="">
+    <img class="tutoImg s40" src="assets/tutoGif5.gif" alt="">
+    <!-- <img class="tutoImg s30" src="assets/tuto13.png" alt=""> -->
 
 
 
-    <h2 id="sect5">Exporting & Importing Trees</h2>
+    <h2 id="sectExport">Exporting & Importing Trees</h2>
 
     <p>TreeBuilder allows us to export a tree in two ways :</p>
     <ul>
@@ -123,11 +138,11 @@
     <p>Exporting as a JSON file allows us to reload into the canvas a tree that we previously worked on. The
         .SVG image exports can be easily added to a Word document, by simply dragging the .SVG file into it.</p>
 
+    <img class="tutoImg s60" src="assets/tutoGif6.gif" alt="">
 
 
 
-
-    <h2 id="sect6">Text Box Editing</h2>
+    <h2 id="sectText">Text Box Editing</h2>
 
     <p>Upon clicking on a text box, we enter text editing mode. Most standard text-editing features work
         in
@@ -137,8 +152,9 @@
         whole
         text box will be colored. If there is a selection, only the selection will be colored :</p>
 
-    <img class="tutoImg" src="assets/tuto15.png" alt="">
-    <img class="tutoImg" src="assets/tuto16.png" alt="">
+    <img class="tutoImg s30" src="assets/tutoGif7.gif" alt="">
+    <!-- <img class="tutoImg" src="assets/tuto15.png" alt="">
+    <img class="tutoImg" src="assets/tuto16.png" alt=""> -->
 
     <p>The bottom-left button of the color menu is used to strikeThrough text. StrikeThrough works on a per-line basis.
     </p>
@@ -148,33 +164,29 @@
         text box
         without a branch below it :</p>
 
-    <img class="tutoImg" src="assets/tuto17.png" alt="">
-    <img class="tutoImg" src="assets/tuto18.png" alt="">
+    <img class="tutoImg s30" src="assets/tutoGif8.gif" alt="">
+    <!-- <img class="tutoImg" src="assets/tuto17.png" alt="">
+    <img class="tutoImg" src="assets/tuto18.png" alt=""> -->
 
     <p>If the text box has multiple lines, the triangle will be placed below the first line of text.
         A triangle can be removed by selecting 'Toggle △' again from the right-click menu.</p>
 
 
 
-    <h2 id="sect7">Adding/Removing Branches from Tree</h2>
+    <h2 id="sectAdd">Adding/Removing Branches from Tree</h2>
 
     <p>Right-clicking on a tree branch pops up a drop-down menu. With this menu we can add a new branch in the
         middle of an existing structure, without having to re-build it from scratch :</p>
 
-    <img class="tutoImg s30" src="assets/tuto19.png" alt="">
-    <img class="tutoImg s30" src="assets/tuto20.png" alt="">
+    <img class="tutoImg s40" src="assets/tutoGif9.gif" alt="">
+    <!-- <img class="tutoImg s30" src="assets/tuto19.png" alt="">
+    <img class="tutoImg s30" src="assets/tuto20.png" alt=""> -->
 
     <p>This menu can also be used to change a binary branch into a ternary one (and vice-versa), and to delete a branch
         in the middle of a structure. For the moment, branch deletion only works for branches that have one child-branch
         or less.</p>
 
 
-    <h2 id="sect8">Moving Around the Canvas</h2>
-
-    <p>We can vertically navigate the canvas by scrolling up/down, and horizontally navigate by scrolling while holding
-        the Shift key.</p>
-
-    <p>We can also reposition the canvas by simply clicking on an empty part of it and dragging the cursor.</p>
 
 </body>
 

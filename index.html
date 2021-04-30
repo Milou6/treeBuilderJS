@@ -160,9 +160,13 @@
             });
         }
 
+        // var bigX = 0;
+        // var bigY = 0;
         //Right click event response
         function rightClickFunct(event) {
             var pointer = canvas.getPointer(event.originalEvent);
+            // bigX = pointer.x;
+            // bigY = pointer.y;
             let found = false;
             // let objectClicked = null;
             console.log(pointer);
@@ -249,10 +253,16 @@
                 }
             }
             //Right-click menu display position
+            // console.log(event);
             var position = {
+                // x: event.offsetX,
+                // y: event.offsetY
                 x: event.clientX,
                 y: event.clientY
+                // x: canvas.getPointer(event.originalEvent).x,
+                // y: canvas.getPointer(event.originalEvent).y
             }
+            // console.log(position);
             $('#contextmenu-output').contextMenu(position);
         }
 
