@@ -58,6 +58,7 @@ function resolveIntersectionX(node, objectGroup, histAction) {
 
     // Horizontal movement depends on which kind of intersection it is
     let movementX = 0;
+    let ancestorFind = null;
     if (intersection == 'right') {
         movementX = nodeTR - objectGroupTL + 40;
         try {
