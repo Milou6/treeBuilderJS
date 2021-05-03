@@ -615,11 +615,13 @@ function correctViewBox(SVG) {
     let brX = 0, brY = 0;
 
     for (let obj of canvas.getObjects()) {
-        // console.log(obj);
-        if (obj.aCoords.tl.x < tlX) tlX = obj.aCoords.tl.x;
-        if (obj.aCoords.tl.y < tlY) tlY = obj.aCoords.tl.y;
-        if (obj.aCoords.br.x > brX) brX = obj.aCoords.br.x;
-        if (obj.aCoords.br.y > brY) brY = obj.aCoords.br.y;
+        if (obj.type != 'pointerCircle') {
+            // console.log(obj);
+            if (obj.aCoords.tl.x < tlX) tlX = obj.aCoords.tl.x;
+            if (obj.aCoords.tl.y < tlY) tlY = obj.aCoords.tl.y;
+            if (obj.aCoords.br.x > brX) brX = obj.aCoords.br.x;
+            if (obj.aCoords.br.y > brY) brY = obj.aCoords.br.y;
+        }
     }
     // let SVGcoords = { tl: { x: tlX, y: tlY }, br: { x: brX, y: brY } };
     // console.log(SVGcoords);
