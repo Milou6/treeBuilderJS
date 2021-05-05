@@ -247,9 +247,18 @@
                 }
             }
             else if (contextMenuObject.type == 'nodeText') {
-                contextMenuItems = {
-                    "toggleTriangle": { name: "Toggle △", icon: "edit" }
-                    // "toggleTriangle": { name: "Toggle △", icon: "fa-exclamation-triangle" }
+                let parentNode = contextMenuObject.parentNode;
+                // Make sure option disabled if textNode has child, or is a topTextNode
+                if (contextMenuObject.attachedHover.hasChildNode || contextMenuObject == parentNode.topTextNode) {
+                    contextMenuItems = {
+                        "toggleTriangle": { name: "Toggle △", icon: "edit" , disabled: true}
+                        // "toggleTriangle": { name: "Toggle △", icon: "fa-exclamation-triangle" }
+                    }
+                }
+                else {
+                    contextMenuItems = {
+                        "toggleTriangle": { name: "Toggle △", icon: "edit" }
+                    }
                 }
             }
             //Right-click menu display position

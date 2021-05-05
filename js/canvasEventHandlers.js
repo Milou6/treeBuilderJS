@@ -109,7 +109,7 @@ function canvasMouseUp(e) {
                 // console.log(target);
                 let hoverIndex = parent.hoverCircles.indexOf(target);
 
-                for (circle of parent.hoverCircles) { // WHAT the hell does this do??
+                for (circle of parent.hoverCircles) { // Finding the index of parent circle
                     if (circle.historyID == target.historyID) {
                         hoverIndex = parent.hoverCircles.indexOf(circle);
                     }

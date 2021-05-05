@@ -71,6 +71,7 @@ fabric.TreeNode.prototype.toObject = (function (toObject) {
             hoverParent: this.hoverParent,
             hoverCircles: this.hoverCircles,
             textNodes: this.textNodes,
+            topTextNode: this.topTextNode,
             horizOffset: this.horizOffset,
             vertOffset: this.vertOffset,
             nodeWidth: this.nodeWidth,
@@ -149,6 +150,7 @@ fabric.Polyline.prototype.toObject = (function (toObject) {
             hoverParent: this.hoverParent,
             hoverCircles: this.hoverCircles,
             textNodes: this.textNodes,
+            topTextNode: this.topTextNode,
             horizOffset: this.horizOffset,
             vertOffset: this.vertOffset,
             nodeWidth: this.nodeWidth,
@@ -339,7 +341,7 @@ fabric.IText.prototype.stateProperties = fabric.Object.prototype.stateProperties
 
 
 
-fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy", "deleteSubtree", "reAddSubtree"
+fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "topTextNode", "moveSubtreeBy", "deleteSubtree", "reAddSubtree"
     // arrow obj atribs
     // "arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"
 
@@ -348,7 +350,7 @@ fabric.TreeNode.prototype.stateProperties = fabric.Object.prototype.statePropert
 fabric.Arrow.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat(["arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition"]);
 fabric.Polyline.prototype.stateProperties = fabric.Object.prototype.stateProperties.concat([
     // TreeNode attribs
-    "X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "moveSubtreeBy", "deleteSubtree", "reAddSubtree",
+    "X", "Y", "armsArray", "nodeParent", "hoverParent", "hoverCircles", "textNodes", "topTextNode", "moveSubtreeBy", "deleteSubtree", "reAddSubtree",
     // Arrow
     "arrowStart", "arrowEnd", "tipStart", "tipEnd", "circleHandler", "arrowInitSequence", "initArrowHandlers", "initArrowTips", "updateArrowPosition",
 

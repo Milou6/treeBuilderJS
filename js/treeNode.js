@@ -288,6 +288,7 @@ fabric.TreeNode = fabric.util.createClass(fabric.Polyline, {
             let nodeTopText = new fabric.NodeText(this.X  /*- this.horizOffset*/, this.Y /*+ this.vertOffset*/ - 12 - 20, this, this.hoverCircles[this.hoverCircles.length - 1], 'XP');
             this.textNodes.push(nodeTopText);
             canvas.add(nodeTopText);
+            this.topTextNode = nodeTopText;
         }
     },
 

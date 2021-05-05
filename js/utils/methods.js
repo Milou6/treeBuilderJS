@@ -82,6 +82,7 @@ function resolveIntersectionX(node, objectGroup, histAction) {
 
 
     if (ancestorFind != null) {
+        
         let ancestor = ancestorFind[0];
         let ancestorHover = ancestorFind[1];
         let ancestorHoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
@@ -376,6 +377,7 @@ function flattenObjects(array, hist, realArray) {
         else if (object.type == 'treeNode') {
             object.nodeParent = (object.nodeParent == null ? null : object.nodeParent.historyID);
             object.hoverParent = (object.hoverParent == null ? null : object.hoverParent.historyID);
+            object.topTextNode = (object.topTextNode == null ? null : object.topTextNode.historyID);
 
             object.hoverCircles.forEach(function (item, innerIndex) {
                 object.hoverCircles[innerIndex] = object.hoverCircles[innerIndex].historyID;
@@ -519,6 +521,7 @@ function reviveNodeText(object) {
 function reviveTreeNode(object) {
     object.nodeParent = findObjByID(object.nodeParent, 'treeNode');
     object.hoverParent = findObjByID(object.hoverParent, 'hoverCircle');
+    object.topTextNode = findObjByID(object.topTextNode, 'nodeText');
 
     // console.log(object.hoverCircles);
     object.hoverCircles.forEach(function (item, innerIndex) {
