@@ -81,6 +81,9 @@
             <!-- <img src="images/zoomOut.png" alt="zoomOut"> -->
             🔍-
         </button>
+        <!-- <button id="toggleCircles" class="btn zoom" onclick="toggleHoverCircleVisibility()" title="Toggle edge circles">
+            O
+        </button> -->
 
         <!-- <button id="render" onclick="renderBoundingRect()">BoundingRect()</button> -->
         <a id="tutorialBtn" href="tutorial.html" target="_blank">Help!</a>
@@ -229,7 +232,7 @@
                 contextMenuItems = {
                     // "delete": { name: "delete", icon: "delete", data: object },
                     "delete": {
-                        name: "Delete node", icon: "delete", disabled: nodeHasManyChildren()
+                        name: "Delete node", icon: "delete"
                     },
                     "add": { name: "Add node here", icon: "add" },
                     "sep1": "---------",
@@ -239,7 +242,7 @@
             else if (contextMenuObject.type == 'treeNode') {       //NOT IDEAL STRUCT, HAVE TO REFACTOR
                 contextMenuItems = {
                     "delete": {
-                        name: "Delete node", icon: "delete", disabled: nodeHasManyChildren()
+                        name: "Delete node", icon: "delete"
                     },
                     // "add": { name: "Add node here", icon: "add" },
                     "sep1": "---------",
@@ -287,47 +290,111 @@
                 let node = contextMenuObject;
                 let parent = node.nodeParent;
                 let hoverParent = node.hoverParent; // Get parent node and hover
+                let childNode = null;
 
-
-                let childNode = null; // Get the child node
-                for (let circle of node.hoverCircles) {
-                    if (circle.childNode != null) { childNode = circle.childNode; }
+                // Once the childNode to be kept has been chosen, the rest of the logic for deleting the node is the same, so we keep all that code in function below.
+                function nonAmbiguousDelete() {
+                    // Only do try-catches below if childNode actually exists
+                    if (childNode != null) {
+                        try {
+                            childNode.nodeParent = parent; // link child to .... parent
+                            childNode.hoverParent = hoverParent; // link child to .... parent
+                        }
+                        catch { // If node deleted had no parent..
+                            childNode.nodeParent = null;
+                            childNode.hoverParent = null;
+                        }
+        
+                        try {
+                        hoverParent.childNode = childNode;
+                        }
+                        catch {}
+         
+                        // if there is a child node, move it to position of deleted node
+                        try {
+                            let moveX = node.left - node.pathOffset.x - childNode.left;
+                            let moveY = node.top - childNode.top;
+        
+                            childNode.moveSubtreeBy(moveX, moveY);
+                            histAction.push(['moveSubtree', childNode, moveX, moveY]);
+                        }
+                        catch { }
+                    }
+                    // if there is no childNode
+                    else {
+                        try {
+                            hoverParent.childNode = null;
+                            hoverParent.hasChildNode = false;
+                        }
+                        catch {}
+                    }
+    
+                    // these below are done no matter if no childNode present or not
+                    node.delete();
+                    histAction.push(['nodeRemoved', node, parent, hoverParent, childNode]);
+                    canvasHist.undoPush(histAction);
                 }
 
-                try {
-                    childNode.nodeParent = parent; // link child to parent
-                    childNode.hoverParent = hoverParent; // link child to parent
-                }
-                catch { // If node deleted had no parent..
-                    childNode.nodeParent = null;
-                    childNode.hoverParent = null;
+                function chooseSurvivingSubtree() {
+                    let indexOfChoice = choiceCircles.indexOf(this);
+                    console.log(indexOfChoice);
+                    childNode = node.hoverCircles[indexOfChoice].childNode;
+                    console.log(childNode);
+
+                    // remove all the subtrees not chosen to be kept
+                    for (let circle of node.hoverCircles) {
+                        let subtree = circle.childNode;
+
+                        if (subtree != null && subtree != childNode) {
+                            subtree.deleteSubtree();
+                            histAction.push(['subtreeRemoved', subtree]);
+                        }
+                    }
+
+                    // Dump same code as non-ambiguous below...
+                    nonAmbiguousDelete();
+
+                    // Remove the choice circles when all is over
+                    for (let c of choiceCircles) {
+                        canvas.remove(c);
+                    }
+                    choiceCircles.length = 0;
                 }
 
-                try {
-                    hoverParent.childNode = childNode;
-                }
-                catch { // If node deleted had no children..
-                    if (hoverParent != null) {
-                        hoverParent.childNode = null;
-                        hoverParent.hasChildNode = false;
+                // Node has 2+ children, must let User decide which subtree to keep!
+                if (nodeHasManyChildren()) {
+                    // let choiceCircles = [];
+                    for (let circle of node.hoverCircles) {
+
+                        if (circle.hasChildNode) {
+                            let subtree = circle.childNode.hoverCircles[circle.childNode.hoverCircles.length-1];
+                            let choice = new fabric.Circle({
+                            left: subtree.left + 10,
+                            top: subtree.top + 10,
+                            originX: 'center',
+                            originY: 'center',
+                            fill: 'orange',
+                            radius: 10,
+                            selectable: false
+                            });
+
+                            choice.on('mousedown', chooseSurvivingSubtree);
+                            canvas.add(choice);
+                            choiceCircles.push(choice);
+                        }
                     }
                 }
 
- 
-                // if there is child node, move it to position of deleted node
-                try {
-                    let moveX = node.left - childNode.left;
-                    let moveY = node.top - childNode.top;
-
-                    childNode.moveSubtreeBy(moveX, moveY);
-                    histAction.push(['moveSubtree', childNode, moveX, moveY]);
+                // Node has 1 or less child, non-ambiguous case
+                else {
+                    childNode = null; // Get the child node
+                    for (let circle of node.hoverCircles) {
+                        if (circle.childNode != null) { childNode = circle.childNode; }
+                    }
+                    // once child is chosen, proceed with delete logic
+                    nonAmbiguousDelete();
+                    
                 }
-                catch { }
-
-                node.delete();
-                histAction.push(['nodeRemoved', node, parent, hoverParent, childNode]);
-                canvasHist.undoPush(histAction);
-
             }
 
             else if (key == "add") {

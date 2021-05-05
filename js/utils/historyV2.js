@@ -184,9 +184,12 @@ class CanvasHistory {
                 this.canvas.add(text);
             }
             this.canvas.add(node);
+            // make sure hovers are clickable
+            node.sendToBack();
 
             // re-attach parent to node and childNode to node
             try {
+                subAction[3].hasChildNode = true;
                 subAction[3].childNode = subAction[1];
             }
             catch { }
@@ -351,6 +354,7 @@ class CanvasHistory {
 
             // re-attach parent to ((node)) childNode 
             try {
+                subAction[3].hasChildNode = false;
                 subAction[3].childNode = subAction[4];
             }
             catch { }

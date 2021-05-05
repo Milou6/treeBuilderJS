@@ -81,14 +81,17 @@ fabric.HoverCircle.fromObject = function (object, callback) {
 
 function hoverCircleMouseOver(e) {
     // Make circle opaque on hover-in
-    e.target.set('fill', 'rgba(0,255,0,1)');
+    e.target.set('fill', 'rgb(0,255,0)');
+    e.target.set('opacity', hoverInOpacity);
     canvas.renderAll();
+    // console.log('fired');
 }
 
 function hoverCircleMouseOut(e) {
     // Make circle translucent on hover-out
-    e.target.set('fill', 'rgba(0,255,0,0.1)');
-    // e.target.set('fill', 'rgba(0,255,0,0)');
+    e.target.set('fill', 'rgb(0,255,0)');
+    e.target.set('opacity', hoverOutOpacity);
     canvas.renderAll();
+    // console.log('fired');
 }
 

@@ -13,6 +13,11 @@ var arrowStart = null;
 var arrowEnd = null;
 fabric.Object.NUM_FRACTION_DIGITS = 2; // DOESNT SEEM TO WORK FOR SVG EXPORT
 var globalArrowsToUpdate = new Set();
+// Globals to set hoverCircles visible/not
+var hoverInOpacity = 1;
+var hoverOutOpacity = 0.1;
+// Global to allow User to choose surviving subtree when deleting node w/ multiple children
+var choiceCircles = [];
 
 
 var canvas = new fabric.Canvas('treeCanvas', {
@@ -46,6 +51,39 @@ function zoomOutCanvas() {
     // canvas.setZoom(canvas.getZoom() - 0.2);
     canvas.renderAll();
     console.log(canvas);
+}
+
+function toggleHoverCircleVisibility() {
+    if (hoverInOpacity == 1) {
+        hoverInOpacity = 0.1;
+        hoverOutOpacity = 0;
+        for (let obj of canvas._objects) {
+            if (obj.type == 'hoverCircle') {
+                console.log('one');
+                canvas.setActiveObject(obj);
+                // obj.set({fill: 'rgba(0,255,0,0)', dirty: true});
+                obj.set({opacity: 0, dirty: true});
+                // canvas.fire('mouseout', {target: obj});
+            }
+        }
+    }
+    else {
+        hoverInOpacity = 1;
+        hoverOutOpacity = 0.1;
+        for (let obj of canvas._objects) {
+            if (obj.type == 'hoverCircle') {
+                console.log('one');
+                canvas.setActiveObject(obj);
+                // obj.set({fill: 'rgba(0,255,0,0.1)', dirty: true});
+                obj.set({opacity: 0.1, dirty: true});
+                // canvas.fire('mouseout', {target: obj});
+            }
+            // obj.set({opacity: 0.1, dirty: true});
+            // canvas.setActiveObject(obj);
+            // canvas.fire('mouseout', {target: obj});
+        }
+    }
+    canvas.renderAll();
 }
 
 

@@ -74,7 +74,7 @@ function canvasMouseDown(e) {
 function canvasMouseUp(e) {
     if (e.target != null) {
         var target = e.target;
-        console.log(target);
+        // console.log(target);
 
         try {
             delta = target.getCenterPoint().subtract(origPos);
