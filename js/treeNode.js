@@ -82,6 +82,13 @@ fabric.Polyline.prototype.updateArmCoords = function (coordUpdates) {
     this.hoverCircles[this.hoverCircles.length - 1].set({ left: this.hoverCircles[this.hoverCircles.length - 1].X, top: this.hoverCircles[this.hoverCircles.length - 1].Y });
     this.hoverCircles[this.hoverCircles.length - 1].setCoords();
     this.sendToBack();
+
+    // resetting correct top-textNode coords (if present)
+    if (this.topTextNode != null) {
+        this.topTextNode.set({left: this.topTextNode.left - this.pathOffset.x});
+        this.topTextNode.setCoords();
+    }
+
     canvas.renderAll();
 }
 

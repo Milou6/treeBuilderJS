@@ -363,13 +363,11 @@ function setSelectedButton(button) {
 
 
 
-// array[index] doesnt work here.... need better solution in long-term
-function flattenObjects(array, hist, realArray) {
-    array.forEach(function (object, index, array) {
-        // console.log(object);
+
+function flattenObjects(array) {
+    array.forEach(function (object) {
 
         if (object.type == 'hoverCircle') {
-            // console.log('type is circle!!');
             object.parentNode = (object.parentNode == null ? null : object.parentNode.historyID);
             object.childNode = (object.childNode == null ? null : object.childNode.historyID);
             object.attachedNodeText = (object.attachedNodeText == null ? null : object.attachedNodeText.historyID);
@@ -384,15 +382,12 @@ function flattenObjects(array, hist, realArray) {
             });
 
             object.textNodes.forEach(function (item, innerIndex) {
-                // object.textNodes[index] = hist.map.get(item);
                 object.textNodes[innerIndex] = object.textNodes[innerIndex].historyID;
             });
         }
         else if (object.type == 'nodeText') {
             object.parentNode = (object.parentNode == null ? null : object.parentNode.historyID);
-            // console.log(object.attachedHover);
             object.attachedHover = object.attachedHover.historyID;
-            // console.log(object.attachedHover);
             object.mainTextNode = (object.mainTextNode == null ? null : object.mainTextNode.historyID);
             object.secondaryText = (object.secondaryText == null ? null : object.secondaryText.historyID);
             object.attachedTriangle = (object.attachedTriangle == null ? null : object.attachedTriangle.historyID);
@@ -601,14 +596,12 @@ function findObjByID(objectID, objectType) {
 
         objs.forEach(function (object) {
             if (object.historyID == objectID) {
-                // console.log('OBJ FOUND');
+                // console.log('Object found');
                 result = object;
             }
         });
-
         if (result == null) console.error(`Obj ${objectID}, type ${objectType} not found by ID`);
         return result;
-
     }
     else { return null; }
 }
