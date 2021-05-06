@@ -1,6 +1,6 @@
 function canvasMouseMove(e) {
     // we have to use absolutePointer, otherwise zoom messes up the text Coords!!
-    Coordstext.set({ text: `X : ${e.absolutePointer.x.toFixed(0)},  Y : ${e.absolutePointer.y.toFixed(0)}` });
+    // Coordstext.set({ text: `X : ${e.absolutePointer.x.toFixed(0)},  Y : ${e.absolutePointer.y.toFixed(0)}` });
 
     // This is for dragging the canvas w/ the mouse 
     if (this.panning && e && e.e) {

@@ -89,8 +89,8 @@ function toggleHoverCircleVisibility() {
 
 
 // Print coords of mouse on the screen for development
-var Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
-canvas.add(Coordstext);
+// var Coordstext = new fabric.Text('', { left: 1200, top: 1100, fontSize: 25, selectable: true });
+// canvas.add(Coordstext);
 
 // ** Attaching all events handlers to canvas
 canvas.on('mouse:move', canvasMouseMove);
