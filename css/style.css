@@ -1,32 +1,29 @@
 canvas {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
-#top-menu{
-    /* display: flex; */
-    margin: 0 0 20px 0;
+#top-menu {
+  /* display: flex; */
+  margin: 0 0 20px 0;
 }
-
 
 #main-toolbar {
-    width: 90vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    /* justify-content: ; */
-    align-content: space-between;
+  width: 90vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* justify-content: ; */
+  align-content: space-between;
 }
 .push {
-    /* margin-left: auto; */
-    justify-self:flex-end;
+  /* margin-left: auto; */
+  justify-self: flex-end;
 }
 
 #main-toolbar button {
-    display: flex;
-    margin: 0 5px 0 5px;
+  display: flex;
+  margin: 0 5px 0 5px;
 }
-
-
 
 /* .container::-webkit-scrollbar {
     width: 0; 
@@ -34,132 +31,134 @@ canvas {
 } */
 
 .container::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
-  
-  /* Hide scrollbar for IE, Edge and Firefox */
+
+/* Hide scrollbar for IE, Edge and Firefox */
 .container {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
-    width: 97vw;
-    /* width: 1200px; */
-    height: 500px;
-    /* max-height: 300px; */
-    overflow-y:scroll;
-    /* position: fixed; */
-
+  width: 97vw;
+  /* width: 1200px; */
+  height: 500px;
+  /* max-height: 300px; */
+  overflow-y: scroll;
+  /* position: fixed; */
 }
 
 button img {
-    height: 100px;
-    width: 100px;
+  height: 100px;
+  width: 100px;
 }
 
 .btn.active {
-    background-color: rgb(31, 21, 180);
+  background-color: rgb(31, 21, 180);
 }
 
 #historyContainer {
-    /* display: none; */
+  /* display: none; */
 }
 
 .undoRedo {
-    align-self: flex-end;
-    font-size:30px;
+  align-self: flex-end;
+  font-size: 30px;
 }
 
 .zoom {
-    font-size:30px;
-    /* height: 50px; */
-    /* width: 100px; */
-    align-self: flex-end;
+  font-size: 30px;
+  /* height: 50px; */
+  /* width: 100px; */
+  align-self: flex-end;
 }
 
-#mailBtn, #tutorialBtn {
-    text-decoration: none;
-    position: absolute;
-    left: 90vw;
-    top: 5vh;
-    height: 60px;
-    width: 60px;
-    z-index: 10;
-    font-size:25px;
-    text-align: center;
-    opacity: 0.5;
-    
-    font-family:Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    line-height: 60px;
+#mailBtn,
+#tutorialBtn {
+  text-decoration: none;
+  position: absolute;
+  left: 90vw;
+  top: 5vh;
+  height: 60px;
+  width: 60px;
+  z-index: 10;
+  font-size: 25px;
+  text-align: center;
+  opacity: 0.5;
 
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  line-height: 60px;
 
-    color: white;
-    background-color: rgb(139, 0, 253);
-    border-radius: 50%;
+  color: white;
+  background-color: rgb(139, 0, 253);
+  border-radius: 50%;
 }
-#mailBtn:hover, #tutorialBtn:hover {
-    font-size: 30px;
-    opacity: 0.9;
-    /* background-color: rgba(139, 0, 253, 0.9); */
+#mailBtn:hover,
+#tutorialBtn:hover {
+  font-size: 30px;
+  opacity: 0.9;
+  /* background-color: rgba(139, 0, 253, 0.9); */
 }
 
 #tutorialBtn {
-    left: 85vw;
-    top: 5vh;
-    font-size:20px;
-    background-color: rgb(46, 20, 196);
+  left: 85vw;
+  top: 5vh;
+  font-size: 20px;
+  background-color: rgb(46, 20, 196);
 }
 #tutorialBtn:hover {
-    font-size: 25px;
+  font-size: 25px;
 }
 
-input[type='file'] {
-    color: rgba(0, 0, 0, 0)
-  }
+input[type="file"] {
+  color: rgba(0, 0, 0, 0);
+}
 
-  #fileLoader {
-      /* display: none; */
-  }
+#fileLoader {
+  /* display: none; */
+}
 
-  #loadFileBtn {
-    color: aliceblue;
-    background-color: rgba(132, 0, 255,0.9);
-    font-size:20px;
-    height: 70px;
-    width: 70px;
-    cursor: pointer;
-  }
+#loadFileBtn {
+  color: aliceblue;
+  background-color: rgba(132, 0, 255, 0.9);
+  font-size: 20px;
+  height: 70px;
+  width: 70px;
+  cursor: pointer;
+}
 
 img.tutoImg {
-    border: 1px solid rgb(0,0,0);
-    width: 20%;
-    height: 20%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  border: 1px solid rgb(0, 0, 0);
+  width: 20%;
+  height: 20%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 img.s30 {
-    width: 30%;
-    height: 30%;
+  width: 30%;
+  height: 30%;
 }
 img.s40 {
-    width: 40%;
-    height: 40%;
+  width: 40%;
+  height: 40%;
 }
 img.s50 {
-    width: 50%;
-    height: 50%;
+  width: 50%;
+  height: 50%;
 }
 
 img.s60 {
-    width: 60%;
-    height: 60%;
+  width: 60%;
+  height: 60%;
 }
 
 h2 {
-    margin-top: 50px;
-    color: rgb(71, 55, 214);
+  margin-top: 50px;
+  color: rgb(71, 55, 214);
 }
