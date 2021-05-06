@@ -37,7 +37,7 @@ class CanvasHistory {
     }
 
     undo() {
-        console.log('UNDO');
+        // console.log('UNDO');
 
         let action = this.undoStack.pop();
         console.log(action);

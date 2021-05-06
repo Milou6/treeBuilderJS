@@ -52,9 +52,11 @@ function resolveIntersectionX(node, objectGroup, histAction) {
     let objectGroupTR = objectGroup.groupCoords.tr.x;
     let intersection = '';
 
-    if (nodeTL < objectGroupTL && objectGroupTL < nodeTR) intersection = 'right';
+    // if (nodeTL < objectGroupTL && objectGroupTL < nodeTR) intersection = 'right';
+    // maybe we don't really need the second check after &&
+    if (nodeTL < objectGroupTL /*&& objectGroupTL < nodeTR*/) intersection = 'right';
     else intersection = 'left';
-    // console.log(intersection);
+    console.log(intersection);
 
     // Horizontal movement depends on which kind of intersection it is
     let movementX = 0;
@@ -62,6 +64,7 @@ function resolveIntersectionX(node, objectGroup, histAction) {
     if (intersection == 'right') {
         movementX = nodeTR - objectGroupTL + 40;
         try {
+            console.log(`find ancestor with : ${objectGroup.object}`);
             ancestorFind = findFirstCommonAncestor(node, objectGroup.object);
         }
         catch {
@@ -86,7 +89,12 @@ function resolveIntersectionX(node, objectGroup, histAction) {
         let ancestor = ancestorFind[0];
         let ancestorHover = ancestorFind[1];
         let ancestorHoverIndex = ancestor.hoverCircles.indexOf(ancestorHover);
-        // console.log(ancestorHoverIndex);
+        console.log(ancestorFind);
+        console.log(ancestorHoverIndex);
+
+        if (ancestorHoverIndex == -1) {
+            console.error("resolveIntersectionX : Couldn't find anecstorHoverIndex!");
+        }
 
         // console.log(ancestor.armsArray);
 
@@ -129,7 +137,7 @@ function resolveIntersectionX(node, objectGroup, histAction) {
 // node1, node2,
 // hoverToFind : which hover to return? parentHover going down to node1 or to node2?
 
-// should return ancestor + hoverCircle of ancestor that leads to arg2
+// should return ancestor + hoverCircle of ancestor that leads to arg2!!
 
 
 /**
@@ -150,7 +158,7 @@ function findFirstCommonAncestor(node1, node2) {
 
     let loopCounter = 0;
     while (ancestorFound == false) {
-        // Fail-safe to keep method from running infinitely
+        // Failsafe to keep method from running infinitely
         if (loopCounter > 100) {
             console.error(`${loopCounter} iterations : no ancestor found.`);
             return null;
@@ -158,8 +166,9 @@ function findFirstCommonAncestor(node1, node2) {
         loopCounter += 1;
 
         // save hover info to pass on to super-method
-        hover1 = node1.hoverParent;
-        hover2 = node2.hoverParent;
+        if (node1.hoverParent != null) {hover1 = node1.hoverParent;}
+        if (node2.hoverParent != null) {hover2 = node2.hoverParent;}
+        // hover2 = node2.hoverParent;
 
         if (node1.nodeParent != null) {
             node1 = node1.nodeParent;
@@ -178,8 +187,8 @@ function findFirstCommonAncestor(node1, node2) {
         filteredArray = node1Ancestors.filter(value => node2Ancestors.includes(value));
         if (filteredArray.length > 0) {
             ancestorFound = true;
-            // console.log('ancestor found');
-            // console.log(filteredArray);
+            console.log('ancestor found');
+            console.log(filteredArray);
         }
     }
 
@@ -187,6 +196,9 @@ function findFirstCommonAncestor(node1, node2) {
     if (node2 == filteredArray[0]) {
         passedHover = hover2;
     }
+    // else if (node1 == filteredArray[0]) {
+    //     passedHover = hover1;
+    // }
     else {
         // keep going up with node until we hit the ancestor, then save the hover that lead to it
         while (node2 != filteredArray[0]) {
@@ -194,6 +206,8 @@ function findFirstCommonAncestor(node1, node2) {
             node2 = node2.nodeParent;
         }
     }
+    console.log(`passedHover:`);
+    console.log(passedHover);
     // return ancestor + correct hover that leads to node2
     return [filteredArray[0], passedHover];
 }
