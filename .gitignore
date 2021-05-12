@@ -5,3 +5,6 @@ out/
 ignore/
 node_modules
 testing.json
+.vscode
+desktop.ini
+folderico-Hp4348.ico
