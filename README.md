@@ -4,8 +4,9 @@ TreeBuilder is a web interface to quickly and easily draw syntactic trees. The t
 
 TreeBuilder was created for professional linguists & linguistic students alike. Its purpose is to make tree-drawing easy and intuitive.
 
-![web interface](./assets/interface.png)
-![tree example](./assets/tutoGif3.gif)
+<img src="./assets/interface.png" alt="usage example" width="800"/>
+
+<img src="./assets/tutoGif3.gif" alt="usage example" width="400"/>
 
 Please understand that this software is **a work in progress**, and as such bugs are still to be expected. A dedicated button for bug reports can be found on the interface, and your help in identifying them is really appreciated!
 
